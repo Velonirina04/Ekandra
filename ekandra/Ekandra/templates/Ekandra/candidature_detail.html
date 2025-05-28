@@ -1,0 +1,115 @@
+{% extends 'Ekandra/base.html' %}
+{% load static %}
+
+{% block title %}Détails Candidature{% endblock %}
+
+{% block content %}
+     <link rel="stylesheet" href="{% static 'Ekandra/css/voir_candidature.css' %}"> 
+
+<div class="container mt-4 mb-5"> 
+    <h1 class="text-center mb-4 text-primary"><i class="bi bi-file-earmark-text me-2"></i> Détails de la candidature</h1> 
+
+   
+    <div class="card mx-auto shadow-sm rounded" style="max-width: 700px;"> 
+        <div class="card-body p-4"> 
+            <h4 class="text-secondary mb-3"><i class="bi bi-info-circle me-2"></i> Informations générales</h4>
+
+            <p class="card-text mb-2">
+                <strong>Offre :</strong>
+                <a href="{% url 'offres'%}" class="text-decoration-none text-primary fw-bold">
+                    <i class="bi bi-briefcase me-1"></i> {{ candidature.offre.titre }}
+                </a>
+            </p>
+
+            <p class="card-text mb-2">
+                <strong>Entreprise :</strong>
+            
+                <a href="{% url 'profile' %}" class="text-decoration-none text-secondary">
+                    <i class="bi bi-building me-1"></i> {{ candidature.offre.entreprise.nom }}
+                </a>
+            </p>
+
+            <p class="card-text mb-2">
+                <strong>Demandeur :</strong>
+                
+                 <a href="{% url 'profile' %}" class="text-decoration-none text-muted">
+                     <i class="bi bi-person-circle me-1"></i> {{ candidature.demandeur.nom|default:"N/A" }}
+                 </a>
+            </p>
+
+            <p class="card-text mb-3">
+                <strong>Date de candidature :</strong> {{ candidature.date_candidature|date:"d/m/Y" }}
+            </p>
+
+            <hr class="my-3"> 
+
+            
+             <h4 class="text-primary mb-3"><i class="bi bi-check-circle-fill me-2"></i> Statut de la candidature</h4>
+
+            <p class="card-text mb-3">
+                <strong>Statut :</strong>
+                
+                 {% if candidature.statut == 'acceptee' %}
+                     <span class="badge bg-success fs-6"><i class="bi bi-check-circle me-1"></i> {{ candidature.get_statut_display }}</span> 
+                 {% elif candidature.statut == 'refusee' %}
+                      <span class="badge bg-danger fs-6"><i class="bi bi-x-circle me-1"></i> {{ candidature.get_statut_display }}</span> 
+                 {% elif candidature.statut == 'en_attente' %}
+                      <span class="badge bg-warning text-dark fs-6"><i class="bi bi-clock me-1"></i> {{ candidature.get_statut_display }}</span> 
+                 {% else %} 
+                       <span class="badge bg-secondary fs-6"><i class="bi bi-info-circle me-1"></i> {{ candidature.get_statut_display }}</span> 
+                 {% endif %}
+            </p>
+
+            <hr class="my-3"> 
+
+            
+            <h4 class="text-secondary mb-3"><i class="bi bi-file-text me-2"></i> Lettre de motivation</h4>
+
+            
+                
+            {% if  candidature.lettre_motivation %}
+            <form method="post">
+                {% csrf_token %}
+                <div class=" mb-3"> 
+                     {{ candidature.lettre_motivation}}
+                    <button type="submit"  class="btn btn-primary" title="Télécharger le LM de {{ candidature.demandeur.nom|default:'ce demandeur' }}"><i class="bi bi-download me-1"></i> Télécharger le LM</button> {# Changed button to primary #}
+                </div>
+                </form>
+            {% else %}
+                <p class="card-text mb-3 text-muted">Aucune lettre de motivation fournie.</p>
+            {% endif %}
+
+            <hr class="my-3"> 
+
+            
+            <h4 class="text-secondary mb-3"><i class="bi bi-file-earmark-arrow-down me-2"></i> Curriculum Vitae</h4>
+
+            {% if  candidature.cv %}
+                <p class="card-text mb-0">
+                    {# mbola ts mandea#}
+                    <a href="#" class="btn btn-primary" title="Télécharger le CV de {{ candidature.demandeur.nom|default:'ce demandeur' }}"><i class="bi bi-download me-1"></i> Télécharger le CV</a> {# Changed button to primary #}
+                </p>
+            {% else %}
+                 <p class="card-text mb-0 text-muted">Aucun CV disponible pour cette candidature.</p>
+            {% endif %}
+
+
+        </div> 
+    </div> 
+
+    
+    <div class="text-center mt-4"> 
+         
+         <a href="{% url 'profile' %}" class="btn btn-secondary"><i class="bi bi-arrow-left me-2"></i> Retour au profil demandeur</a> {# Link back to demandeur profile #}
+    </div>
+
+
+</div> 
+{% endblock %}
+
+{% block extra_css %}
+    
+     <link rel="stylesheet" href="{% static 'Ekandra/css/style.css' %}"> 
+     <link rel="stylesheet" href="{% static 'Ekandra/css/voir_candidature.css' %}"> 
+    
+{% endblock %}

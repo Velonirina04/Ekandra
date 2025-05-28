@@ -1,0 +1,194 @@
+{% extends 'Ekandra/base.html' %}
+{% load static %}
+{% load bootstrap5 %}
+
+
+{% block title %}Profil Entreprise{% endblock %}
+
+{% block content %}
+<div class="container mt-4"> 
+    <div class="bg-light p-3 rounded shadow-sm mb-4">
+        <h1 class="mb-0 text-primary">Profil de {{ entreprise.nom|default:"[Nom de l'entreprise]" }} le {{to_date}}</h1> {# Added text-primary color #}
+    </div>
+
+
+    {% if profile_incomplete %}
+        <div class="alert alert-warning" role="alert">
+            Votre profil est incomplet. Veuillez ajouter votre nom et une description pour une meilleure visibilité.
+        </div>
+    {% endif %}
+
+    
+    <div class="card mb-4 shadow-sm rounded">
+        <div class="card-body">
+            <div class="d-flex align-items-center mb-3">
+                <div class="flex-shrink-0 me-4"> 
+                    {% if entreprise.photo_profil %}
+                        <img src="{{ entreprise.photo_profil.url }}" alt="Photo de profil de {{ entreprise.nom }}" class="profile-photo rounded-circle border border-secondary p-1" style="width: 100px; height: 100px; object-fit: cover;">
+                    {% else %}
+                        <i class="bi bi-building text-muted" style="font-size: 4rem;"></i>
+                    {% endif %}
+                </div>
+                <div class="flex-grow-1"> 
+                    <p class="lead mb-1"><strong>Nom :</strong> {{ entreprise.nom|default:"Non spécifié" }}</p>
+                    <p class="mb-1"><strong>Email :</strong> {{ entreprise.user.email }}</p>
+                    <p class="mb-0"><strong>Secteur :</strong> {{ entreprise.secteur|default:"Non spécifié" }}</p>
+                </div>
+            </div>
+
+            <hr>
+
+             <div class="mb-2">
+                 <p class="mb-1"><strong>Note moyenne :</strong></p>
+                 <div class="d-flex align-items-center">
+                    <span class="star-rating me-2">
+                        {% for i in "12345" %}
+                            {% if i <= moyenne|floatformat:0 %}
+                                <i class="bi bi-star-fill"></i>
+                            {% else %}
+                                <i class="bi bi-star"></i>
+                            {% endif %}
+                        {% endfor %}
+                    </span>
+                    <strong class="text-secondary">{{ moyenne|floatformat:1 }}/5</strong> {# Make the score bold and secondary color #}
+                 </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <ul class="nav nav-tabs" id="profileTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile-info" type="button" role="tab" aria-controls="profile-info" aria-selected="true"><i class="bi bi-person-badge me-1"></i> Profil & Description</button> 
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="offers-tab" data-bs-toggle="tab" data-bs-target="#offers" type="button" role="tab" aria-controls="offers" aria-selected="false"><i class="bi bi-briefcase me-1"></i> Offres ({{ offres.count }})</button> 
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="evaluations-tab" data-bs-toggle="tab" data-bs-target="#evaluations" type="button" role="tab" aria-controls="evaluations" aria-selected="false"><i class="bi bi-star-half me-1"></i> Évaluations ({{ notations.count }})</button> 
+        </li>
+    </ul>
+
+    <div class="tab-content pt-4" id="profileTabsContent">
+
+        <div class="tab-pane fade show active" id="profile-info" role="tabpanel" aria-labelledby="profile-tab">
+            <h2 class="mb-3 text-secondary">Informations détaillées</h2>
+            <p>{{ entreprise.description|default:"Non spécifié" }}</p>
+
+            <hr class="mt-4 mb-4">
+
+            <button class="btn btn-primary mb-3" type="button" data-bs-toggle="collapse" data-bs-target="#collapseProfileForm" aria-expanded="{% if profile_incomplete %}true{% else %}false{% endif %}" aria-controls="collapseProfileForm">
+                 <i class="bi bi-pencil-square me-1"></i> Modifier le profil
+            </button>
+
+            
+            <div class="collapse {% if profile_incomplete %}show{% endif %}" id="collapseProfileForm">
+                <h3 class="mb-3 text-center ext-secondary">Formulaire de mise à jour</h3>
+                <div class="card shadow-sm rounded" style="max-width: 600px;">
+                    <div class="card-body">
+                        <form method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            {% bootstrap_form form %} 
+                            <button type="submit" class="btn btn-success mt-3 w-100"><i class="bi bi-check-circle me-1"></i> Enregistrer les modifications</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+        <div class="tab-pane fade" id="offers" role="tabpanel" aria-labelledby="offers-tab">
+             <div class="d-flex justify-content-between align-items-center mb-3">
+                 <h2 class="text-secondary">Mes offres</h2> 
+                 <a href="{% url 'offre_create' %}" class="btn btn-success"><i class="bi bi-plus-circle me-1"></i> Publier une nouvelle offre</a>
+             </div>
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr class="table-primary"> 
+                            <th>Titre</th>
+                            <th>Salaire</th>
+                            <th>Date</th>
+                            <th>Limite</th>
+                            <th>Statut</th>
+                            <th>Candidatures</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for offre in offres %}
+                            <tr>
+                                <td><a href="{% url 'offres' %}" class="text-decoration-none text-primary fw-bold">{{ offre.titre }}</a></td>
+                                <td>{% if offre.salaire %}{{ offre.salaire }} Ar{% else %}Non précisé{% endif %}</td>
+                                <td>{{ offre.date_publication|date:"d/m/Y" }}</td>
+                                <td>{{ offre.date_fin|date:"d/m/Y" }}</td>
+                                <td>
+                                    {% if offre.active  %}
+                                        <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>Active</span> 
+                                    {% else %}
+                                        <span class="badge bg-danger"><i class="bi bi-x-circle me-1"></i>Inactive</span> 
+                                    {% endif %}
+                                </td>
+                                <td>{{ offre.candidature_set.count }}</td>
+                                <td>
+                                     {% comment %} <a href="{% url 'offre_update' offre.pk %}" class="btn btn-sm btn-outline-primary me-1" title="Modifier l'offre"><i class="bi bi-pencil"></i> Modifier</a> {# Added text #} {% endcomment %}
+                                     {% if offre.active %}
+                            
+                                         <a href="{% url 'supprimer_offre' offre.id %}" class="btn btn-sm btn-outline-danger" title="Désactiver l'offre"><i class="bi bi-trash"></i> supprimer</a> 
+                                         {# Added text #}
+                                         <a href="{% url 'voir_candidatures' offre.id %}" class="btn btn-sm btn-outline-primary" title="Voir l'offre"><i class="bi bi-eye"></i> voir</a> 
+                                     {% else %}
+                                          <a href="#" class="btn btn-sm btn-outline-success" title="Activer l'offre"><i class="bi bi-check-circle"></i> Activer</a> 
+                                     {% endif %}
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="6" class="text-center text-muted py-4">Aucune offre publiée pour l'instant.</td> 
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        
+        <div class="tab-pane fade" id="evaluations" role="tabpanel" aria-labelledby="evaluations-tab">
+            <h2 class="mb-3 text-secondary">Évaluations des demandeurs</h2> 
+            {% for notation in notations %}
+               
+                <div class="card mb-3 shadow-sm rounded">
+                    <div class="card-body">
+                        <h5 class="card-title mb-1"><i class="bi bi-person-circle me-1 text-muted"></i> {{ notation.demandeur.nom|default:"Demandeur anonyme" }}</h5> 
+                         <div class="mb-2">
+                            <span class="star-rating">
+                                {% for i in "12345" %}
+                                    {% if i|add:0 <= notation.note %}
+                                        <i class="bi bi-star-fill"></i>
+                                    {% else %}
+                                        <i class="bi bi-star"></i>
+                                    {% endif %}
+                                {% endfor %}
+                            </span>
+                         </div>
+                        <p class="card-text">{{ notation.commentaire|default:"Aucun commentaire" }}</p>
+                        <small class="text-muted d-block text-end"><i class="bi bi-calendar me-1"></i> Posté le {{ notation.date_creation|date:"d/m/Y" }}</small> 
+                    </div>
+                </div>
+            {% empty %}
+                <p class="text-center text-muted py-4">Aucune évaluation pour l'instant.</p> 
+            {% endfor %}
+        </div>
+
+    </div> 
+
+</div> 
+{% endblock %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'Ekandra/css/style.css' %}">
+{% endblock %}
+
+{% block extra_js %}
+    <script src="{% static 'Ekandra/js/custom.js' %}"></script>
+{% endblock %}

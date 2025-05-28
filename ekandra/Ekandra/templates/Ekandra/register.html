@@ -1,0 +1,56 @@
+{% extends 'Ekandra/base.html' %}
+{% load bootstrap5 %} 
+{% load static %} 
+
+{% block title %}Inscription{% endblock %}
+
+{% block content %}
+<div class="container mt-5 mb-5"> 
+
+
+    <div class="card mx-auto shadow-lg rounded" style="max-width: 600px;">
+        <div class="card-body p-4">
+
+            <h1 class="text-center mb-4 text-primary"><i class="bi bi-person-plus me-2"></i> Créer un compte</h1>
+
+            <form method="post">
+                {% csrf_token %}
+
+                <div class="mb-3"> 
+                    <label for="user_type" class="form-label">Type d'utilisateur</label>
+                    <select name="user_type" id="user_type" class="form-select">
+                        <option value="demandeur" {% if user_type == 'demandeur' %}selected{% endif %}>Demandeur</option>
+                        <option value="entreprise" {% if user_type == 'entreprise' %}selected{% endif %}>Entreprise</option>
+                    </select>
+                    <small class="form-text text-muted">Choisissez le type de compte que vous souhaitez créer.</small>
+                </div>
+                {% bootstrap_form form %}
+
+                <button type="submit" class="btn btn-primary w-100 mt-3"><i class="bi bi-box-arrow-in-right me-2"></i> S'inscrire</button> 
+
+                <p class="mt-3 text-center text-muted">Déjà un compte ? <a href="{% url 'login' %}" class="text-decoration-none text-primary fw-bold">Connectez-vous</a></p>
+            </form>
+        </div> 
+    </div> 
+
+</div> 
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const userTypeSelect = document.getElementById('user_type');
+    if (userTypeSelect) {
+        userTypeSelect.addEventListener('change', function() {
+            const baseUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+            window.location.href = baseUrl + "?user_type=" + this.value;
+        });
+    }
+});
+</script>
+
+{% endblock %}
+
+{# Optional: Add any custom CSS or JS blocks if you have specific styles/scripts not handled above #}
+{% block extra_css %}
+    {# Link your custom style.css if it contains relevant styles (like .auth-container if you kept it and its styles) #}
+    <link rel="stylesheet" href="{% static 'Ekandra/css/style.css' %}"> 
+{% endblock %}

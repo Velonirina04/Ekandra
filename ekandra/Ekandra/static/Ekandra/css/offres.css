@@ -1,0 +1,233 @@
+/* Variables CSS pour une gestion facile des couleurs */
+:root {
+    --primary-color: #0d6efd; /* Bleu Bootstrap par défaut */
+    --secondary-color: #6c757d; /* Gris Bootstrap par défaut */
+    --accent-color: #28a745; /* Vert pour certains accents ou succès */
+    --light-bg: #f8f9fa; /* Arrière-plan plus doux */
+    --text-color: #343a40; /* Couleur de texte sombre */
+    --navbar-bg: #ffffff; /* Fond de la barre de navigation */
+    --shadow-light: 0 4px 12px rgba(0, 0, 0, 0.08); /* Ombre plus prononcée mais douce */
+    --card-hover-shadow: 0 12px 24px rgba(0, 0, 0, 0.15); /* Ombre plus forte au survol */
+}
+
+/* Styles globaux du corps */
+body {
+    font-family: 'Open Sans', sans-serif;
+    color: var(--text-color);
+    background-color: var(--light-bg);
+    line-height: 1.7;
+}
+
+/* Styles pour les titres */
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+}
+
+/* Barre de navigation */
+.navbar {
+    background-color: var(--navbar-bg) !important;
+    box-shadow: var(--shadow-light);
+    padding: 1.25rem 1.75rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.navbar-brand {
+    font-weight: 700;
+    font-size: 1.6rem;
+    color: var(--primary-color) !important;
+    letter-spacing: -0.5px;
+}
+
+.nav-link {
+    font-weight: 600;
+    color: var(--secondary-color) !important;
+    transition: color 0.3s ease-in-out, transform 0.2s ease-in-out;
+    padding: 0.75rem 1.2rem;
+    display: flex;
+    align-items: center;
+}
+
+.nav-link i {
+    margin-right: 8px;
+    font-size: 1.1em;
+}
+
+.nav-link:hover {
+    color: var(--primary-color) !important;
+    transform: translateY(-2px);
+}
+
+.nav-item .badge {
+    margin-left: 0.3rem;
+    vertical-align: middle;
+    font-size: 0.75em;
+    padding: 0.4em 0.6em;
+    border-radius: 1rem;
+}
+
+/* Conteneur principal */
+.container {
+    max-width: 1300px;
+    padding: 2.5rem 1.5rem;
+}
+
+/* Messages d'alerte */
+.alert {
+    border-radius: 0.6rem;
+    padding: 1.3rem 1.6rem;
+    font-size: 1rem;
+    border: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.alert-success { background-color: #d4edda; color: #155724; }
+.alert-danger { background-color: #f8d7da; color: #721c24; }
+.alert-info { background-color: #d1ecf1; color: #0c5460; }
+
+
+/* Styles spécifiques pour les offres d'emploi */
+
+.header-section {
+    padding: 3rem 0;
+    background-color: var(--navbar-bg);
+    border-radius: 0.75rem;
+    box-shadow: var(--shadow-light);
+    margin-bottom: 3rem; /* Légèrement plus d'espace */
+}
+
+.header-section h1 {
+    font-size: 2.8rem;
+    margin-bottom: 0.75rem; /* Plus d'espace sous le titre principal */
+    color: var(--primary-color); /* Assurer la couleur du titre */
+}
+
+.header-section .lead {
+    font-size: 1.25rem;
+    color: var(--secondary-color);
+}
+
+.offer-card {
+    border: 1px solid #e0e0e0;
+    border-radius: 0.75rem;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    overflow: hidden;
+    background-color: #ffffff; /* Fond blanc pour les cartes */
+}
+
+.offer-card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--card-hover-shadow);
+}
+
+.offer-card .card-body {
+    padding: 1.75rem; /* Plus de padding pour un look aéré */
+}
+
+.offer-card .card-title {
+    font-size: 1.6rem; /* Taille du titre de l'offre légèrement plus grande */
+    font-weight: 700;
+    line-height: 1.3;
+    min-height: 4.8rem; /* Assure une hauteur minimale cohérente pour les titres */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary-color);
+    text-shadow: 0 1px 1px rgba(0,0,0,0.05); /* Petite ombre pour le titre */
+}
+
+.offer-card .card-text {
+    font-size: 0.95rem;
+    color: var(--text-color);
+    margin-bottom: 1.75rem; /* Plus d'espace sous la description */
+    line-height: 1.6;
+    flex-grow: 1;
+}
+
+.info-group {
+    border-bottom: 1px dashed #e9ecef; /* Ligne pointillée subtile */
+    padding-bottom: 0.75rem;
+    margin-bottom: 0.75rem !important; /* Ajuster la marge */
+}
+
+.info-group:last-of-type {
+    border-bottom: none; /* Pas de ligne sous le dernier groupe d'infos */
+}
+
+.info-item {
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    color: #555;
+    font-weight: 500; /* Légèrement plus gras */
+}
+
+.info-item i {
+    margin-right: 0.6rem; /* Plus d'espace pour les icônes */
+    color: var(--primary-color);
+    font-size: 1.1em;
+    opacity: 0.8; /* Légèrement moins opaque */
+}
+
+.offer-card .btn.postuler-btn { /* Classe spécifique pour le bouton */
+    margin-top: 1.5rem; /* Plus d'espace au-dessus du bouton */
+    border-radius: 0.6rem; /* Bords légèrement plus arrondis */
+    font-weight: 700; /* Texte du bouton plus gras */
+    padding: 0.8rem 1.8rem; /* Plus de padding pour un bouton plus grand */
+    transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Ombre sur le bouton */
+}
+
+.offer-card .btn.postuler-btn:hover {
+    background-color: #0a58ca; /* Une teinte plus foncée de bleu au survol */
+    border-color: #0a58ca;
+    transform: translateY(-2px); /* Léger effet de soulèvement plus prononcé */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); /* Ombre plus forte au survol du bouton */
+}
+
+/* Styles pour les boutons secondaires (ex: se connecter pour postuler) */
+.btn-secondary.postuler-btn {
+    background-color: #6c757d;
+    border-color: #6c757d;
+}
+.btn-secondary.postuler-btn:hover {
+    background-color: #5a6268;
+    border-color: #545b62;
+}
+
+
+/* Responsivité */
+@media (max-width: 992px) {
+    .header-section h1 {
+        font-size: 2.2rem;
+    }
+    .header-section .lead {
+        font-size: 1.1rem;
+    }
+    .offer-card .card-title {
+        font-size: 1.4rem;
+        min-height: auto;
+    }
+    .info-item {
+        font-size: 0.85rem;
+    }
+    .offer-card .btn-lg {
+        width: 100% !important;
+    }
+}
+
+@media (max-width: 576px) {
+    .info-group {
+        flex-direction: column; /* Empiler les éléments d'information sur petits écrans */
+        align-items: flex-start;
+    }
+    .info-item {
+        margin-bottom: 0.5rem;
+    }
+    .info-item:last-child {
+        margin-bottom: 0;
+    }
+}

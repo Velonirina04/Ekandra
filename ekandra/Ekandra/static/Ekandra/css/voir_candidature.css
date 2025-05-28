@@ -1,0 +1,170 @@
+/* Styles spécifiques pour la gestion des candidatures */
+
+.candidatures-list {
+    margin-top: 2rem;
+}
+
+.candidature-item {
+    border: 1px solid var(--border-color);
+    border-radius: 0.75rem;
+    box-shadow: var(--shadow-light);
+    background-color: var(--card-bg);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+body.dark-mode .candidature-item {
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+.candidature-item:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--card-hover-shadow);
+}
+
+.candidature-item .card-body {
+    padding: 1.75rem;
+}
+
+.candidature-item .card-title {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+.offer-title-highlight {
+    color: var(--text-color); /* Assure que le titre de l'offre reste lisible */
+    font-weight: 700;
+}
+body.dark-mode .offer-title-highlight {
+    color: var(--text-color);
+}
+
+.candidature-item .card-subtitle {
+    font-size: 0.95rem;
+    color: var(--secondary-color);
+}
+body.dark-mode .candidature-item .card-subtitle {
+    color: var(--secondary-color);
+}
+
+.candidature-status {
+    padding: 0.4rem 1.2rem;
+    border-radius: 20px; /* Pilule */
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-transform: capitalize; /* Met la première lettre en majuscule */
+    min-width: 100px; /* Largeur minimale pour l'uniformité */
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Couleurs spécifiques pour les statuts */
+.status-pending {
+    background-color: #ffc107; /* Jaune/orange */
+    color: #343a40; /* Texte foncé pour contraste */
+}
+body.dark-mode .status-pending {
+    background-color: #b38b00;
+    color: #fff;
+}
+
+.status-accepted {
+    background-color: #28a745; /* Vert */
+    color: #ffffff;
+}
+body.dark-mode .status-accepted {
+    background-color: #1a6f30;
+    color: #fff;
+}
+
+.status-rejected {
+    background-color: #dc3545; /* Rouge */
+    color: #ffffff;
+}
+body.dark-mode .status-rejected {
+    background-color: #8c2a34;
+    color: #fff;
+}
+
+.status-default { /* Pour tout autre statut non défini */
+    background-color: var(--secondary-color);
+    color: #ffffff;
+}
+body.dark-mode .status-default {
+    background-color: #5a6268;
+    color: #fff;
+}
+
+
+.view-details-btn {
+    font-size: 0.9rem;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.view-details-btn:hover {
+    background-color: var(--primary-color);
+    color: var(--navbar-bg);
+}
+body.dark-mode .view-details-btn:hover {
+    background-color: var(--primary-color);
+    color: var(--light-bg);
+}
+
+
+.action-buttons .action-btn {
+    font-size: 0.9rem;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.action-buttons .action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+/* Retour au profil */
+.btn-outline-secondary {
+    color: var(--secondary-color);
+    border-color: var(--secondary-color);
+}
+body.dark-mode .btn-outline-secondary {
+    color: var(--secondary-color);
+    border-color: var(--secondary-color);
+}
+.btn-outline-secondary:hover {
+    background-color: var(--secondary-color);
+    color: var(--navbar-bg);
+}
+body.dark-mode .btn-outline-secondary:hover {
+    background-color: var(--secondary-color);
+    color: var(--light-bg);
+}
+
+/* Responsivité */
+@media (max-width: 768px) {
+    .candidature-item .card-body {
+        padding: 1.25rem;
+    }
+    .candidature-item .card-title {
+        font-size: 1.2rem;
+    }
+    .candidature-status {
+        padding: 0.3rem 0.8rem;
+        font-size: 0.8rem;
+        min-width: 80px;
+    }
+    .view-details-btn, .action-buttons .action-btn {
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+    .action-buttons .d-inline-block {
+        display: block !important; /* Force les boutons d'action à s'empiler */
+        margin-right: 0 !important;
+    }
+}

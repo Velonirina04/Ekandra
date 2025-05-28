@@ -1,0 +1,170 @@
+{% extends 'Ekandra/base.html' %}
+{% load bootstrap5 %} {# Load the django-bootstrap5 template tags #}
+{% load static %} {# Load the static template tags #}
+
+{% block title %}Profil Demandeur{% endblock %}
+
+{% block content %}
+    <link rel="stylesheet" href="{% static 'Ekandra/css/style001.css' %}">
+
+<div class="container mt-4"> {# Use a Bootstrap container for better centering and padding #}
+
+    
+    <div class="bg-light p-3 rounded shadow-sm mb-4">
+        <h1 class="mb-0 text-primary"><i class="bi bi-person-circle me-2"></i> Profil de {{ demandeur.nom }}</h1> {# Added icon and text-primary color #}
+    </div>
+
+    {% if profile_incomplete %}
+        <div class="alert alert-warning" role="alert">
+            Votre profil est incomplet. Veuillez ajouter votre nom et vos compétences pour une meilleure visibilité.
+        </div>
+    {% endif %}
+
+    
+    <div class="card mb-4 shadow-sm rounded">
+        <div class="card-body">
+            <div class="d-flex align-items-center mb-3">
+                <div class="flex-shrink-0 me-4"> {# Use flex-shrink-0 to prevent shrinking #}
+                    {% if demandeur.photo_profil %}
+                        <img src="{{ demandeur.photo_profil.url }}" alt="Photo de profil de {{ demandeur.nom }}" class="profile-photo rounded-circle border border-secondary p-1" style="width: 100px; height: 100px; object-fit: cover;"> {# Use profile-photo CSS class #}
+                    {% else %}
+                        <i class="bi bi-person-circle text-muted" style="font-size: 4rem;"></i> {# Job seeker icon #}
+                    {% endif %}
+                </div>
+                <div class="flex-grow-1"> {# Allow text to grow #}
+                    <p class="lead mb-1"><strong>Nom :</strong> {{ demandeur.nom|default:"Non spécifié" }}</p>
+                    <p class="mb-1"><strong>Email :</strong> {{ demandeur.user.email }}</p>
+                    <p class="mb-0"><strong>Compétences :</strong> {{ demandeur.competences|default:"Non spécifié" }}</p>
+                     <p class="mb-0"><strong>CV :</strong>
+                        {% if demandeur.cv %}
+                            {# Assuming a URL pattern like 'demandeur_cv_download' that takes demandeur.pk #}
+                            <a href="#" class="text-decoration-none"><i class="bi bi-download me-1"></i> Télécharger</a>
+                        {% else %}
+                            Aucun
+                        {% endif %}
+                     </p>
+                </div>
+            </div>
+        </div> {# End card-body #}
+    </div> {# End main info card #}
+
+
+    {# --- Dynamic Content with Tabs --- #}
+    {# Tabs navigation #}
+    <ul class="nav nav-tabs" id="demandeurProfileTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="demandeur-profile-tab" data-bs-toggle="tab" data-bs-target="#demandeur-profile-info" type="button" role="tab" aria-controls="demandeur-profile-info" aria-selected="true"><i class="bi bi-person-badge me-1"></i> Profil & Compétences</button> {# Added icon #}
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="candidatures-tab" data-bs-toggle="tab" data-bs-target="#candidatures" type="button" role="tab" aria-controls="candidatures" aria-selected="false"><i class="bi bi-briefcase me-1"></i> Mes candidatures ({{ candidatures.count }})</button> {# Added icon and count #}
+        </li>
+    </ul>
+
+    {# Tab Content Area - Added padding-top #}
+    <div class="tab-content pt-4" id="demandeurProfileTabsContent">
+
+        {# --- Tab 1: Profile Info & Update Form --- #}
+        <div class="tab-pane fade show active" id="demandeur-profile-info" role="tabpanel" aria-labelledby="demandeur-profile-tab">
+            {# Replaced old display with info from the card above, but could add more details here if needed #}
+            {# The info display is now primarily in the card above the tabs for quick overview #}
+
+            <h2 class="mb-3 text-secondary">Mettre à jour le profil</h2>
+
+            
+            <button class="btn btn-primary mb-3" type="button" data-bs-toggle="collapse" data-bs-target="#collapseDemandeurForm" aria-expanded="{% if profile_incomplete %}true{% else %}false{% endif %}" aria-controls="collapseDemandeurForm">
+                 
+                 <i class="bi bi-pencil-square me-1"></i> Modifier le profil
+            </button>
+
+            
+            <div class="collapse {% if profile_incomplete %}show{% endif %}" id="collapseDemandeurForm">
+                <h3 class="mb-3 text-secondary text-center">Formulaire de mise à jour</h3> 
+                
+                <div class="card shadow-sm rounded " style="max-width: 600px; position:center;">
+                    <div class="card-body">
+                        <form method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            {% bootstrap_form form %} 
+                            <button type="submit" class="btn btn-success mt-3 w-100"><i class="bi bi-check-circle me-1"></i> Enregistrer les modifications</button> {# Changed button color and text #}
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {# --- Tab 2: liste candidature --- #}
+        <div class="tab-pane fade" id="candidatures" role="tabpanel" aria-labelledby="candidatures-tab">
+             <div class="d-flex justify-content-between align-items-center mb-3">
+                 <h2 class="text-secondary">Mes candidatures</h2> 
+                 
+             </div>
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr class="table-primary"> 
+                            <th>Offre</th>
+                            <th>Entreprise</th>
+                            <th>Statut</th>
+                            <th>Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for candidature in candidatures %}
+                            <tr>
+                                <td><a href="{% url 'offres' %}" class="text-decoration-none text-primary fw-bold">{{ candidature.offre.titre }}</a></td>
+                                <td>
+                                     
+                                    <a href="{% url 'profile' %}" class="text-decoration-none">{{ candidature.offre.entreprise.nom }}</a>
+                                </td>
+                                <td>
+                                    
+                                    {% if candidature.statut == 'acceptee' %}
+                                        <span class="badge bg-success">{{ candidature.get_statut_display }}</span>
+                                    {% elif candidature.statut == 'refusee' %}
+                                         <span class="badge bg-danger">{{ candidature.get_statut_display }}</span>
+                                    {% elif candidature.statut == 'en_attente' %}
+                                         <span class="badge bg-warning text-dark">{{ candidature.get_statut_display }}</span>
+                                    {% else %}
+                                         <span class="badge bg-secondary">{{ candidature.get_statut_display }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ candidature.date_candidature|date:"d/m/Y" }}</td>
+                                <td>
+                                    
+                                    <div>
+                                    <a href="{% url 'candidature_detail' candidature.id %}" class="btn btn-sm btn-outline-info me-1" title="Voir les détails"><i class="bi bi-eye"></i> Détails</a> {# Styled button #}
+                                    
+                                    
+                                    <a href="{% url 'noter_entreprise' entreprise_id=candidature.offre.entreprise.pk %}" class="btn btn-sm btn-outline-primary" title="Noter l'entreprise"><i class="bi bi-star"></i> Noter</a> {# Styled button #}
+                                    <a href="#" class="btn btn-sm btn-outline-danger" title="Annule l'offre" class="btn btn-sm btn-outline-danger"><i class="bi bi-x-circle"></i> supprimer</a> 
+                                    </div>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center text-muted py-4">Aucune candidature enregistrée pour l'instant.</td> {# Added padding #}
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div> 
+
+</div> 
+
+{% endblock %}
+
+{% block extra_css %}
+    
+    <link rel="stylesheet" href="{% static 'Ekandra/css/style.css' %}">
+   
+{% endblock %}
+
+{% block extra_js %}
+    
+    <script src="{% static 'Ekandra/js/custom.js' %}"></script>
+    {% bootstrap_javascript %} 
+{% endblock %}

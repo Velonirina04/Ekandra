@@ -1,0 +1,330 @@
+/* Variables CSS pour une gestion facile des couleurs */
+:root {
+    /* Mode clair par défaut */
+    --primary-color: #0d6efd; /* Bleu Bootstrap par défaut */
+    --secondary-color: #6c757d; /* Gris Bootstrap par défaut */
+    --accent-color: #28a745; /* Vert pour certains accents ou succès */
+    --light-bg: #f8f9fa; /* Arrière-plan plus doux */
+    --text-color: #343a40; /* Couleur de texte sombre */
+    --navbar-bg: #ffffff; /* Fond de la barre de navigation */
+    --card-bg: #ffffff; /* Fond des cartes */
+    --border-color: #e0e0e0; /* Couleur des bordures */
+    --shadow-light: 0 4px 12px rgba(0, 0, 0, 0.08); /* Ombre plus prononcée mais douce */
+    --card-hover-shadow: 0 12px 24px rgba(0, 0, 0, 0.15); /* Ombre plus forte au survol */
+    --alert-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Styles pour le mode sombre */
+body.dark-mode { /* Augmenter la spécificité en ciblant le body */
+    --primary-color: #72b2ff; /* Bleu plus clair pour le mode sombre */
+    --secondary-color: #a0a0a0; /* Gris plus clair */
+    --accent-color: #4CAF50; /* Vert ajusté */
+    --light-bg: #1e1e1e; /* Fond très sombre */
+    --text-color: #f0f0f0; /* Texte clair */
+    --navbar-bg: #2d2d2d; /* Barre de navigation sombre */
+    --card-bg: #2d2d2d; /* Fond des cartes sombre */
+    --border-color: #444; /* Bordures sombres */
+    --shadow-light: 0 4px 12px rgba(0, 0, 0, 0.3); /* Ombre plus prononcée en sombre */
+    --card-hover-shadow: 0 12px 24px rgba(0, 0, 0, 0.4);
+    --alert-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Transitions pour un changement de mode fluide */
+/* Appliquer les transitions directement aux propriétés affectées par les variables */
+body, 
+.navbar, 
+.card, 
+.alert, 
+.btn,
+.nav-link,
+h1, h2, h3, h4, h5, h6,
+p, span, strong, a {
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+
+/* Styles globaux du corps */
+body {
+    font-family: 'Open Sans', sans-serif;
+    color: var(--text-color); /* Utilise la variable */
+    background-color: var(--light-bg); /* Utilise la variable */
+    line-height: 1.7;
+}
+
+/* Styles pour les titres */
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    color: var(--primary-color); /* Utilise la variable */
+    margin-bottom: 1rem;
+}
+
+/* Barre de navigation */
+.navbar {
+    background-color: var(--navbar-bg) !important; /* Utilise la variable, !important pour surcharger Bootstrap */
+    box-shadow: var(--shadow-light); /* Utilise la variable */
+    padding: 1.25rem 1.75rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+/* Spécificité accrue pour le mode sombre sur la navbar */
+body.dark-mode .navbar {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+
+.navbar-brand {
+    font-weight: 700;
+    font-size: 1.6rem;
+    color: var(--primary-color) !important; /* Utilise la variable */
+    letter-spacing: -0.5px;
+}
+body.dark-mode .navbar-brand { /* Spécificité accrue */
+    color: var(--primary-color) !important;
+}
+
+.nav-link {
+    font-weight: 600;
+    color: var(--secondary-color) !important; /* Utilise la variable */
+    padding: 0.75rem 1.2rem;
+    display: flex;
+    align-items: center;
+}
+
+.nav-link i {
+    margin-right: 8px;
+    font-size: 1.1em;
+}
+
+.nav-link:hover {
+    color: var(--primary-color) !important; /* Utilise la variable */
+    transform: translateY(-2px);
+}
+body.dark-mode .nav-link:hover { /* Spécificité accrue */
+    color: var(--primary-color) !important;
+}
+
+
+.nav-item .badge {
+    margin-left: 0.3rem;
+    vertical-align: middle;
+    font-size: 0.75em;
+    padding: 0.4em 0.6em;
+    border-radius: 1rem;
+}
+/* Les badges peuvent aussi être affectés par le mode sombre */
+body.dark-mode .badge {
+    background-color: var(--primary-color) !important; /* Exemple d'ajustement */
+    color: var(--card-bg) !important;
+}
+
+
+/* Conteneur principal */
+.container {
+    max-width: 1300px;
+    padding: 2.5rem 1.5rem;
+}
+
+/* Messages d'alerte */
+.alert {
+    border-radius: 0.6rem;
+    padding: 1.3rem 1.6rem;
+    font-size: 1rem;
+    border: none;
+    box-shadow: var(--alert-shadow); /* Utilise la variable */
+}
+
+/* Les couleurs de base des alertes sont définies par Bootstrap, nous les ajustons en dark-mode */
+body.dark-mode .alert-success { background-color: #214d2a; color: #a3e6b4; }
+body.dark-mode .alert-danger { background-color: #5c2c2f; color: #f2b7b7; }
+body.dark-mode .alert-info { background-color: #2a4e5c; color: #b7d6e6; }
+
+
+/* Styles spécifiques pour les offres d'emploi */
+
+.header-section {
+    padding: 3rem 0;
+    background-color: var(--navbar-bg); /* Utilise la variable */
+    border-radius: 0.75rem;
+    box-shadow: var(--shadow-light); /* Utilise la variable */
+    margin-bottom: 3rem;
+}
+body.dark-mode .header-section { /* Spécificité accrue */
+    background-color: var(--navbar-bg);
+    box-shadow: var(--shadow-light);
+}
+
+
+.header-section h1 {
+    font-size: 2.8rem;
+    margin-bottom: 0.75rem;
+    color: var(--primary-color); /* Utilise la variable */
+}
+
+.header-section .lead {
+    font-size: 1.25rem;
+    color: var(--secondary-color); /* Utilise la variable */
+}
+
+.offer-card {
+    border: 1px solid var(--border-color); /* Utilise la variable */
+    border-radius: 0.75rem;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08); /* Ombre de base */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    overflow: hidden;
+    background-color: var(--card-bg); /* Utilise la variable */
+}
+body.dark-mode .offer-card { /* Spécificité accrue */
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+.offer-card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--card-hover-shadow); /* Utilise la variable */
+}
+
+.offer-card .card-body {
+    padding: 1.75rem;
+}
+
+.offer-card .card-title {
+    font-size: 1.6rem;
+    font-weight: 700;
+    line-height: 1.3;
+    min-height: 4.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary-color); /* Utilise la variable */
+    text-shadow: 0 1px 1px rgba(0,0,0,0.05);
+}
+body.dark-mode .offer-card .card-title { /* Spécificité accrue */
+    color: var(--primary-color);
+    text-shadow: none;
+}
+
+.offer-card .card-text {
+    font-size: 0.95rem;
+    color: var(--text-color); /* Utilise la variable */
+    margin-bottom: 1.75rem;
+    line-height: 1.6;
+    flex-grow: 1;
+}
+
+.info-group {
+    border-bottom: 1px dashed var(--border-color); /* Utilise la variable */
+    padding-bottom: 0.75rem;
+    margin-bottom: 0.75rem !important;
+}
+
+.info-group:last-of-type {
+    border-bottom: none;
+}
+
+.info-item {
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    color: var(--secondary-color); /* Utilise la variable */
+    font-weight: 500;
+}
+body.dark-mode .info-item { /* Spécificité accrue */
+    color: var(--secondary-color);
+}
+body.dark-mode .offer-card .card-text {
+    color: aliceblue;
+}
+
+.info-item i {
+    margin-right: 0.6rem;
+    color: var(--primary-color); /* Utilise la variable */
+    font-size: 1.1em;
+    opacity: 0.8;
+}
+
+.offer-card .btn.postuler-btn {
+    margin-top: 1.5rem;
+    border-radius: 0.6rem;
+    font-weight: 700;
+    padding: 0.8rem 1.8rem;
+    transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background-color: var(--primary-color); /* Utilise la variable */
+    border-color: var(--primary-color); /* Utilise la variable */
+}
+body.dark-mode .offer-card .btn.postuler-btn { /* Spécificité accrue */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.offer-card .btn.postuler-btn:hover {
+    background-color: #0a58ca;
+    border-color: #0a58ca;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+body.dark-mode .offer-card .btn.postuler-btn:hover { /* Spécificité accrue */
+    background-color: #5c9eff; /* Bleu plus clair au survol en dark mode */
+    border-color: #5c9eff;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Styles pour les boutons secondaires (ex: se connecter pour postuler) */
+.btn-outline-secondary { /* Cible le bouton du mode sombre spécifiquement */
+    color: var(--secondary-color); /* Utilise la variable */
+    border-color: var(--secondary-color); /* Utilise la variable */
+}
+body.dark-mode .btn-outline-secondary { /* Spécificité accrue */
+    color: var(--secondary-color);
+    border-color: var(--secondary-color);
+}
+.btn-outline-secondary:hover {
+    background-color: var(--secondary-color); /* Utilise la variable */
+    color: var(--navbar-bg); /* Utilise la variable */
+}
+body.dark-mode .btn-outline-secondary:hover { /* Spécificité accrue */
+    background-color: var(--secondary-color);
+    color: var(--light-bg);
+}
+
+
+.btn-secondary.postuler-btn { /* Cible le bouton de connexion pour postuler */
+    background-color: var(--secondary-color); /* Utilise la variable */
+    border-color: var(--secondary-color); /* Utilise la variable */
+}
+.btn-secondary.postuler-btn:hover {
+    background-color: #5a6268;
+    border-color: #545b62;
+}
+
+
+/* Responsivité */
+@media (max-width: 992px) {
+    .header-section h1 {
+        font-size: 2.2rem;
+    }
+    .header-section .lead {
+        font-size: 1.1rem;
+    }
+    .offer-card .card-title {
+        font-size: 1.4rem;
+        min-height: auto;
+    }
+    .info-item {
+        font-size: 0.85rem;
+    }
+    .offer-card .btn-lg {
+        width: 100% !important;
+    }
+}
+
+@media (max-width: 576px) {
+    .info-group {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .info-item {
+        margin-bottom: 0.5rem;
+    }
+    .info-item:last-child {
+        margin-bottom: 0;
+    }
+}

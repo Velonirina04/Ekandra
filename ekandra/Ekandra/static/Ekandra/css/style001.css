@@ -1,0 +1,388 @@
+/* Variables pour mode clair et sombre */
+:root {
+    --bg-color: #fafafa;
+    --text-color: #212121;
+    --card-bg: #ffffff;
+    --primary-color: #113dce;
+    --primary-hover: #1928ad;
+    --danger-color: #ef4444;
+    --focus-outline: #05186e;
+}
+
+[data-theme="dark"] {
+    --bg-color: #1a1a1a;
+    --text-color: #e0e0e0;
+    --card-bg: #2a2a2a;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: 'Open Sans', sans-serif;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.navbar {
+    background-color: var(--card-bg);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-brand {
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+.nav-link {
+    color: var(--text-color);
+    transition: color 0.3s;
+}
+
+.nav-link:hover {
+    color: var(--primary-color);
+}
+
+.card {
+    background-color: var(--card-bg);
+    border: none;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    animation: slideIn 0.5s ease-out;
+    margin: 0 auto 4rem;
+}
+
+@keyframes slideIn {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.auth-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: calc(100vh - 56px);
+}
+
+.form-group {
+    margin-bottom: 4rem;
+}
+
+.form-label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.form-control {
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    padding: 0.75rem;
+    font-size: 1rem;
+    transition: border-color 0.3s;
+}
+
+.form-control:focus {
+    border-color: var(--focus-outline);
+    box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
+    outline: none;
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    transition: background-color 0.3s;
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-hover);
+    border-color: var(--primary-hover);
+}
+
+.btn-outline-primary {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+}
+
+.btn-outline-primary:hover {
+    background-color: var(--primary-color);
+    color: #fff;
+}
+
+.profile-photo {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 50%;
+    margin-bottom: 1rem;
+}
+
+.message-item {
+    display: block;
+    padding: 1rem;
+    border-bottom: 1px solid #ccc;
+    text-decoration: none;
+    color: var(--text-color);
+    transition: background-color 0.3s;
+}
+
+.message-item:hover {
+    background-color: rgba(76, 175, 80, 0.1);
+}
+
+.message-item.unread {
+    font-weight: bold;
+}
+
+.badge-unread {
+    background-color: var(--danger-color);
+    color: #fff;
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 12px;
+}
+
+.message.sent {
+    background-color: rgba(76, 175, 80, 0.1);
+    padding: 1rem;
+    border-radius: 8px;
+    margin: 0.5rem 0;
+}
+
+.message.received {
+    background-color: rgba(0, 0, 0, 0.05);
+    padding: 1rem;
+    border-radius: 8px;
+    margin: 0.5rem 0;
+}
+
+.star-rating {
+    color: #ffb300;
+}
+
+.alert {
+    margin-bottom: 1rem;
+}
+
+@media (max-width: 576px) {
+    .card {
+        width: 100%;
+    }
+    .form-control, .btn {
+        font-size: 0.85rem;
+    }
+    .form-group {
+        margin-bottom: 3rem;
+    }
+}
+/* style.css */
+
+/* Ekandra/static/Ekandra/css/style.css */
+
+/* ======================================================= */
+/* --- Styles Généraux Site-wide --- */
+/* (Ces styles s'appliquent partout où les classes/éléments correspondants sont utilisés) */
+/* ======================================================= */
+
+/* Style pour les photos de profil (utilisé sur les pages de profil) *//* Ekandra/static/Ekandra/css/style.css */
+
+/* ======================================================= */
+/* --- Styles Généraux Site-wide --- */
+/* (Ces styles s'appliquent partout où les classes/éléments correspondants sont utilisés) */
+/* ======================================================= */
+
+/* Style pour les photos de profil (utilisé sur les pages de profil) */
+.profile-photo {
+    width: 100px;
+    height: 100px;
+    object-fit: cover; /* Assure que l'image couvre la zone sans distorsion */
+    /* La bordure et le padding sont gérés par les classes Bootstrap dans le HTML (border, p-1) */
+    /* Les coins arrondis sont gérés par la classe Bootstrap dans le HTML (rounded-circle) */
+}
+
+/* Styles pour les icônes d'évaluation par étoiles (utilisé sur les pages de profil) */
+.star-rating i.bi-star-fill {
+    color: gold; /* Couleur dorée pour les étoiles remplies */
+}
+
+.star-rating i.bi-star {
+    color: #ccc; /* Gris clair pour les étoiles vides */
+}
+
+
+/* ======================================================= */
+/* --- Styles Spécifiques par Page --- */
+/* (Styles appliqués à des éléments ou composants spécifiques sur certaines pages) */
+/* ======================================================= */
+
+/* --- Page Détails Candidature --- */
+
+/* Style pour la boîte de texte de la lettre de motivation */
+/* Cible la div avec les classes de style Bootstrap utilisées pour la lettre */
+.card-body .border.rounded.p-3.bg-light {
+    white-space: pre-wrap; /* Préserve les espaces blancs et passe à la ligne pour les longues lignes */
+    word-wrap: break-word; /* Coupe les mots longs si nécessaire */
+}
+
+/* --- Page Liste de Messages --- */
+
+/* Style pour les éléments de conversation non lus dans la liste */
+.list-group-item.unread-conversation {
+    background-color: #e9ecef; /* Fond gris clair pour les éléments non lus */
+    /* La couleur du texte à l'intérieur s'adapte généralement automatiquement */
+}
+
+/* S'assure que le nom d'utilisateur est en gras dans un élément de liste non lu */
+.list-group-item.unread-conversation h6 {
+    font-weight: bold;
+}
+
+
+/* --- Page Conversation (Interface de Chat) --- */
+
+/* Le conteneur des messages de chat */
+#chat-box {
+    max-height: 500px; /* Hauteur maximale avant défilement */
+    overflow-y: auto; /* Active le défilement vertical */
+    padding: 15px; /* Padding à l'intérieur de la boîte de chat */
+    border-radius: 8px; /* Coins arrondis */
+
+    /* --- Astuce Flexbox pour empiler les messages par le bas (le plus récent en bas) --- */
+    display: flex;
+    flex-direction: column-reverse; /* Empile les éléments du bas vers le haut */
+    /* Assure que la barre de défilement est initialement en bas */
+
+    /* Couleurs par défaut (mode clair) */
+    background-color: #f8f9fa; /* Fond très léger */
+    border: 1px solid #dee2e6; /* Bordure légère */
+}
+
+/* Style pour la div de bulle de message individuelle */
+.message {
+    max-width: 75%; /* Limite la largeur de la bulle de message */
+    margin-bottom: 10px; /* Espace entre les messages */
+    padding: 10px 15px; /* Padding à l'intérieur de la bulle */
+    border-radius: 18px; /* Coins fortement arrondis */
+    word-wrap: break-word; /* Assure que les mots longs sont coupés */
+    white-space: pre-wrap; /* Préserve les nouvelles lignes et passe à la ligne pour les longues lignes */
+    /* Display: flex; flex-direction: column; appliqué au parent .d-flex dans le HTML pour l'alignement */
+}
+
+/* Style pour les métadonnées (expéditeur/date) à l'intérieur de la bulle */
+.message small {
+    display: block; /* Fait de la balise small un bloc pour un meilleur contrôle de l'espacement */
+    font-size: 0.8em; /* Taille de police plus petite */
+    margin-bottom: 4px; /* Espace entre les métadonnées et le contenu du message */
+}
+
+/* Style pour les messages envoyés (par l'utilisateur actuel) */
+.message.sent {
+    background-color: #0d6efd; /* Bleu primaire de Bootstrap */
+    color: white; /* Texte blanc */
+    border-bottom-right-radius: 4px; /* Coin plus plat en bas à droite */
+    /* align-self: flex-end; appliqué au parent .d-flex dans le HTML */
+}
+
+/* Style des métadonnées dans les messages envoyés */
+.message.sent small {
+    color: rgba(255, 255, 255, 0.8); /* Gris légèrement transparent */
+    text-align: right;
+}
+
+/* Style pour les messages reçus (de l'autre utilisateur) */
+.message.received {
+    /* Couleurs par défaut (mode clair) */
+    background-color: #ffffff; /* Blanc */
+    color: #212529; /* Texte sombre */
+    border: 1px solid #dee2e6; /* Bordure légère */
+    border-bottom-left-radius: 4px; /* Coin plus plat en bas à gauche */
+    /* align-self: flex-start; appliqué au parent .d-flex dans le HTML */
+}
+
+/* Style des métadonnées dans les messages reçus */
+.message.received small {
+    /* Couleur par défaut (mode clair) */
+    color: #6c757d; /* Gris muted */
+    text-align: left;
+}
+
+/* Ajuste la marge sous le paragraphe de contenu du message */
+.message p:last-child {
+    margin-bottom: 0;
+}
+
+
+/* --- Zone de saisie du formulaire de conversation (Bouton positionné à l'intérieur) --- */
+
+.message-input-wrapper {
+    position: relative; /* Conteneur pour le positionnement absolu du bouton */
+    margin-top: 15px; /* Espace au-dessus de la zone de saisie depuis la ligne HR */
+}
+
+/* Style de la zone de texte à l'intérieur du conteneur */
+.message-input-wrapper textarea.form-control {
+    padding-right: 45px; /* Ajoute de l'espace à droite pour le bouton */
+    padding-bottom: 10px; /* Ajoute de l'espace en bas si le texte se superpose */
+    resize: none; /* Empêche le redimensionnement vertical par l'utilisateur */
+    min-height: 40px; /* Hauteur minimale */
+    /* Bootstrap gère les styles par défaut de bordure, fond, focus */
+}
+
+/* Style du conteneur du bouton pour le positionnement absolu */
+.message-send-button-wrapper {
+    position: absolute;
+    bottom: 5px; /* Position depuis le bas du conteneur */
+    right: 5px; /* Position depuis la droite du conteneur */
+    z-index: 2; /* S'assure que le bouton est au-dessus du texte de la zone de texte */
+    display: flex; /* Utilise flexbox pour centrer l'icône */
+    align-items: center;
+    justify-content: center;
+    /* Optionnel : Faites du bouton un cercle/carré de taille fixe */
+    /* width: 38px; height: 38px; padding: 0; border-radius: 50%; */
+}
+
+/* Style du bouton réel à l'intérieur de son conteneur */
+.message-send-button-wrapper .btn {
+    padding: 6px 10px; /* Ajuster le padding pour un bouton avec seulement une icône */
+    line-height: 1;
+}
+
+
+/* ======================================================= */
+/* --- Overrides en Mode Sombre --- */
+/* (Appliqués UNIQUEMENT quand l'élément html a l'attribut data-bs-theme="dark") */
+/* Ces règles remplacent les styles correspondants du mode clair */
+/* ======================================================= */
+
+/* Ajustements pour la boîte de chat en mode sombre */
+[data-bs-theme="dark"] #chat-box {
+    background-color: #343a40; /* Fond gris foncé */
+    border-color: #495057; /* Bordure plus foncée */
+}
+
+/* Bulles de message reçues en mode sombre */
+[data-bs-theme="dark"] .message.received {
+    background-color: #495057; /* Gris foncé */
+    color: #f8f9fa; /* Texte très clair */
+    border-color: #6c757d; /* Bordure légèrement plus claire et foncée */
+}
+
+/* Métadonnées (nom/date) dans les bulles reçues en mode sombre */
+[data-bs-theme="dark"] .message.received small {
+    color: #ced4da; /* Texte gris clair muted */
+}
+
+/* Ajustements pour la boîte de lettre de motivation en mode sombre */
+/* (Le fond bg-light et la bordure border changent aussi via les variables Bootstrap) */
+[data-bs-theme="dark"] .card-body .border.rounded.p-3.bg-light {
+     /* Assurez-vous que la bordure est visible en mode sombre */
+     border-color: #495057 !important; /* Utiliser une couleur de bordure sombre !important si nécessaire pour outrepasser l'utilitaire */
+     /* La couleur de fond bg-light devrait s'adapter automatiquement en mode sombre */
+}
+
+/* Éléments de liste de conversation non lus en mode sombre */
+[data-bs-theme="dark"] .list-group-item.unread-conversation {
+    background-color: #495057; /* Fond gris foncé */
+    /* La couleur du texte à l'intérieur devrait devenir claire automatiquement via les variables Bootstrap */
+}
+
+/* --- Ajoutez ici des règles pour tout autre élément personnalisé ayant des couleurs fixes --- */
+/* Vérifiez vos templates HTML pour tout autre élément où vous avez utilisé des styles en ligne */
+/* ou des classes qui appliquent des couleurs fixes qui ne sont pas couvertes ici et ajoutez des règles */

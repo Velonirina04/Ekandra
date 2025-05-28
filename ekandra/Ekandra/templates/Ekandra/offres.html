@@ -1,0 +1,60 @@
+ {% extends 'Ekandra/base.html' %}
+ {% load static %}
+    {% load bootstrap5 %}
+    {% load i18n %}
+    
+    
+    {% block extra_head %}
+        {% bootstrap_css %}
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    {% endblock %}
+    
+{% block title %}Offres d’emploi{% endblock %}
+{% block content %}
+
+<div class="header-section text-center mb-5">
+    <h1 class="display-5 fw-bold text-primary mb-3">Découvrez nos opportunités d'emploi</h1>
+    <p class="lead text-muted">Trouvez le poste idéal parmi nos annonces mises à jour au {{ to_date|date:"d F Y" }}.</p>
+</div>
+
+<div class="row">
+    {% for offre in offres %}
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card h-100 offer-card">
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title text-center mb-3">{{ offre.titre }}</h5>
+                    <p class="card-text mb-4">{{ offre.description|truncatewords:50 }}</p> 
+                    
+                    <div class="d-flex justify-content-between align-items-center mb-2 info-group">
+                        <span class="info-item"><i class="bi bi-building"></i> <strong>Entreprise :</strong> {{ offre.entreprise.nom }}</span>
+                        <span class="info-item"><i class="bi bi-cash-stack"></i> <strong>Salaire :</strong> {% if offre.salaire %}{{ offre.salaire }} Ar{% else %}Non précisé{% endif %}</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-4 info-group">
+                        <span class="info-item"><i class="bi bi-calendar-event"></i> <strong>Publié :</strong> {{ offre.date_publication|date:"d M Y" }}</span>
+                        <span class="info-item text-danger"><i class="bi bi-calendar-x"></i> <strong>Limite :</strong> {{ offre.date_fin|date:"d M Y" }}</span>
+                    </div>
+
+                    <div class="mt-auto text-center"> 
+                        {% if user.is_authenticated %}
+                            <a href="{% url 'candidature_create' offre.id %}" class="btn btn-primary btn-lg w-75 postuler-btn">Postuler</a>
+                        {% else %}
+                            <a href="{% url 'login' %}" class="btn btn-secondary btn-lg w-75 postuler-btn">Se connecter pour postuler</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% empty %}
+        
+        <div class="col-12 text-center py-5">
+            <i class="bi bi-emoji-frown display-4 text-muted mb-3"></i>
+            <p class="lead">Aucune offre d'emploi n'est disponible pour le moment.</p>
+            <p class="text-muted">Revenez bientôt, de nouvelles opportunités sont ajoutées régulièrement !</p>
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'Ekandra/css/offres.css' %}">
+{% endblock %}

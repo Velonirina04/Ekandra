@@ -1,0 +1,104 @@
+/* Styles spécifiques pour les formulaires (ex: publication d'offre) */
+
+.form-card {
+    border: 1px solid var(--border-color);
+    border-radius: 0.75rem;
+    box-shadow: var(--shadow-light);
+    background-color: var(--card-bg);
+}
+
+body.dark-mode .form-card {
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+.form-card .card-body {
+    padding: 2.5rem; /* Augmenter le padding pour une meilleure aération */
+}
+
+.offer-form .form-label {
+    color: var(--text-color); /* Couleur du texte label */
+    font-weight: 600; /* Texte des labels un peu plus gras */
+    margin-bottom: 0.5rem;
+}
+
+.offer-form .form-control,
+.offer-form .form-select,
+.offer-form .form-control-plaintext { /* Cible les champs de formulaire */
+    border-color: var(--border-color);
+    background-color: var(--light-bg); /* Arrière-plan des champs */
+    color: var(--text-color);
+    padding: 0.8rem 1rem; /* Padding pour les champs */
+    border-radius: 0.5rem; /* Bords légèrement arrondis */
+    transition: all 0.3s ease;
+}
+
+body.dark-mode .offer-form .form-control,
+body.dark-mode .offer-form .form-select,
+body.dark-mode .offer-form .form-control-plaintext {
+    background-color: #3a3a3a; /* Fond des champs plus foncé en dark mode */
+    border-color: #555;
+    color: var(--text-color);
+}
+
+.offer-form .form-control:focus,
+.offer-form .form-select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25); /* Ombre de focus de Bootstrap */
+    background-color: var(--card-bg); /* Retour au fond de carte au focus */
+}
+
+body.dark-mode .offer-form .form-control:focus,
+body.dark-mode .offer-form .form-select:focus {
+    background-color: #2d2d2d; /* Retour au fond de carte sombre au focus */
+    box-shadow: 0 0 0 0.25rem rgba(114, 178, 255, 0.4); /* Ombre de focus mode sombre */
+}
+
+
+.offer-form .form-text {
+    font-size: 0.85rem;
+    color: var(--secondary-color); /* Texte d'aide */
+    margin-top: 0.25rem;
+}
+
+.publish-btn { /* Style pour le bouton de publication */
+    font-weight: 700;
+    padding: 0.9rem 1.5rem;
+    border-radius: 0.6rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.publish-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    background-color: #0a58ca;
+    border-color: #0a58ca;
+}
+
+body.dark-mode .publish-btn {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+body.dark-mode .publish-btn:hover {
+    background-color: #5c9eff;
+    border-color: #5c9eff;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Styles pour les messages d'erreur des champs */
+.alert-danger {
+    background-color: #f8d7da;
+    color: #721c24;
+    border-left: 5px solid #dc3545; /* Barre rouge sur le côté */
+    border-radius: 0.25rem;
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+}
+body.dark-mode .alert-danger {
+    background-color: #5c2c2f;
+    color: #f2b7b7;
+    border-left-color: #dc3545;
+}

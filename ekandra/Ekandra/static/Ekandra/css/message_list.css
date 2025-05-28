@@ -1,0 +1,145 @@
+/* Add to your existing style.css */
+
+/* Variables CSS for a gestion facile des couleurs (Existing) */
+/* ... (Your existing :root and body.dark-mode variables) ... */
+
+/* Global transitions (Ensure these are comprehensive) */
+body, .navbar, .card, .alert, .btn,
+.nav-link, h1, h2, h3, h4, h5, h6,
+p, span, strong, a, .list-group-item { /* Added list-group-item */
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+
+/* Styles for the Messages Page */
+
+.conversations-card {
+    border: none; /* Remove default card border */
+    max-width: 700px; /* Specific max-width for consistency */
+    box-shadow: var(--shadow-light); /* Use global shadow variable */
+    background-color: var(--card-bg); /* Use global card background */
+}
+
+body.dark-mode .conversations-card {
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4); /* Darker shadow in dark mode */
+}
+
+.conversations-card .card-title {
+    color: var(--primary-color); /* Primary color for card headings */
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.conversations-card .card-footer {
+    background-color: var(--light-bg); /* Lighter background for footer */
+    border-top: 1px solid var(--border-color); /* Border for separation */
+    border-bottom-left-radius: calc(0.75rem - 1px); /* Match card rounding */
+    border-bottom-right-radius: calc(0.75rem - 1px); /* Match card rounding */
+}
+
+body.dark-mode .conversations-card .card-footer {
+    background-color: #272727; /* Darker background for footer in dark mode */
+    border-top-color: #3a3a3a;
+}
+#ff {
+    color: whitesmoke;
+}
+
+/* List Group Items for Conversations */
+.list-group-item {
+    border-color: var(--border-color); /* Consistent border color */
+    background-color: var(--card-bg); /* Consistent background */
+    color: var(--text-color); /* Consistent text color */
+}
+
+body.dark-mode .list-group-item {
+    border-color: #3a3a3a;
+    background-color: #2d2d2d;
+    color: var(--text-color);
+}
+
+.list-group-item.list-group-item-action:hover {
+    background-color: var(--light-bg); /* Hover effect */
+}
+
+body.dark-mode .list-group-item.list-group-item-action:hover {
+    background-color: #222; /* Darker hover in dark mode */
+}
+
+
+/* Custom style for unread conversations */
+.unread-conversation {
+    background-color: var(--light-bg); /* Lighter background for unread */
+    font-weight: bold;
+    border-left: 5px solid var(--primary-color); /* Highlight with primary color bar */
+}
+
+body.dark-mode .unread-conversation {
+    background-color: #2a2a2a; /* Slightly lighter than card bg in dark mode */
+    border-left-color: var(--primary-color);
+    color: whitesmoke;
+
+}
+
+.unread-conversation .h6,
+.unread-conversation .last-message-snippet {
+    color: var(--text-color); /* Ensure text is readable */
+}
+
+.unread-conversation .unread-badge {
+    background-color: var(--primary-color) !important; /* Force primary color for badge */
+    color: white !important;
+}
+
+/* Style for the last message snippet */
+.last-message-snippet {
+    font-size: 0.9rem;
+    color: var(--secondary-color); /* Muted text color */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: calc(100% - 10px); /* Adjust max-width for padding/badge */
+    display: block; /* Ensures it takes full width for truncation */
+}
+
+body.dark-mode .last-message-snippet {
+    color: var(--secondary-color);
+}
+
+.conversation-details {
+    flex-grow: 1; /* Allow to take available space */
+}
+
+/* Badge for unread count */
+.unread-badge {
+    font-size: 0.75em;
+    padding: 0.35em 0.65em;
+    margin-left: 10px;
+    vertical-align: middle;
+}
+
+/* Ensure icons scale well */
+.bi {
+    font-size: 1.1em;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .conversations-card {
+        margin: 0 15px; /* Adjust margin for smaller screens */
+    }
+
+    .list-group-item {
+        flex-direction: column; /* Stack elements vertically on small screens */
+        align-items: flex-start !important; /* Align content to the start */
+    }
+
+    .list-group-item .text-end {
+        align-self: flex-end; /* Push date/badge to bottom right */
+        margin-top: 10px;
+    }
+
+    .last-message-snippet {
+        max-width: 100%; /* Use full width on small screens */
+    }
+}

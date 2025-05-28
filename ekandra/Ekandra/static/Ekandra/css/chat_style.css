@@ -1,0 +1,102 @@
+/* Basic chat container styling */
+#chat-log {
+    max-height: 24rem; /* Set a max height for scrolling */
+    overflow-y: auto; /* Enable vertical scrolling */
+    display: flex; /* Use flexbox for message alignment */
+    flex-direction: column; /* Stack messages vertically */
+    padding: 15px; /* Add some padding inside the chat log */
+    background-color: #f0f2f5; /* Light background color */
+}
+
+/* Styling for individual message containers */
+.message-container {
+    display: flex;
+    margin-bottom: 10px;
+    align-items: flex-end; /* Align items to the bottom */
+}
+
+/* Align messages to the right for the current user */
+.message-container.current-user {
+    justify-content: flex-end;
+}
+
+/* Align messages to the left for the other user */
+.message-container.other-user {
+    justify-content: flex-start;
+}
+
+/* Styling for the message bubble */
+.message-bubble {
+    max-width: 75%; /* Limit bubble width */
+    padding: 8px 12px; /* Padding inside the bubble */
+    border-radius: 18px; /* More rounded corners */
+    word-wrap: break-word; /* Break long words */
+}
+
+/* Colors for current user messages (Facebook blue) */
+.message-container.current-user .message-bubble {
+    background-color: #007bff; /* Bootstrap primary, similar to Facebook blue */
+    color: white;
+}
+
+/* Colors for other user messages (light grey) */
+.message-container.other-user .message-bubble {
+    background-color: #e4e6eb; /* Light grey */
+    color: #050505; /* Dark text */
+}
+
+/* Styling for the timestamp and sender name */
+.message-meta {
+    font-size: 0.75rem; /* Smaller text */
+    color: #65676b; /* Muted grey color */
+    margin-top: 2px;
+}
+
+.message-container.current-user .message-meta {
+     margin-right: 12px; /* Space between bubble and timestamp */
+     text-align: end;
+}
+
+ .message-container.other-user .message-meta {
+     margin-left: 12px; /* Space between bubble and timestamp */
+     text-align: start;
+}
+
+
+/* Styling for the input area */
+#chat-form {
+    margin-top: 15px;
+    background-color: #fff; /* White background */
+    padding: 10px 15px;
+    border-top: 1px solid #ced4da; /* Light border top */
+}
+
+#chat-message-input {
+    border-radius: 20px; /* Pill shape */
+    margin-right: 10px;
+    border-color: #ced4da; /* Match border color */
+}
+
+#chat-form button {
+     border-radius: 20px; /* Pill shape */
+     padding: 8px 20px;
+}
+
+ /* Optional: Style for scrollbar (Webkit browsers) */
+#chat-log::-webkit-scrollbar {
+    width: 8px;
+}
+
+#chat-log::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+#chat-log::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 10px;
+}
+
+#chat-log::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}

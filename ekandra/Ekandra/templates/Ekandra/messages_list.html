@@ -1,0 +1,91 @@
+{% extends 'Ekandra/base.html' %}
+{% load static %} 
+{% load bootstrap5 %}
+{% load i18n %}
+
+
+{% block title %}{% trans "My Conversations" %}{% endblock %}
+
+
+{% comment %} {% block extra_head %}
+    {% bootstrap_css %}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="{% static 'Ekandra/css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'Ekandra/css/message_list.css' %}">
+
+{% endblock %} {% endcomment %}
+{% block content %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<link rel="stylesheet" href="{% static 'Ekandra/css/message_list.css' %}">
+
+
+
+<div class="container my-4 mb-5">
+    
+    <div class="header-section text-center mb-5">
+        <h1 class="display-5 fw-bold text-primary mb-3"><i class="bi bi-envelope-fill me-3"></i> {% trans "Mes Messages" %}</h1>
+    </div>
+
+    
+    <div class="card mx-auto shadow-lg rounded-3 conversations-card"> 
+        <div class="card-body p-0">
+            
+            <h2 class="card-title p-4 mb-0 border-bottom text-secondary fw-bold text-center">{% trans "Conversations" %}</h2>
+
+            {% if conversations %}
+                <div class="list-group list-group-flush">
+                    {% for conv in conversations %}
+                        <a href="{% url 'message_conversation' conv.user.id %}"
+                           class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3 {% if conv.unread_count > 0 %}unread-conversation{% endif %}"
+                           data-user-id="{{ conv.user.id }}"
+                           data-sender-username="{{ conv.user.username }}">
+
+                            
+                            <div class="conversation-details flex-grow-1 me-3">
+                                <h6 class="mb-1 fw-bold text-truncate">{{ conv.user.username }}</h6>
+                                {% if conv.last_message %}
+                                    <p class="mb-0 last-message-snippet text-muted small">
+                                        {% if conv.last_message.expediteur == request.user %}
+                                            <span class="fw-bold">{% trans "Vous" %}:</span>
+                                        {% else %}
+                                            <span class="fw-bold">{{ conv.last_message.expediteur.username }}:</span>
+                                        {% endif %}
+                                        {{ conv.last_message.contenu|truncatewords:10 }}
+                                    </p>
+                                {% else %}
+                                    <p class="mb-0 text-muted small">{% trans "Pas encore de message." %}</p>
+                                {% endif %}
+                            </div>
+
+                            
+                            <div class="text-end flex-shrink-0">
+                                {% if conv.last_message %}
+                                    <small class="text-muted d-block mb-1" id="ff">{{ conv.last_message.date_envoi|date:"d/m/Y" }}</small>
+                                {% endif %}
+                                {% if conv.unread_count > 0 %}
+                                    <span class="badge bg-primary rounded-pill unread-badge">{{ conv.unread_count }}</span>
+                                {% endif %}
+                            </div>
+                        </a>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="p-5 text-center text-muted">
+                    <p class="lead"><i class="bi bi-info-circle-fill me-2"></i> {% trans "Vous n'avez pas encore de message." %}</p>
+                    <p>{% trans "Touver un interlocuteur!" %}</p>
+                </div>
+            {% endif %}
+            <div class="card-footer text-center p-3">
+                <a href="{% url 'chercher_utilisateur' %}" class="btn btn-outline-primary btn-sm">
+                    <i class="bi bi-search me-2"></i> {% trans "Trouver interlocuteur" %}
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+    <script src="{% static 'Ekandra/js/sombre.js' %}"></script>
+    <script src="{% static 'Ekandra/js/message_list.js' %}"></script>
+{% endblock %}
