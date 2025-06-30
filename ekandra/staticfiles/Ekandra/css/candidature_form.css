@@ -1,0 +1,113 @@
+
+/* General Body and Container Styles */
+body {
+    background-color: #f8f9fa; /* Light background for the whole page */
+    font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    color: #343a40;
+}
+
+.container {
+    max-width: 800px; /* Optimal width for a form-heavy page */
+}
+
+/* Header Section (consistent with other pages) */
+.header-section {
+    background-color: #ffffff;
+    border-bottom: 3px solid #007bff; /* Primary color emphasis */
+    padding: 2.5rem 1.5rem; /* More generous padding */
+    border-radius: 0.75rem; /* Rounded corners */
+    box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.05); /* Soft shadow */
+}
+
+.header-section h1 {
+    color: #007bff !important; /* Primary blue for main title */
+    font-weight: 700;
+}
+
+.header-section .lead {
+    color: #6c757d !important; /* Secondary grey for lead text */
+}
+
+/* Application Form Card */
+.application-form-card {
+    border-radius: 1rem; /* More rounded */
+    box-shadow: 0 0.75rem 2rem rgba(0, 0, 0, 0.1) !important; /* Deeper shadow for main card */
+    background-color: #ffffff;
+    border: none;
+}
+
+.application-form-card .card-title {
+    font-size: 1.8rem; /* Larger title for the form */
+    font-weight: 600;
+    color: #007bff; /* Primary color */
+}
+
+/* Form Fields (using Bootstrap's form-control defaults but ensuring consistency) */
+.form-control {
+    border-radius: 0.5rem; /* Slightly rounded inputs */
+    border: 1px solid #ced4da;
+    padding: 0.8rem 1rem;
+    font-size: 1rem;
+}
+
+.form-control:focus {
+    border-color: #80bdff;
+    box-shadow: 0 0 0 0.25rem rgba(0, 123, 255, 0.25);
+}
+
+/* Apply Button */
+.apply-btn {
+    background-color: #28a745; /* Success green */
+    border-color: #28a745;
+    font-weight: 600;
+    font-size: 1.25rem; /* Larger text */
+    padding: 0.8rem 2rem;
+    transition: all 0.3s ease;
+}
+
+.apply-btn:hover {
+    background-color: #218838; /* Darker green on hover */
+    border-color: #1e7e34;
+    transform: translateY(-2px); /* Slight lift */
+    box-shadow: 0 4px 8px rgba(40, 167, 69, 0.2); /* Soft shadow on hover */
+}
+
+/* Back Button (consistent with other pages) */
+.back-button-animated {
+    background-color: transparent;
+    border-color: #6c757d;
+    color: #6c757d;
+    font-size: 1.1rem;
+    padding: 0.75rem 2rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    border-radius: 2rem; /* Rounded button */
+}
+
+.back-button-animated:hover {
+    background-color: #6c757d;
+    color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(108, 117, 125, 0.2);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 767.98px) {
+    .header-section h1 {
+        font-size: 2rem;
+    }
+    .header-section .lead {
+        font-size: 1rem;
+    }
+    .application-form-card .card-title {
+        font-size: 1.5rem;
+    }
+    .apply-btn {
+        font-size: 1.1rem;
+        padding: 0.7rem 1.5rem;
+    }
+    .back-button-animated {
+        width: 100%;
+        padding: 0.6rem 1.5rem;
+    }
+}

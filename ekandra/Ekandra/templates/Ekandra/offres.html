@@ -1,60 +1,2315 @@
- {% extends 'Ekandra/base.html' %}
- {% load static %}
-    {% load bootstrap5 %}
-    {% load i18n %}
-    
-    
-    {% block extra_head %}
-        {% bootstrap_css %}
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    {% endblock %}
-    
-{% block title %}Offres d’emploi{% endblock %}
-{% block content %}
+{% extends 'Ekandra/base.html' %}
+{% load static %}
+{% load bootstrap5 %}
+{% load star_filters %}
+{% load i18n %}
 
-<div class="header-section text-center mb-5">
-    <h1 class="display-5 fw-bold text-primary mb-3">Découvrez nos opportunités d'emploi</h1>
-    <p class="lead text-muted">Trouvez le poste idéal parmi nos annonces mises à jour au {{ to_date|date:"d F Y" }}.</p>
-</div>
-
-<div class="row">
-    {% for offre in offres %}
-        <div class="col-md-6 col-lg-4 mb-4">
-            <div class="card h-100 offer-card">
-                <div class="card-body d-flex flex-column">
-                    <h5 class="card-title text-center mb-3">{{ offre.titre }}</h5>
-                    <p class="card-text mb-4">{{ offre.description|truncatewords:50 }}</p> 
-                    
-                    <div class="d-flex justify-content-between align-items-center mb-2 info-group">
-                        <span class="info-item"><i class="bi bi-building"></i> <strong>Entreprise :</strong> {{ offre.entreprise.nom }}</span>
-                        <span class="info-item"><i class="bi bi-cash-stack"></i> <strong>Salaire :</strong> {% if offre.salaire %}{{ offre.salaire }} Ar{% else %}Non précisé{% endif %}</span>
-                    </div>
-                    <div class="d-flex justify-content-between align-items-center mb-4 info-group">
-                        <span class="info-item"><i class="bi bi-calendar-event"></i> <strong>Publié :</strong> {{ offre.date_publication|date:"d M Y" }}</span>
-                        <span class="info-item text-danger"><i class="bi bi-calendar-x"></i> <strong>Limite :</strong> {{ offre.date_fin|date:"d M Y" }}</span>
-                    </div>
-
-                    <div class="mt-auto text-center"> 
-                        {% if user.is_authenticated %}
-                            <a href="{% url 'candidature_create' offre.id %}" class="btn btn-primary btn-lg w-75 postuler-btn">Postuler</a>
-                        {% else %}
-                            <a href="{% url 'login' %}" class="btn btn-secondary btn-lg w-75 postuler-btn">Se connecter pour postuler</a>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-        </div>
-    {% empty %}
-        
-        <div class="col-12 text-center py-5">
-            <i class="bi bi-emoji-frown display-4 text-muted mb-3"></i>
-            <p class="lead">Aucune offre d'emploi n'est disponible pour le moment.</p>
-            <p class="text-muted">Revenez bientôt, de nouvelles opportunités sont ajoutées régulièrement !</p>
-        </div>
-    {% endfor %}
-</div>
+{% block extra_head %}
+    {% bootstrap_css %}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 {% endblock %}
 
+{% block title %}Offres d'emploi - E-kandra{% endblock %}
+
+{% block content %}
+<style>
+    /* Styles pour les nouvelles images */
+    .hero-section {
+        background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)),
+                        url('{% static "Ekandra/image/hands.avif" %}');
+        background-size: cover;
+        background-position: center;
+        padding: 8rem 0;
+        color: white;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .hero-section::after {
+        content: "";
+        background: url('{% static "Ekandra/image/alter.png" %}') no-repeat;
+        background-size: contain;
+        opacity: 0.1;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        pointer-events: none;
+    }
+
+    .offer-card {
+        transition: all 0.3s ease;
+        border: none;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        position: relative;
+    }
+
+    .offer-card::before {
+        content: "";
+        background: url('{% static "Ekandra/image/four.png" %}') no-repeat;
+        background-size: 60%;
+        background-position: right bottom;
+        opacity: 0.05;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        pointer-events: none;
+        z-index: 0;
+    }
+
+    .offer-card-inner {
+        position: relative;
+        z-index: 1;
+        background: white;
+        height: 100%;
+    }
+
+    .company-badge {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        width: 50px;
+        height: 50px;
+        background: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        overflow: hidden;
+    }
+
+    .no-offers-found {
+        background: url('https://cdn.dribbble.com/users/1577055/screenshots/4914645/media/028d394ffb00cb7a4b2ef9915a384fd9.png') no-repeat center top;
+        background-size: 300px;
+        padding-top: 250px;
+    }
+
+    .feature-icon {
+        width: 80px;
+        height: 80px;
+        margin: 0 auto 20px;
+    }
+
+    .category-banner {
+        height: 8px;
+        background: linear-gradient(90deg, #4b6cb7 0%, #182848 100%);
+        margin-bottom: 15px;
+    }
+    /* Styles pour les nouvelles images */
+.hero-section {
+    background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)),
+                    url('{% static "Ekandra/image/hands.avif" %}');
+    background-size: cover;
+    background-position: center;
+    padding: 8rem 0;
+    color: white;
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-section::after {
+    content: "";
+    background: url('{% static "Ekandra/image/alter.png" %}') no-repeat;
+    background-size: contain;
+    opacity: 0.1;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+}
+
+.offer-card {
+    transition: all 0.3s ease;
+    border: none;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    position: relative;
+}
+
+.offer-card::before {
+    content: "";
+    background: url('{% static "Ekandra/image/four.png" %}') no-repeat;
+    background-size: 60%;
+    background-position: right bottom;
+    opacity: 0.05;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.offer-card-inner {
+    position: relative;
+    z-index: 1;
+    background: white; /* Default light mode background */
+    height: 100%;
+}
+
+.company-badge {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    width: 50px;
+    height: 50px;
+    background: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+.no-offers-found {
+    background: url('https://cdn.dribbble.com/users/1577055/screenshots/4914645/media/028d394ffb00cb7a4b2ef9915a384fd9.png') no-repeat center top;
+    background-size: 300px;
+    padding-top: 250px;
+}
+
+.feature-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 20px;
+}
+
+.category-banner {
+    height: 8px;
+    background: linear-gradient(90deg, #4b6cb7 0%, #182848 100%);
+    margin-bottom: 15px;
+}
+
+/* --- Dark Mode Styles --- */
+
+/* Base body styles for dark mode */
+body.dark-mode {
+    background-color: #1a202c; /* Dark background */
+    color: #e2e8f0; /* Light text for dark mode */
+}
+
+/* Adjust main text color */
+body.dark-mode .text-dark {
+    color: #e2e8f0 !important; /* Override Bootstrap's .text-dark */
+}
+
+/* Offer Card in Dark Mode */
+body.dark-mode .offer-card {
+    box-shadow: 0 5px 20px rgba(0,0,0,0.4); /* Darker shadow */
+}
+
+body.dark-mode .offer-card-inner {
+    background: #2d3748; /* Dark background for card inner */
+    color: #e2e8f0; /* Light text inside cards */
+}
+
+body.dark-mode .offer-card::before {
+    opacity: 0.08; /* Slightly more visible background pattern in dark mode */
+}
+
+/* Company Badge in Dark Mode */
+body.dark-mode .company-badge {
+    background: #3a0ca3; /* Primary or a contrasting dark color for badge background */
+    box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+}
+
+/* Card Titles and Text */
+body.dark-mode .card-title {
+    color: #4cc9f0; /* Accent color for titles */
+}
+
+/* Offer Description in Dark Mode (Even More Visible) */
+body.dark-mode .offer-description {
+    color: white ; /* Use a very bright, almost white color from your variables */
+    font-weight: 500; /* Keep it slightly bolder */
+    line-height: 1.6; /* Maintain good line spacing */
+    letter-spacing: 0.02em; /* Add a tiny bit of letter spacing for clarity */
+    text-shadow: 0 0 2px rgba(0, 0, 0, 0.1); /* Subtle shadow to make text pop */
+    opacity: 1; /* Ensure full opacity */
+}
+/* Info List items (text) */
+body.dark-mode .info-list li strong {
+    color: #e2e8f0; /* Ensure strong tags are light */
+}
+
+body.dark-mode .info-list li span {
+    color: #cbd5e0; /* Ensure regular spans are light */
+}
+
+body.dark-mode .info-list .text-muted {
+    color: #94a3b8 !important; /* Darker muted text */
+}
+
+/* Star Rating in Dark Mode */
+body.dark-mode .star-rating .text-warning {
+    color: #f59e0b !important; /* Keep warning color for stars, ensure !important */
+}
+
+body.dark-mode .star-rating .text-secondary {
+    color: #4a5568 !important; /* Darker secondary for empty stars */
+}
+
+body.dark-mode .rating-text {
+    color: #cbd5e0;
+}
+
+/* Buttons in Dark Mode */
+body.dark-mode .btn-primary {
+    background: linear-gradient(135deg, #3a0ca3, #4361ee); /* Invert or change gradient for dark mode if desired */
+    border-color: #3a0ca3;
+    color: white;
+}
+
+body.dark-mode .btn-primary:hover {
+    background: linear-gradient(135deg, #4361ee, #3a0ca3);
+    border-color: #4361ee;
+}
+
+body.dark-mode .btn-outline-secondary {
+    border-color: #94a3b8;
+    color: #e2e8f0;
+}
+
+body.dark-mode .btn-outline-secondary:hover {
+    background-color: #94a3b8;
+    color: #1a202c;
+}
+
+/* No Offers Found Section in Dark Mode */
+body.dark-mode .no-offers-found {
+    background-image: url('https://cdn.dribbble.com/users/1577055/screenshots/4914645/media/028d394ffb00cb7a4b2ef9915a384fd9.png'); /* Keep same image */
+    background-size: 300px;
+    filter: invert(0.9) hue-rotate(180deg) brightness(0.8); /* Adjust image for dark mode */
+}
+
+body.dark-mode .no-offers-found h3 {
+    color: #e2e8f0 !important;
+}
+
+body.dark-mode .no-offers-found p {
+    color: #cbd5e0 !important;
+}
+
+body.dark-mode .btn-outline-primary {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+}
+
+body.dark-mode .btn-outline-primary:hover {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+/* New Section (bg-light) in Dark Mode */
+body.dark-mode .bg-light {
+    background-color: #1a202c !important; /* Override bg-light */
+    color: #e2e8f0;
+}
+
+body.dark-mode .bg-light h2,
+body.dark-mode .bg-light h3 {
+    color: #4cc9f0; /* Accent color for titles in this section */
+}
+
+body.dark-mode .bg-light p {
+    color: #cbd5e0;
+}
+
+/* Ensure any other text that might be black in light mode becomes light in dark mode */
+body.dark-mode .text-secondary {
+    color: #cbd5e0 !important;
+}
+
+/* --- Search Bar / Filters Container in Dark Mode --- */
+body.dark-mode .filters-container {
+    background-color: #2d3748; /* Dark background for the filter section */
+    border-radius: 10px;
+    padding: 2rem; /* Add some padding if it's a distinct box */
+    box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+}
+
+body.dark-mode .filters-container label {
+    color: #e2e8f0; /* Label text color */
+}
+
+body.dark-mode .form-control {
+    background-color: #4a5568; /* Darker background for input fields */
+    color: #e2e8f0; /* Light text color for input */
+    border-color: #6b7280; /* Slightly lighter border */
+}
+
+body.dark-mode .form-control:focus {
+    border-color: #4cc9f0; /* Accent color on focus */
+    box-shadow: 0 0 0 0.25rem rgba(76, 201, 240, 0.25); /* Lighter shadow on focus */
+    background-color: #4a5568; /* Keep background consistent */
+}
+
+body.dark-mode .form-control::placeholder {
+    color: #a0aec0; /* Lighter placeholder text */
+}
+
+body.dark-mode .btn-dark-mode-search { /* Assuming a custom class for your search button */
+    background-color: #4361ee;
+    border-color: #4361ee;
+    color: white;
+}
+
+body.dark-mode .btn-dark-mode-search:hover {
+    background-color: #3a0ca3;
+    border-color: #3a0ca3;
+}
+
+/* If you have select elements or specific filter buttons within .filters-container */
+body.dark-mode .filters-container select {
+    background-color: #4a5568;
+    color: #e2e8f0;
+    border-color: #6b7280;
+}
+body.dark-mode #description{
+    color:white;
+}
+body.dark-mode .filters-container select option {
+    background-color: #4a5568; /* For option backgrounds */
+    color: #e2e8f0;
+}
+
+body.dark-mode .filters-container .form-select { /* For Bootstrap 5+ custom select */
+    background-color: #4a5568;
+    color: #e2e8f0;
+    border-color: #6b7280;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23e2e8f0' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e"); /* Custom SVG for dark mode arrow */
+}
+</style>
+
+<div id="loadingOverlay" class="active" aria-live="polite" aria-label="Chargement en cours">
+    <div class="loading-spinner"></div>
+    <span class="sr-only">Chargement des offres d'emploi...</span>
+</div>
+
+<div class="hero-section text-center">
+    <div class="content-wrapper">
+        <h1 class="display-4 fw-bold mb-3 animate__animated animate__fadeInDown">
+            {% comment %} <img src="https://cdn-icons-png.flaticon.com/512/2933/2933245.png" alt="Icône emploi" class="feature-icon animate__animated animate__bounceIn"> {% endcomment %}
+            Découvrez nos opportunités d'emploi
+        </h1>
+        <p class="lead text-white animate__animated animate__fadeInUp animate__delay-0-5s">
+            Trouvez le poste idéal parmi nos annonces
+            <span class="fw-bold">{{ to_date }}</span>
+        </p>
+        <hr class="my-4 bg-light">
+        <a href="#filtre-section" class="btn btn-light btn-lg rounded-pill animate__animated animate__pulse animate__infinite">
+            <i class="bi bi-briefcase-fill me-2" aria-hidden="true"></i> Voir les Offres
+        </a>
+    </div>
+</div>
+
+<main class="my-5">
+    <div class="content-wrapper">
+        <h2 class="text-center mb-4 text-dark animate__animated animate__fadeIn animate__delay-1s">
+            Les dernières offres disponibles
+        </h2>
+        <hr class="mb-5 w-25 mx-auto animate__animated animate__fadeIn animate__delay-1-5s">
+
+        <section class="filters-container mb-5" id="filtre-section" aria-label="Filtres de recherche d'emploi">
+            <!-- Filtres existants -->
+        </section>
+
+        <div class="row offers-grid" id="offersGrid" aria-live="polite" aria-atomic="true">
+            {% for offre in offres %}
+                <div class="col-md-6 col-lg-4 mb-4 offer-card" itemscope itemtype="http://schema.org/JobPosting" tabindex="0">
+                    <div class="category-banner"></div>
+                    <div class="offer-card-inner">
+                        <div class="company-badge">
+                            {% if offre.entreprise.photo_profil%}
+                                <img src="{{ offre.entreprise.photo_profil.url }}" alt="Logo {{ offre.entreprise.nom }}" style="max-width: 80%; max-height: 80%;">
+                            {% else %}
+                                <img src="https://cdn-icons-png.flaticon.com/512/3639/3639518.png" alt="Logo entreprise" style="max-width: 80%; max-height: 80%;">
+                            {% endif %}
+                        </div>
+                        <div class="card-body d-flex flex-column p-4">
+                            <h5 class="card-title mb-3" itemprop="title">{{ offre.titre }}</h5>
+                            <p class="card-text mb-4 flex-grow-1 offer-description" id="description" itemprop="description">
+                                {{ offre.description|truncatewords:40 }}
+                            </p>
+
+                            <ul class="list-unstyled mb-4 info-list" aria-label="Détails de l'offre">
+                                <li>
+                                    <i class="bi bi-building me-2 text-info" aria-hidden="true"></i>
+                                    <strong>Entreprise :</strong> <span class="fw-bold company-name" itemprop="hiringOrganization" itemtype="http://schema.org/Organization" itemscope><span itemprop="name">{{ offre.entreprise.nom }}</span></span><br>
+                                    
+                                </li>
+                                <li>
+                                    <i class="bi bi-cash-stack me-2 text-success" aria-hidden="true"></i>
+                                    <strong>Salaire :</strong>
+                                    {% if offre.salaire %}
+                                        <span class="fw-bold salary-amount" itemprop="salary">{{ offre.salaire }} Ar</span>
+                                    {% else %}
+                                        <span class="text-muted">Non précisé</span>
+                                    {% endif %}
+                                </li>
+                                <li>
+                                    <i class="bi bi-calendar-event me-2 text-warning" aria-hidden="true"></i>
+                                    <strong>Publié :</strong> <time datetime="{{ offre.date_publication|date:'Y-m-d' }}" itemprop="datePosted">{{ offre.date_publication|date:"d M Y" }}</time>
+                                </li>
+                                <li>
+                                    <i class="bi bi-calendar-x me-2 text-danger" aria-hidden="true"></i>
+                                    <strong>Limite :</strong> <span class="fw-bold" itemprop="validThrough">{{ offre.date_fin|date:"d M Y" }}</span>
+                                </li>
+                                {% if offre.lieu %}
+                                <li>
+                                    <i class="bi bi-geo-alt me-2 text-secondary" aria-hidden="true"></i>
+                                    <strong>Lieu :</strong> <span itemprop="jobLocation" itemtype="http://schema.org/Place" itemscope><span itemprop="address" itemtype="http://schema.org/PostalAddress" itemscope><span itemprop="addressLocality">{{ offre.lieu }}</span></span></span>
+                                </li>
+                                {% endif %}
+                                <li>
+                                    <i class="bi bi-star-fill me-2 text-warning" aria-hidden="true"></i>
+                                    <strong>Note :</strong>
+                                    {% if offre.entreprise.moyenne is not None %}
+                                        <span class="ms-2 star-rating" role="img" aria-label="Note de {{ offre.entreprise.moyenne|floatformat:1 }} sur 5">
+                                            {% with rating_val=offre.entreprise.moyenne|add:0.0 %}
+                                            {% for i in "12345" %}
+                                                {% if rating_val >= forloop.counter %}
+                                                    <i class="bi bi-star-fill text-warning" aria-hidden="true"></i>
+                                                {% elif rating_val > forloop.counter|add:-1 and rating_val < forloop.counter %}
+                                                    <i class="bi bi-star-half text-warning" aria-hidden="true"></i>
+                                                {% else %}
+                                                    <i class="bi bi-star text-secondary" aria-hidden="true"></i>
+                                                {% endif %}
+                                            {% endfor %}
+                                            {% endwith %}
+                                            <span class="rating-text" itemprop="aggregateRating" itemtype="http://schema.org/AggregateRating" itemscope><span itemprop="ratingValue">{{ offre.entreprise.moyenne|floatformat:1 }}</span>/5</span>
+                                        </span>
+                                    {% else %}
+                                        <span class="text-muted ms-2">Non notée</span>
+                                    {% endif %}
+                                </li>
+                            </ul>
+
+                            <div class="mt-auto text-center">
+                                {% if user.is_authenticated %}
+                                    <a href="{% url 'candidature_create' offre.id %}" class="btn btn-primary btn-lg w-75 btn-apply" role="button">
+                                        <span class="btn-text">Postuler</span>
+                                        <i class="bi bi-arrow-right btn-icon ms-2" aria-hidden="true"></i>
+                                    </a>
+                                {% else %}
+                                    <a href="{% url 'login' %}" class="btn btn-outline-secondary btn-lg w-75 btn-login" role="button">
+                                        <span class="btn-text">Se connecter pour postuler</span>
+                                        <i class="bi bi-box-arrow-in-right btn-icon ms-2" aria-hidden="true"></i>
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col-12 text-center py-5 no-offers-found">
+                    <h3 class="text-dark mb-3 animate__animated animate__fadeInUp">Aucune offre d'emploi n'est disponible pour le moment.</h3>
+                    <p class="lead text-secondary animate__animated animate__fadeInUp animate__delay-0-5s">
+                        Revenez bientôt, de nouvelles opportunités sont ajoutées régulièrement !
+                    </p>
+                    <a href="{% url 'home' %}" class="btn btn-outline-primary mt-4 animate__animated animate__zoomIn animate__delay-1s" role="button">
+                        <i class="bi bi-arrow-clockwise me-2" aria-hidden="true"></i> Actualiser
+                    </a>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</main>
+
+<!-- Nouvelle section avant le footer -->
+<div class="bg-light py-5 mt-5">
+    <div class="content-wrapper text-center">
+        <h2 class="mb-5">Pourquoi choisir notre plateforme ?</h2>
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <img src="{% static 'Ekandra/image/four.png' %}"  alt="Icône opportunités" class="feature-icon">
+                <h3>+10 000 opportunités</h3>
+                <p>Le plus large choix d'offres d'emploi dans tous les secteurs</p>
+            </div>
+            <div class="col-md-4 mb-4">
+                <img src="{% static 'Ekandra/image/house.png' %}"  alt="Icône alerte" class="feature-icon">
+                <h3>Alertes personnalisées</h3>
+                <p>Soyez informé immédiatement des nouvelles offres correspondant à votre profil</p>
+            </div>
+            <div class="col-md-4 mb-4">
+                <img src="{% static 'Ekandra/image/wind.png' %}"  alt="Icône confiance" class="feature-icon">
+                <h3>Entreprises vérifiées</h3>
+                <p>Toutes nos offres proviennent d'entreprises sérieuses et vérifiées</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
 {% block extra_css %}
     <link rel="stylesheet" href="{% static 'Ekandra/css/offres.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <style>
+        /* Variables Globales et Reset */
+        :root {
+            --primary-color: #2563eb; /* Cobalt Blue */
+            --primary-hover: #1e40af; /* Darker Cobalt */
+            --secondary-color: #6b7280; /* Gray */
+            --accent-color: #f59e0b; /* Amber for warnings/stars */
+            --info-color: #0ea5e9; /* Sky Blue for info icons */
+            --success-color: #22c55e; /* Emerald Green for salary */
+            --danger-color: #ef4444; /* Red for deadlines */
+            --white: #ffffff;
+            --light-gray: #f9fafb; /* Lighter than gray-50 */
+            --medium-gray: #e5e7eb; /* Light border/background */
+            --dark-gray: #374151; /* Main text */
+
+            --spacing-xs: 0.25rem;    /* 4px */
+            --spacing-sm: 0.5rem;     /* 8px */
+            --spacing-md: 1rem;       /* 16px */
+            --spacing-lg: 1.5rem;     /* 24px */
+            --spacing-xl: 2rem;       /* 32px */
+            --spacing-2xl: 3rem;      /* 48px */
+            --spacing-3xl: 4rem;      /* 64px */
+
+            --font-family-base: 'Inter', sans-serif;
+            --font-size-sm: 0.875rem; /* 14px */
+            --font-size-base: 1rem;   /* 16px */
+            --font-size-lg: 1.25rem;  /* 20px */
+            --font-size-xl: 1.5rem;   /* 24px */
+            --font-size-2xl: 1.875rem; /* 30px */
+            --font-size-3xl: 2.25rem; /* 36px */
+            --font-size-4xl: 3rem;    /* 48px */
+
+            --font-weight-regular: 400;
+            --font-weight-medium: 500;
+            --font-weight-semibold: 600;
+            --font-weight-bold: 700;
+
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --shadow-interactive: 0 8px 25px rgba(37, 99, 235, 0.2); /* For card hover */
+
+            --radius-sm: 0.25rem;
+            --radius-md: 0.5rem;
+            --radius-lg: 0.75rem;
+            --radius-xl: 1rem;
+            --radius-full: 9999px;
+
+            --transition-fast: 0.15s ease-out;
+            --transition-normal: 0.3s ease-out;
+            --transition-slow: 0.5s ease-out;
+        }
+
+        body {
+            font-family: var(--font-family-base);
+            background-color: var(--light-gray);
+            color: var(--dark-gray);
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden; /* Prevent horizontal scroll from animations */
+        }
+
+        /* Supprime les marges/paddings par défaut des .container de Bootstrap */
+        /* Utilisation de !important pour s'assurer de l'override */
+        .container {
+            max-width: 100% !important;
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+        }
+
+        /* Nouveau wrapper pour centrer le contenu interne des sections pleine largeur */
+        .content-wrapper {
+            max-width: 1500px; /* Largeur maximale pour le contenu sur les très grands écrans */
+            margin-left: auto;
+            margin-right: auto;
+            padding-left: var(--spacing-2xl); /* Padding interne pour ne pas coller aux bords */
+            padding-right: var(--spacing-2xl);
+            box-sizing: border-box; /* Inclure padding dans la largeur */
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-weight: var(--font-weight-bold);
+            color: var(--dark-gray);
+        }
+        .text-primary { color: var(--primary-color) !important; }
+        .text-secondary { color: var(--secondary-color) !important; }
+        .text-info { color: var(--info-color) !important; }
+        .text-success { color: var(--success-color) !important; }
+        .text-warning { color: var(--accent-color) !important; }
+        .text-danger { color: var(--danger-color) !important; }
+        .text-muted { color: var(--secondary-color) !important; }
+
+        /* Hero Section - Pleine largeur */
+        .hero-section {
+            padding: var(--spacing-3xl) 0; /* Padding vertical, horizontal géré par content-wrapper */
+            background: linear-gradient(135deg, var(--primary-color) 0%, #4a8dff 100%);
+            color: var(--white);
+            border-radius: 0; /* Pas d'arrondi pour la pleine largeur */
+            box-shadow: var(--shadow-xl);
+            overflow: hidden;
+            margin: 0; /* Pas de marge externe */
+        }
+        /* Contenu du Hero - Centré et lisible */
+        .hero-section .content-wrapper {
+            max-width: 1200px; /* Contenu plus compact pour le hero */
+            padding-left: var(--spacing-xl);
+            padding-right: var(--spacing-xl);
+        }
+
+        .hero-section h1 {
+            color: var(--white);
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+            font-size: var(--font-size-4xl);
+        }
+        .hero-section p {
+            color: rgba(255,255,255,0.9);
+            font-size: var(--font-size-lg);
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .hero-section hr {
+            border-color: rgba(255,255,255,0.3);
+            margin: var(--spacing-xl) auto;
+        }
+
+        /* Filtres - Centré et sticky */
+        .filters-container {
+            background: var(--white);
+            border-radius: var(--radius-xl);
+            padding: var(--spacing-xl);
+            margin-bottom: var(--spacing-2xl);
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--medium-gray);
+            position: sticky;
+            top: 1rem; /* Reste en haut de l'écran avec un petit décalage */
+            z-index: 500;
+            transition: transform var(--transition-normal);
+            max-width: 1500px; /* Correspond à la largeur du content-wrapper principal */
+            margin-left: auto;
+            margin-right: auto;
+            left: 0;
+            right: 0;
+        }
+
+        .filters-wrapper {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--spacing-md);
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .search-container {
+            flex: 1;
+            min-width: 280px;
+            max-width: 400px;
+        }
+
+        .search-input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: var(--spacing-sm) var(--spacing-md) var(--spacing-sm) 3rem;
+            border: 2px solid var(--medium-gray);
+            border-radius: var(--radius-full);
+            font-size: var(--font-size-base);
+            transition: all var(--transition-fast);
+            background: var(--light-gray);
+            color: var(--dark-gray);
+            height: 48px;
+        }
+
+        .search-input::placeholder {
+            color: var(--secondary-color);
+            opacity: 0.8;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            background: var(--white);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: var(--spacing-md);
+            color: var(--secondary-color);
+            font-size: var(--font-size-lg);
+            pointer-events: none; /* Empêche l'icône de bloquer les clics sur l'input */
+        }
+
+        .search-clear {
+            position: absolute;
+            right: var(--spacing-sm);
+            background: none;
+            border: none;
+            color: var(--secondary-color);
+            cursor: pointer;
+            padding: var(--spacing-xs);
+            border-radius: 50%;
+            transition: all var(--transition-fast);
+            font-size: var(--font-size-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+        }
+
+        .search-clear:hover {
+            color: var(--dark-gray);
+            background: var(--medium-gray);
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: var(--spacing-sm);
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+
+        .filter-btn {
+            padding: var(--spacing-sm) var(--spacing-lg);
+            border: 1px solid var(--medium-gray);
+            background: var(--white);
+            color: var(--secondary-color);
+            border-radius: var(--radius-full);
+            font-weight: var(--font-weight-medium);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            white-space: nowrap;
+            font-size: var(--font-size-sm);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .filter-btn:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            box-shadow: var(--shadow-md);
+            transform: translateY(-1px);
+        }
+
+        .filter-btn.active {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+            color: var(--white);
+            box-shadow: var(--shadow-md);
+        }
+
+        .results-info {
+            margin-top: var(--spacing-md);
+            color: var(--secondary-color);
+            font-size: var(--font-size-sm);
+            text-align: center;
+            padding: var(--spacing-sm) 0;
+            opacity: 0;
+            transition: opacity var(--transition-normal);
+        }
+        .results-info.active {
+            opacity: 1;
+        }
+
+        /* Cartes d'Offres */
+        .offer-card {
+            padding-bottom: var(--spacing-md);
+            outline: none; /* Pour l'accessibilité au focus */
+        }
+
+        .offer-card-inner {
+            background: var(--white);
+            border-radius: var(--radius-xl);
+            overflow: hidden;
+            transition: all var(--transition-normal);
+            cursor: pointer;
+            border: 1px solid var(--medium-gray) !important;
+            position: relative;
+        }
+
+        .offer-card-inner:hover {
+            transform: translateY(-5px); /* Effet de soulèvement */
+            box-shadow: var(--shadow-interactive); /* Ombre interactive */
+            border-color: var(--primary-color) !important; /* Bordure accentuée */
+        }
+
+        .offer-card:focus-within .offer-card-inner { /* Focus pour l'accessibilité clavier */
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-interactive);
+            border-color: var(--primary-color) !important;
+            outline: 2px solid var(--primary-color);
+            outline-offset: 2px;
+        }
+
+        .offer-card .card-title {
+            font-size: var(--font-size-lg);
+            font-weight: var(--font-weight-semibold);
+            color: var(--primary-color);
+            min-height: 2.5em; /* Assure une hauteur constante pour le titre */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            transition: transform var(--transition-fast);
+        }
+        .offer-card-inner:hover .card-title {
+             transform: scale(1.02); /* Léger zoom sur le titre au survol */
+        }
+
+        .offer-card .card-text.offer-description {
+            font-size: var(--font-size-base);
+            color: var(--dark-gray);
+            line-height: 1.5;
+            margin-bottom: var(--spacing-md);
+        }
+
+        .info-list {
+            font-size: var(--font-size-sm);
+            margin-bottom: var(--spacing-xl) !important;
+        }
+
+        .info-list li {
+            display: flex;
+            align-items: center;
+            margin-bottom: var(--spacing-sm);
+            color: var(--secondary-color);
+        }
+
+        .info-list li:last-child {
+            margin-bottom: 0;
+        }
+
+        .info-list strong {
+            color: var(--dark-gray);
+            margin-right: var(--spacing-xs);
+            font-weight: var(--font-weight-semibold);
+        }
+
+        .info-list i {
+            font-size: var(--font-size-base);
+        }
+
+        .star-rating i {
+            font-size: var(--font-size-base);
+            vertical-align: middle;
+            margin-right: 2px;
+        }
+        .star-rating .text-warning { color: var(--accent-color) !important; }
+
+        /* Boutons d'Application */
+        .btn-apply, .btn-login {
+            font-size: var(--font-size-lg);
+            font-weight: var(--font-weight-bold);
+            padding: var(--spacing-sm) var(--spacing-xl);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--spacing-sm);
+            transition: all var(--transition-normal);
+            position: relative;
+            overflow: hidden;
+            border-radius: var(--radius-full) !important; /* Assure des bords ronds */
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            border-color: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-outline-secondary {
+            border-color: var(--secondary-color);
+            color: var(--secondary-color);
+        }
+
+        .btn-outline-secondary:hover {
+            background-color: var(--secondary-color);
+            color: var(--white);
+            border-color: var(--secondary-color);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        /* État de chargement pour les boutons (JS) */
+        .btn.loading {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            opacity: 0.9;
+            cursor: progress;
+            pointer-events: none;
+        }
+        .btn.loading .btn-text {
+            visibility: hidden;
+        }
+        .btn.loading .btn-icon {
+            animation: spin 1s linear infinite;
+        }
+
+        /* Section "Aucune offre trouvée" */
+        .no-offers-found {
+            background: var(--white);
+            border-radius: var(--radius-xl);
+            padding: var(--spacing-3xl);
+            box-shadow: var(--shadow-md);
+            margin-top: var(--spacing-2xl);
+            border: 1px solid var(--medium-gray);
+            max-width: 1200px; /* Maintient le message lisible */
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .no-offers-found i {
+            color: var(--secondary-color);
+            opacity: 0.7;
+        }
+        .no-offers-found h3 {
+            color: var(--dark-gray);
+            font-weight: var(--font-weight-bold);
+        }
+        .no-offers-found p {
+            color: var(--secondary-color);
+            font-size: var(--font-size-lg);
+        }
+
+
+        /* Preview Modal */
+        .preview-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity var(--transition-normal), visibility var(--transition-normal);
+        }
+
+        .preview-modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .preview-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: var(--spacing-md);
+        }
+
+        .preview-content {
+            background: var(--white);
+            border-radius: var(--radius-xl);
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto; /* Permet le scroll si le contenu est long */
+            box-shadow: var(--shadow-xl);
+            transform: scale(0.8);
+            transition: transform var(--transition-normal);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .preview-modal.active .preview-content {
+            transform: scale(1); /* Effet d'agrandissement à l'ouverture */
+        }
+
+        .preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: var(--spacing-xl);
+            border-bottom: 1px solid var(--medium-gray);
+            position: sticky;
+            top: 0;
+            background: var(--white);
+            z-index: 10;
+        }
+
+        .preview-title {
+            margin: 0;
+            color: var(--primary-color);
+            font-size: var(--font-size-2xl);
+            line-height: 1.3;
+            flex-grow: 1;
+            padding-right: var(--spacing-md);
+        }
+
+        .preview-close {
+            background: none;
+            border: none;
+            font-size: var(--font-size-2xl);
+            color: var(--secondary-color);
+            cursor: pointer;
+            padding: var(--spacing-xs);
+            border-radius: var(--radius-md);
+            transition: all var(--transition-fast);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+        }
+
+        .preview-close:hover {
+            background: var(--medium-gray);
+            color: var(--dark-gray);
+        }
+
+        .preview-body {
+            padding: var(--spacing-xl);
+            flex-grow: 1;
+        }
+
+        .preview-company {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            color: var(--dark-gray);
+            margin-bottom: var(--spacing-md);
+            font-weight: var(--font-weight-semibold);
+            font-size: var(--font-size-lg);
+        }
+        .preview-company i {
+            color: var(--info-color);
+            font-size: var(--font-size-xl);
+        }
+
+        .preview-description {
+            color: var(--dark-gray);
+            line-height: 1.7;
+            margin: 0;
+            font-size: var(--font-size-base);
+        }
+
+        .preview-footer {
+            display: flex;
+            gap: var(--spacing-md);
+            padding: var(--spacing-xl);
+            border-top: 1px solid var(--medium-gray);
+            justify-content: flex-end;
+            position: sticky;
+            bottom: 0;
+            background: var(--white);
+            z-index: 10;
+        }
+
+        /* Bouton Retour en Haut */
+        .back-to-top {
+            position: fixed;
+            bottom: var(--spacing-xl);
+            right: var(--spacing-xl);
+            width: 56px;
+            height: 56px;
+            background: var(--primary-color);
+            color: var(--white);
+            border: none;
+            border-radius: 50%;
+            font-size: var(--font-size-xl);
+            cursor: pointer;
+            box-shadow: var(--shadow-lg);
+            transition: all var(--transition-normal);
+            opacity: 0;
+            visibility: hidden; /* Masqué par défaut */
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .back-to-top:hover {
+            background: var(--primary-hover);
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: var(--shadow-xl);
+        }
+
+        /* Animations */
+        .fade-in {
+            animation: fadeIn 0.4s ease-in-out forwards;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .offer-card.animate-in {
+            animation: slideInUp 0.8s ease-out forwards;
+            opacity: 0;
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(60px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Overlay de chargement */
+        #loadingOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--white);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            opacity: 1;
+            visibility: visible;
+            transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
+        }
+
+        #loadingOverlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        #loadingOverlay:not(.active) {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .loading-spinner {
+            border: 5px solid var(--medium-gray);
+            border-top: 5px solid var(--primary-color);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Utilité pour les lecteurs d'écran */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border-width: 0;
+        }
+
+        /* Ajustements Responsifs */
+        @media (max-width: 992px) {
+            .filters-wrapper {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .search-container {
+                width: 100%;
+                max-width: none;
+            }
+            .filter-buttons {
+                justify-content: center;
+                width: 100%;
+            }
+            .hero-section h1 {
+                font-size: var(--font-size-3xl);
+            }
+            .hero-section p {
+                font-size: var(--font-size-base);
+            }
+            .content-wrapper {
+                padding-left: var(--spacing-xl);
+                padding-right: var(--spacing-xl);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero-section {
+                padding: var(--spacing-2xl) var(--spacing-md);
+            }
+            .hero-section h1 {
+                font-size: var(--font-size-2xl);
+            }
+            .filters-container {
+                padding: var(--spacing-lg);
+            }
+            .filter-btn {
+                padding: var(--spacing-sm) var(--spacing-md);
+                font-size: var(--font-size-sm);
+            }
+            .preview-content {
+                max-width: 90%;
+                margin: var(--spacing-md);
+            }
+            .back-to-top {
+                bottom: var(--spacing-lg);
+                right: var(--spacing-lg);
+                width: 50px;
+                height: 50px;
+                font-size: var(--font-size-lg);
+            }
+            .content-wrapper {
+                padding-left: var(--spacing-lg);
+                padding-right: var(--spacing-lg);
+            }
+        }
+
+        @media (max-width: 576px) {
+            .content-wrapper {
+                padding-left: var(--spacing-md);
+                padding-right: var(--spacing-md);
+            }
+            .hero-section {
+                padding: var(--spacing-xl);
+            }
+            .hero-section h1 {
+                font-size: var(--font-size-xl);
+            }
+            .filters-container {
+                padding: var(--spacing-md);
+                margin-bottom: var(--spacing-xl);
+            }
+            .filter-buttons {
+                justify-content: center;
+                gap: var(--spacing-xs);
+            }
+            .filter-btn {
+                font-size: var(--font-size-sm);
+                padding: 8px 12px;
+            }
+            .preview-header,
+            .preview-body,
+            .preview-footer {
+                padding: var(--spacing-md);
+            }
+            .preview-title {
+                font-size: var(--font-size-lg);
+            }
+            .preview-company {
+                font-size: var(--font-size-base);
+            }
+            .btn-apply, .btn-login {
+                width: 100%;
+                font-size: var(--font-size-base);
+            }
+            .back-to-top {
+                bottom: var(--spacing-md);
+                right: var(--spacing-md);
+                width: 45px;
+                height: 45px;
+                font-size: var(--font-size-md);
+            }
+            .no-offers-found {
+                padding: var(--spacing-xl);
+            }
+        }
+    </style>
+{% endblock %}
+{% block extra_js %}
+    <script>
+        // JobOffersPage class and its methods go here
+        // (Copy-paste the entire JavaScript class from the previous response)
+
+        /**
+         * Job Offers Page - Enhanced JavaScript Functionality
+         * Améliore l'expérience utilisateur avec des interactions fluides
+         */
+
+        class JobOffersPage {
+            constructor() {
+                this.init();
+            }
+
+            init() {
+                this.setupEventListeners();
+                this.initializeIntersectionObserver();
+                this.setupLoadingStates();
+                this.initializeAccessibility();
+                this.setupPerformanceOptimizations();
+            }
+
+            /**
+             * Configuration des écouteurs d'événements
+             */
+            setupEventListeners() {
+                // Gestion des clics sur les cartes d'offres
+                this.setupCardInteractions();
+                
+                // Gestion des boutons de candidature
+                this.setupApplicationButtons();
+                
+                // Gestion du filtrage et de la recherche
+                this.setupFiltering();
+                
+                // Gestion du scroll et de la navigation
+                this.setupScrollEffects();
+                
+                // Gestion des événements clavier
+                this.setupKeyboardNavigation();
+            }
+
+            /**
+             * Interactions avec les cartes d'offres
+             */
+            setupCardInteractions() {
+                const offerCards = document.querySelectorAll('.offer-card');
+                
+                offerCards.forEach((card, index) => {
+                    // Animation d'entrée échelonnée
+                    // card.style.animationDelay = `${index * 100}ms`; // Handled by animate-in class now
+
+                    // Add tabindex to the card itself if it's not already on an interactive element
+                    // The Django template applies 'tabindex="0"' already.
+                    // This ensures the card can be focused directly.
+
+                    // Effet de survol amélioré
+                    card.addEventListener('mouseenter', (e) => {
+                        this.enhanceCardHover(e.currentTarget.querySelector('.offer-card-inner')); // Target the inner card
+                    });
+                    
+                    card.addEventListener('mouseleave', (e) => {
+                        this.resetCardHover(e.currentTarget.querySelector('.offer-card-inner')); // Target the inner card
+                    });
+                    
+                    // Prévisualisation rapide au clic
+                    card.addEventListener('click', (e) => {
+                        // Ensure click on buttons inside card doesn't trigger preview
+                        if (!e.target.closest('.btn') && !e.target.closest('.preview-close') && !e.target.closest('.preview-cancel') && !e.target.closest('.preview-apply')) {
+                            this.showQuickPreview(card);
+                        }
+                    });
+
+                     // Add keyboard support for activating the quick preview on card focus
+                    card.addEventListener('keydown', (e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault(); // Prevent default scroll for spacebar
+                            this.showQuickPreview(card);
+                        }
+                    });
+                });
+            }
+
+            /**
+             * Amélioration de l'effet de survol des cartes
+             */
+            enhanceCardHover(cardInner) { // Renamed parameter to cardInner
+                // We are relying more on pure CSS :hover for transform and box-shadow now.
+                // This JS function will primarily handle subtle inner elements.
+                const title = cardInner.querySelector('.card-title'); // Changed to .card-title
+                // const applyBtn = cardInner.querySelector('.btn'); // This specific enhancement is now primarily CSS-driven
+                
+                if (title) {
+                    title.style.transform = 'scale(1.02)';
+                    title.style.transition = 'transform 0.2s ease';
+                }
+                // No longer directly manipulating applyBtn styles here, rely on CSS
+            }
+
+            /**
+             * Réinitialisation de l'effet de survol
+             */
+            resetCardHover(cardInner) { // Renamed parameter to cardInner
+                const title = cardInner.querySelector('.card-title'); // Changed to .card-title
+                // const applyBtn = cardInner.querySelector('.btn');
+                
+                if (title) {
+                    title.style.transform = 'scale(1)';
+                }
+                // No longer directly manipulating applyBtn styles here, rely on CSS
+            }
+
+            /**
+             * Prévisualisation rapide d'une offre
+             */
+            showQuickPreview(card) {
+                // Fetch full description and other details for the modal from the actual card content
+                const title = card.querySelector('.card-title').textContent;
+                const company = card.querySelector('.company-name').textContent;
+                // For the full description, you might need a data attribute or fetch it if not fully present in the truncated version
+                const description = card.querySelector('.offer-description').getAttribute('data-full-description') || card.querySelector('.offer-description').textContent; // Assume a data-full-description for longer text if needed.
+                const salary = card.querySelector('.salary-amount') ? card.querySelector('.salary-amount').textContent : 'Non précisé';
+                const datePosted = card.querySelector('time[itemprop="datePosted"]') ? card.querySelector('time[itemprop="datePosted"]').textContent : 'Non précisé';
+                const dateEnd = card.querySelector('[itemprop="validThrough"]') ? card.querySelector('[itemprop="validThrough"]').textContent : 'Non précisé';
+                const companyRating = card.querySelector('.rating-text') ? card.querySelector('.rating-text').textContent : 'Non notée';
+                const applyLink = card.querySelector('.btn-apply, .btn-login').href; // Get the actual application link
+
+                // Création du modal de prévisualisation
+                const modal = this.createPreviewModal({
+                    title,
+                    company,
+                    description,
+                    salary,
+                    datePosted,
+                    dateEnd,
+                    companyRating,
+                    applyLink
+                });
+                
+                document.body.appendChild(modal);
+                document.body.style.overflow = 'hidden'; // Prevent scrolling body when modal is open
+                requestAnimationFrame(() => {
+                    modal.classList.add('active');
+                    modal.querySelector('.preview-close').focus(); // Focus on close button for accessibility
+                });
+            }
+
+            /**
+             * Création du modal de prévisualisation
+             */
+            createPreviewModal({ title, company, description, salary, datePosted, dateEnd, companyRating, applyLink }) {
+                const modal = document.createElement('div');
+                modal.className = 'preview-modal';
+                modal.innerHTML = `
+                    <div class="preview-overlay" role="dialog" aria-modal="true" aria-labelledby="preview-title">
+                        <div class="preview-content">
+                            <header class="preview-header">
+                                <h3 id="preview-title" class="preview-title">${title}</h3>
+                                <button class="preview-close" aria-label="Fermer la prévisualisation">
+                                    <i class="bi bi-x-lg"></i>
+                                </button>
+                            </header>
+                            <div class="preview-body">
+                                <p class="preview-company">
+                                    <i class="bi bi-building"></i>
+                                    ${company}
+                                </p>
+                                <p class="preview-description">${description}</p>
+                                <hr class="my-3">
+                                <div class="preview-details">
+                                    <p><i class="bi bi-cash-stack me-2 text-success"></i><strong>Salaire :</strong> ${salary}</p>
+                                    <p><i class="bi bi-calendar-event me-2 text-warning"></i><strong>Publié :</strong> ${datePosted}</p>
+                                    <p><i class="bi bi-calendar-x me-2 text-danger"></i><strong>Limite :</strong> ${dateEnd}</p>
+                                    <p><i class="bi bi-star-fill me-2 text-warning"></i><strong>Note entreprise :</strong> ${companyRating}</p>
+                                </div>
+                            </div>
+                            <footer class="preview-footer">
+                                <button class="btn btn-outline-secondary preview-cancel">Fermer</button>
+                                <a href="${applyLink}" class="btn btn-primary preview-apply">Voir l'offre complète / Postuler</a>
+                            </footer>
+                        </div>
+                    </div>
+                `;
+
+                // Gestion de la fermeture du modal
+                const closeBtn = modal.querySelector('.preview-close');
+                const cancelBtn = modal.querySelector('.preview-cancel');
+                const overlay = modal.querySelector('.preview-overlay');
+
+                [closeBtn, cancelBtn].forEach(btn => {
+                    btn.addEventListener('click', () => this.closePreviewModal(modal));
+                });
+
+                overlay.addEventListener('click', (e) => {
+                    if (e.target === overlay) {
+                        this.closePreviewModal(modal);
+                    }
+                });
+
+                // Gestion des touches clavier
+                modal.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape') {
+                        this.closePreviewModal(modal);
+                    }
+                     // Trap focus inside the modal for accessibility
+                    if (e.key === 'Tab') {
+                        const focusableElements = modal.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+                        const firstFocusable = focusableElements[0];
+                        const lastFocusable = focusableElements[focusableElements.length - 1];
+
+                        if (e.shiftKey) { // Shift + Tab
+                            if (document.activeElement === firstFocusable) {
+                                lastFocusable.focus();
+                                e.preventDefault();
+                            }
+                        } else { // Tab
+                            if (document.activeElement === lastFocusable) {
+                                firstFocusable.focus();
+                                e.preventDefault();
+                            }
+                        }
+                    }
+                });
+
+                return modal;
+            }
+
+            /**
+             * Fermeture du modal de prévisualisation
+             */
+            closePreviewModal(modal) {
+                modal.classList.remove('active');
+                document.body.style.overflow = ''; // Restore scrolling on body
+                setTimeout(() => {
+                    if (modal.parentNode) {
+                        modal.parentNode.removeChild(modal);
+                    }
+                }, 300); // Match CSS transition duration
+            }
+
+            /**
+             * Configuration des boutons de candidature
+             */
+            setupApplicationButtons() {
+                const applyButtons = document.querySelectorAll('.btn-apply, .btn-login'); // Also target login buttons
+                
+                applyButtons.forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        this.handleApplicationClick(e);
+                    });
+                });
+            }
+
+            /**
+             * Gestion du clic sur candidature
+             */
+            handleApplicationClick(e) {
+                const button = e.currentTarget;
+                const originalText = button.querySelector('.btn-text').textContent;
+                const originalIconClass = button.querySelector('.btn-icon').className;
+                
+                // Animation de chargement
+                button.classList.add('loading');
+                button.setAttribute('aria-busy', 'true'); // Announce loading state to screen readers
+                button.querySelector('.btn-text').textContent = 'Chargement...';
+                button.querySelector('.btn-icon').className = 'bi bi-hourglass-split btn-icon';
+                
+                // Simulation du chargement (sera remplacé par la vraie logique d'appel API)
+                setTimeout(() => {
+                    button.classList.remove('loading');
+                    button.removeAttribute('aria-busy');
+                    button.querySelector('.btn-text').textContent = originalText;
+                    button.querySelector('.btn-icon').className = originalIconClass; // Restore original icon
+                    
+                    // In a real application, you would handle success/failure here
+                    // e.g., redirect, show a success message, etc.
+                    // For now, we revert the button to its original state.
+                }, 1500);
+            }
+
+            /**
+             * Configuration de l'Intersection Observer pour les animations
+             */
+            initializeIntersectionObserver() {
+                const observerOptions = {
+                    threshold: 0.1,
+                    rootMargin: '0px 0px -50px 0px'
+                };
+
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('animate-in');
+                            observer.unobserve(entry.target);
+                        }
+                    });
+                }, observerOptions);
+
+                // Observer les cartes d'offres
+                document.querySelectorAll('.offer-card').forEach(card => {
+                    observer.observe(card);
+                });
+            }
+
+            /**
+             * Configuration des états de chargement
+             */
+            setupLoadingStates() {
+                const loadingOverlay = document.getElementById('loadingOverlay');
+                
+                // Simulate loading on first page load
+                if (loadingOverlay) {
+                    setTimeout(() => {
+                        loadingOverlay.classList.remove('active');
+                        // Announce that content is loaded for screen readers
+                        const liveRegion = document.getElementById('live-announcements');
+                        if (liveRegion) {
+                            liveRegion.textContent = "Contenu de la page chargé.";
+                        }
+                    }, 800);
+                }
+            }
+
+            /**
+             * Configuration du filtrage et de la recherche
+             */
+            setupFiltering() {
+                // Création dynamique de filtres si nécessaire
+                this.createFilterControls();
+                
+                // Recherche en temps réel
+                this.setupLiveSearch();
+                
+                // Filtres par catégorie
+                this.setupCategoryFilters();
+
+                 // Initialize results count display
+                this.updateResultsCount(document.querySelectorAll('.offer-card').length, '');
+            }
+
+            /**
+             * Création des contrôles de filtrage
+             */
+            createFilterControls() {
+                const filtersContainer = document.createElement('div');
+                filtersContainer.className = 'filters-container';
+                filtersContainer.innerHTML = `
+                    <div class="filters-wrapper">
+                        <div class="search-container">
+                            <div class="search-input-wrapper">
+                                <i class="bi bi-search search-icon"></i>
+                                <input type="text" 
+                                       class="search-input" 
+                                       placeholder="Rechercher une offre..." 
+                                       aria-label="Rechercher parmi les offres d'emploi">
+                                <button class="search-clear" aria-label="Effacer la recherche" style="display: none;">
+                                    <i class="bi bi-x-circle-fill"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="filter-buttons">
+                            <button class="filter-btn active" data-filter="all">Toutes</button>
+                            <button class="filter-btn" data-filter="recent">Récentes</button>
+                            <button class="filter-btn" data-filter="high-salary">Salaire élevé</button>
+                            <button class="filter-btn" data-filter="rated">Bien notées</button>
+                        </div>
+                    </div>
+                `;
+
+                // Insertion avant la grille d'offres
+                const offersGrid = document.querySelector('.offers-grid');
+                if (offersGrid) {
+                    offersGrid.parentNode.insertBefore(filtersContainer, offersGrid);
+                }
+            }
+
+            /**
+             * Configuration de la recherche en temps réel
+             */
+            setupLiveSearch() {
+                const searchInput = document.querySelector('.search-input');
+                const clearButton = document.querySelector('.search-clear');
+                
+                if (!searchInput) return;
+
+                // Use the debounce utility method
+                const debouncedSearch = this.debounce((query) => {
+                    this.performSearch(query);
+                    const liveRegion = document.getElementById('live-announcements');
+                    if (liveRegion) {
+                        const count = document.querySelectorAll('.offer-card:not([style*="display: none"])').length;
+                        if (query) {
+                            liveRegion.textContent = `${count} résultat${count > 1 ? 's' : ''} trouvé${count > 1 ? 's' : ''} pour "${query}".`;
+                        } else {
+                            liveRegion.textContent = `Recherche effacée. ${count} offre${count > 1 ? 's' : ''} affichée${count > 1 ? 's' : ''}.`;
+                        }
+                    }
+                }, 300);
+
+                searchInput.addEventListener('input', (e) => {
+                    const query = e.target.value.trim();
+                    
+                    // Afficher/masquer le bouton de clear
+                    clearButton.style.display = query ? 'block' : 'none';
+                    
+                    debouncedSearch(query);
+                });
+
+                clearButton.addEventListener('click', () => {
+                    searchInput.value = '';
+                    clearButton.style.display = 'none';
+                    debouncedSearch(''); // Perform search with empty query
+                    searchInput.focus();
+                });
+            }
+
+            /**
+             * Exécution de la recherche
+             */
+            performSearch(query) {
+                const cards = document.querySelectorAll('.offer-card');
+                let visibleCount = 0;
+                const noOffersMessage = document.querySelector('.no-offers-found');
+                const offersGrid = document.getElementById('offersGrid'); // Get the grid container
+
+                cards.forEach(card => {
+                    const title = card.querySelector('.card-title').textContent.toLowerCase();
+                    const company = card.querySelector('.company-name').textContent.toLowerCase();
+                    const description = card.querySelector('.offer-description').textContent.toLowerCase();
+                    
+                    const matches = !query || 
+                                     title.includes(query.toLowerCase()) ||
+                                     company.includes(query.toLowerCase()) ||
+                                     description.includes(query.toLowerCase());
+                    
+                    if (matches) {
+                        card.style.display = 'block';
+                        card.classList.add('fade-in'); // Apply fade-in effect
+                        visibleCount++;
+                    } else {
+                        card.style.display = 'none';
+                        card.classList.remove('fade-in');
+                    }
+                });
+
+                // Toggle "No offers found" message based on visible count
+                if (noOffersMessage) { // Check if the element exists in the initial render
+                    if (visibleCount === 0 && cards.length > 0) { // Only show if there are cards but none match
+                        noOffersMessage.style.display = 'block';
+                        offersGrid.style.display = 'none'; // Hide grid if no offers match
+                    } else if (visibleCount === 0 && cards.length === 0) {
+                         // This means the initial render had no offers
+                         noOffersMessage.style.display = 'block';
+                         offersGrid.style.display = 'none';
+                    }
+                    else {
+                        noOffersMessage.style.display = 'none';
+                        offersGrid.style.display = 'flex'; // Restore flex display for grid
+                    }
+                }
+
+                // Mise à jour du compteur de résultats
+                this.updateResultsCount(visibleCount, query);
+            }
+
+            /**
+             * Mise à jour du compteur de résultats
+             */
+            updateResultsCount(count, query) {
+                let resultsInfo = document.querySelector('.results-info');
+                
+                if (!resultsInfo) {
+                    resultsInfo = document.createElement('div');
+                    resultsInfo.className = 'results-info';
+                    const filtersContainer = document.querySelector('.filters-container');
+                    if (filtersContainer) {
+                        filtersContainer.appendChild(resultsInfo);
+                    }
+                }
+
+                if (query) {
+                    resultsInfo.textContent = `${count} résultat${count > 1 ? 's' : ''} pour "${query}"`;
+                    resultsInfo.classList.add('active'); // Show results info
+                } else {
+                    // Only show total count if no query and not filtering
+                    const activeFilter = document.querySelector('.filter-btn.active');
+                    if (activeFilter && activeFilter.dataset.filter === 'all') {
+                         resultsInfo.textContent = `${count} offre${count > 1 ? 's' : ''} disponible${count > 1 ? 's' : ''}.`;
+                         resultsInfo.classList.add('active');
+                    } else {
+                        resultsInfo.classList.remove('active'); // Hide if no query and a specific filter is active
+                    }
+                }
+            }
+
+            /**
+             * Configuration des filtres par catégorie
+             */
+            setupCategoryFilters() {
+                const filterButtons = document.querySelectorAll('.filter-btn');
+                
+                filterButtons.forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        // Mise à jour de l'état actif
+                        filterButtons.forEach(b => b.classList.remove('active'));
+                        e.target.classList.add('active');
+                        
+                        // Application du filtre
+                        const filter = e.target.dataset.filter;
+                        this.applyFilter(filter);
+
+                         const liveRegion = document.getElementById('live-announcements');
+                        if (liveRegion) {
+                            const count = document.querySelectorAll('.offer-card:not([style*="display: none"])').length;
+                            liveRegion.textContent = `Filtre "${e.target.textContent}" appliqué. ${count} offre${count > 1 ? 's' : ''} affichée${count > 1 ? 's' : ''}.`;
+                        }
+                    });
+                });
+            }
+
+            /**
+             * Application des filtres
+             */
+            applyFilter(filter) {
+                const cards = document.querySelectorAll('.offer-card');
+                let visibleCount = 0;
+                const noOffersMessage = document.querySelector('.no-offers-found');
+                const offersGrid = document.getElementById('offersGrid');
+
+                cards.forEach(card => {
+                    let shouldShow = true;
+                    
+                    switch (filter) {
+                        case 'recent':
+                            shouldShow = this.isRecentOffer(card);
+                            break;
+                        case 'high-salary':
+                            shouldShow = this.isHighSalary(card);
+                            break;
+                        case 'rated':
+                            shouldShow = this.isWellRated(card);
+                            break;
+                        case 'all':
+                        default:
+                            shouldShow = true;
+                            break;
+                    }
+                    
+                    if (shouldShow) {
+                        card.style.display = 'block';
+                        card.classList.add('fade-in');
+                        visibleCount++;
+                    } else {
+                        card.style.display = 'none';
+                        card.classList.remove('fade-in');
+                    }
+                });
+
+                // Toggle "No offers found" message for filters
+                if (noOffersMessage) {
+                    if (visibleCount === 0) {
+                        noOffersMessage.style.display = 'block';
+                        offersGrid.style.display = 'none';
+                    } else {
+                        noOffersMessage.style.display = 'none';
+                        offersGrid.style.display = 'flex';
+                    }
+                }
+                
+                // Update results count based on applied filter
+                this.updateResultsCount(visibleCount, ''); // Empty query for filter updates
+            }
+
+            /**
+             * Vérification si l'offre est récente
+             */
+            isRecentOffer(card) {
+                const dateElement = card.querySelector('time[itemprop="datePosted"]');
+                if (!dateElement) return false;
+                
+                const publishDate = new Date(dateElement.getAttribute('datetime'));
+                const now = new Date();
+                const daysDiff = (now - publishDate) / (1000 * 60 * 60 * 24);
+                
+                return daysDiff <= 7; // Offres de moins de 7 jours
+            }
+
+            /**
+             * Vérification si le salaire est élevé
+             */
+            isHighSalary(card) {
+                const salaryElement = card.querySelector('.salary-amount');
+                if (!salaryElement) return false;
+                
+                const salaryText = salaryElement.textContent.replace(/[^\d]/g, '');
+                const salary = parseInt(salaryText);
+                
+                return salary >= 1000000; // Salary >= 1M Ar (changed from > for inclusive)
+            }
+
+            /**
+             * Vérification si l'entreprise est bien notée
+             */
+            isWellRated(card) {
+                const ratingElement = card.querySelector('.rating-text');
+                if (!ratingElement) return false;
+                
+                const ratingMatch = ratingElement.textContent.match(/(\d+\.?\d*)/);
+                if (!ratingMatch) return false;
+                
+                const rating = parseFloat(ratingMatch[1]);
+                return rating >= 4.0; // Note >= 4.0
+            }
+
+            /**
+             * Configuration des effets de scroll
+             */
+            setupScrollEffects() {
+                let lastScrollTop = 0;
+                const header = document.querySelector('.hero-section');
+                const filtersContainer = document.querySelector('.filters-container');
+                
+                // Use throttled scroll handler
+                const throttledScroll = this.throttle(() => {
+                    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                    
+                    // Parallax effect on the hero section
+                    if (header) {
+                        // Only apply parallax if it's the hero section, not the sticky filter
+                        const scrolled = scrollTop * 0.3; // Less intense parallax
+                        header.style.transform = `translateY(${Math.min(scrolled, header.offsetHeight / 2)}px)`; // Cap parallax movement
+                    }
+
+                    // Sticky filter effect (adjust if already using position: sticky)
+                    // If you use CSS `position: sticky;`, this JS might be redundant
+                    if (filtersContainer) {
+                        if (scrollTop > (header ? header.offsetHeight : 200)) { // Adjust threshold
+                            filtersContainer.classList.add('sticky-active'); // Add a class for sticky styles
+                        } else {
+                            filtersContainer.classList.remove('sticky-active');
+                        }
+                    }
+                    
+                    // Back to top button visibility
+                    this.toggleBackToTop(scrollTop > 300);
+                    
+                    lastScrollTop = scrollTop;
+                }, 100); // Throttle scroll events to run every 100ms
+
+                window.addEventListener('scroll', throttledScroll);
+                
+                // Création du bouton retour en haut
+                this.createBackToTopButton();
+            }
+
+            /**
+             * Création du bouton retour en haut
+             */
+            createBackToTopButton() {
+                const backToTop = document.createElement('button');
+                backToTop.className = 'back-to-top';
+                backToTop.innerHTML = '<i class="bi bi-arrow-up"></i>';
+                backToTop.setAttribute('aria-label', 'Retour en haut de page');
+                
+                backToTop.addEventListener('click', () => {
+                    window.scrollTo({
+                        top: 0,
+                        behavior: 'smooth'
+                    });
+                    // Announce for screen readers
+                    const liveRegion = document.getElementById('live-announcements');
+                    if (liveRegion) {
+                        liveRegion.textContent = "Retour en haut de page.";
+                    }
+                });
+                
+                document.body.appendChild(backToTop);
+            }
+
+            /**
+             * Affichage/masquage du bouton retour en haut
+             */
+            toggleBackToTop(show) {
+                const backToTop = document.querySelector('.back-to-top');
+                if (backToTop) {
+                    if (show) {
+                        backToTop.classList.add('active');
+                    } else {
+                        backToTop.classList.remove('active');
+                    }
+                }
+            }
+
+            /**
+             * Configuration de la navigation clavier
+             */
+            setupKeyboardNavigation() {
+                document.addEventListener('keydown', (e) => {
+                    // Navigation with arrow keys only when a card is focused
+                    if (document.activeElement && document.activeElement.classList.contains('offer-card')) {
+                        if (e.key === 'ArrowDown' || e.key === 'ArrowUp' || e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+                            this.handleArrowNavigation(e);
+                        }
+                    }
+                    
+                    // Keyboard shortcuts
+                    if (e.ctrlKey || e.metaKey) {
+                        switch (e.key) {
+                            case 'f': // Ctrl/Cmd + F for search
+                            case 'k': // Ctrl/Cmd + K for search (common in many apps)
+                                e.preventDefault();
+                                this.focusSearchInput();
+                                break;
+                            case 'Escape': // Escape key to close modal (also handled in modal listener)
+                                const activeModal = document.querySelector('.preview-modal.active');
+                                if (activeModal) {
+                                    this.closePreviewModal(activeModal);
+                                }
+                                break;
+                        }
+                    }
+                });
+            }
+
+            /**
+             * Focus sur le champ de recherche
+             */
+            focusSearchInput() {
+                const searchInput = document.querySelector('.search-input');
+                if (searchInput) {
+                    searchInput.focus();
+                    searchInput.select();
+                    const liveRegion = document.getElementById('live-announcements');
+                    if (liveRegion) {
+                        liveRegion.textContent = "Champ de recherche activé.";
+                    }
+                }
+            }
+
+            /**
+             * Navigation avec les flèches (enhanced for grid layout)
+             */
+            handleArrowNavigation(e) {
+                const focusableCards = Array.from(document.querySelectorAll('.offer-card:not([style*="display: none"])'));
+                if (focusableCards.length === 0) return;
+
+                const currentFocusedCard = document.activeElement;
+                let currentIndex = focusableCards.indexOf(currentFocusedCard);
+
+                if (currentIndex === -1) {
+                    // If no card is currently focused, focus the first one
+                    focusableCards[0].focus();
+                    e.preventDefault();
+                    return;
+                }
+
+                let nextIndex = currentIndex;
+                const cardsPerRow = this.getCardsPerRow(); // Helper to determine grid layout
+
+                if (e.key === 'ArrowDown') {
+                    nextIndex = currentIndex + cardsPerRow;
+                } else if (e.key === 'ArrowUp') {
+                    nextIndex = currentIndex - cardsPerRow;
+                } else if (e.key === 'ArrowRight') {
+                    nextIndex = currentIndex + 1;
+                } else if (e.key === 'ArrowLeft') {
+                    nextIndex = currentIndex - 1;
+                }
+
+                // Wrap around logic for horizontal arrows within a row (optional, can be removed)
+                if (e.key === 'ArrowRight' && (nextIndex % cardsPerRow === 0) && nextIndex !== currentIndex + 1) {
+                    nextIndex = currentIndex - (cardsPerRow - 1); // Wrap to start of next row
+                }
+                if (e.key === 'ArrowLeft' && ((currentIndex % cardsPerRow === 0) || nextIndex < 0) && nextIndex !== currentIndex - 1) {
+                    nextIndex = currentIndex + (cardsPerRow - 1); // Wrap to end of previous row
+                }
+
+                // Ensure nextIndex is within bounds and wrap around vertically
+                if (nextIndex >= focusableCards.length) {
+                    nextIndex = nextIndex % focusableCards.length; // Wrap to start
+                } else if (nextIndex < 0) {
+                    nextIndex = focusableCards.length + nextIndex; // Wrap to end
+                }
+                
+                if (focusableCards[nextIndex]) {
+                    e.preventDefault();
+                    focusableCards[nextIndex].focus();
+                }
+            }
+
+             getCardsPerRow() {
+                const grid = document.getElementById('offersGrid');
+                if (!grid) return 1; // Default to 1 if grid not found
+
+                const cardStyle = window.getComputedStyle(grid.firstElementChild);
+                const cardWidth = grid.firstElementChild.offsetWidth + parseFloat(cardStyle.marginLeft) + parseFloat(cardStyle.marginRight);
+                if (cardWidth === 0) return 1; // Avoid division by zero
+
+                const gridWidth = grid.offsetWidth;
+                return Math.floor(gridWidth / cardWidth);
+            }
+
+            /**
+             * Configuration de l'accessibilité
+             */
+            initializeAccessibility() {
+                // `tabindex` and `role` are already added in the Django template for '.offer-card'
+                // This means the card itself is focusable, which is good.
+                
+                // Amélioration des messages d'état
+                this.setupAriaLiveRegions();
+                
+                // Support des lecteurs d'écran (already handled with live region updates in search/filter)
+                this.enhanceScreenReaderSupport();
+            }
+
+            /**
+             * Configuration des régions ARIA live
+             */
+            setupAriaLiveRegions() {
+                // Ensure only one live region exists
+                let liveRegion = document.getElementById('live-announcements');
+                if (!liveRegion) {
+                    liveRegion = document.createElement('div');
+                    liveRegion.setAttribute('aria-live', 'polite');
+                    liveRegion.setAttribute('aria-atomic', 'true');
+                    liveRegion.className = 'sr-only';
+                    liveRegion.id = 'live-announcements';
+                    document.body.appendChild(liveRegion);
+                }
+            }
+
+            /**
+             * Amélioration du support des lecteurs d'écran (already integrated into filter/search logic)
+             */
+            enhanceScreenReaderSupport() {
+                // This method currently contains logic that has been moved into `setupLiveSearch` and `setupCategoryFilters`
+                // to make the announcements directly at the point of action.
+                // We can add more general screen reader enhancements here if needed, e.g., announcements for modal open/close.
+            }
+
+            /**
+             * Optimisations de performance
+             */
+            setupPerformanceOptimizations() {
+                // Lazy loading des images si présentes
+                this.setupLazyLoading();
+                
+                // Throttling des événements scroll (already integrated into setupScrollEffects)
+                // this.throttleScrollEvents(); // This line is not needed here as it's called inside setupScrollEffects
+                
+                // Préchargement des pages de candidature
+                this.preloadApplicationPages();
+            }
+
+            /**
+             * Configuration du lazy loading
+             */
+            setupLazyLoading() {
+                // Assuming images have class="lazy" and data-src attribute
+                const images = document.querySelectorAll('img.lazy[data-src]');
+                
+                if ('IntersectionObserver' in window) {
+                    const imageObserver = new IntersectionObserver((entries, observer) => {
+                        entries.forEach(entry => {
+                            if (entry.isIntersecting) {
+                                const img = entry.target;
+                                img.src = img.dataset.src;
+                                img.removeAttribute('data-src'); // Remove data-src once loaded
+                                img.classList.remove('lazy');
+                                observer.unobserve(img); // Stop observing once loaded
+                            }
+                        });
+                    }, { rootMargin: '0px 0px 200px 0px' }); // Load images 200px before they enter viewport
+                    
+                    images.forEach(img => imageObserver.observe(img));
+                } else {
+                    // Fallback for browsers that don't support IntersectionObserver
+                    images.forEach(img => {
+                        img.src = img.dataset.src;
+                        img.removeAttribute('data-src');
+                        img.classList.remove('lazy');
+                    });
+                }
+            }
+
+            /**
+             * Throttling des événements scroll (method is called in setupScrollEffects)
+             */
+            throttleScrollEvents() {
+                // The main scroll listener in setupScrollEffects is already throttled.
+                // This method itself is a utility, not meant to be called directly from init.
+            }
+
+            /**
+             * Préchargement des pages de candidature
+             */
+            preloadApplicationPages() {
+                const applyLinks = document.querySelectorAll('.btn-apply, .btn-login'); // Target all potential application links
+                
+                applyLinks.forEach(link => {
+                    link.addEventListener('mouseenter', () => {
+                        // Check if the link is actually an internal page to prefetch
+                        if (link.href && link.href.startsWith(window.location.origin)) {
+                            const linkTag = document.createElement('link');
+                            linkTag.rel = 'prefetch';
+                            linkTag.href = link.href;
+                            document.head.appendChild(linkTag);
+                        }
+                    }, { once: true }); // Prefetch only once per link
+                });
+            }
+
+            /**
+             * Méthodes utilitaires
+             */
+            
+            /**
+             * Debounce function
+             */
+            debounce(func, wait) {
+                let timeout;
+                return function executedFunction(...args) {
+                    const later = () => {
+                        clearTimeout(timeout);
+                        func(...args);
+                    };
+                    clearTimeout(timeout);
+                    timeout = setTimeout(later, wait);
+                };
+            }
+
+            /**
+             * Throttle function
+             */
+            throttle(func, limit) {
+                let inThrottle;
+                let lastFunc;
+                let lastRan;
+                return function() {
+                    const context = this;
+                    const args = arguments;
+                    if (!inThrottle) {
+                        func.apply(context, args);
+                        lastRan = Date.now();
+                        inThrottle = true;
+                    } else {
+                        clearTimeout(lastFunc);
+                        lastFunc = setTimeout(function() {
+                            if ((Date.now() - lastRan) >= limit) {
+                                func.apply(context, args);
+                                lastRan = Date.now();
+                            }
+                        }, limit - (Date.now() - lastRan));
+                    }
+                };
+            }
+        }
+
+        // Initialize the page functionality when the DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            new JobOffersPage();
+        });
+    </script>
 {% endblock %}

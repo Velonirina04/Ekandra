@@ -1,50 +1,791 @@
-{% extends 'Ekandra/base.html' %}
-{% load static %} 
-{% load bootstrap5 %} 
-{% block title %}Accueil{% endblock %}
-{% block content %}
-<div class="bg-light p-3 rounded shadow-sm mb-4">
-<h1>Bienvenue sur E-kandra</h1>
-<h2 class="text-center mb-4 text-primary">La plateforme pour connecter demandeurs d’emploi et entreprises.</h2>
-</div>
-<div class="row">
-    {% for offre in offres %}
-        <div class="col-md-6 col-lg-4 mb-4">
-            <div class="card h-100 offer-card">
-                <div class="card-body d-flex flex-column">
-                    <h5 class="card-title text-center mb-3">{{ offre.titre }}</h5>
-                    <p class="card-text  mb-4">{{ offre.description|truncatewords:50 }}</p> {# Tronque la description pour un aperçu #}
-                    
-                    <div class="d-flex justify-content-between align-items-center mb-2 info-group">
-                        <span class="info-item"><i class="bi bi-building"></i> <strong>Entreprise :</strong> {{ offre.entreprise.nom }}</span>
-                        <span class="info-item"><i class="bi bi-cash-stack"></i> <strong>Salaire :</strong> {% if offre.salaire %}{{ offre.salaire }} Ar{% else %}Non précisé{% endif %}</span>
-                    </div>
-                    <div class="d-flex justify-content-between align-items-center mb-4 info-group">
-                        <span class="info-item"><i class="bi bi-calendar-event"></i> <strong>Publié :</strong> {{ offre.date_publication|date:"d M Y" }}</span>
-                        <span class="info-item text-danger"><i class="bi bi-calendar-x"></i> <strong>Limite :</strong> {{ offre.date_fin|date:"d M Y" }}</span>
-                    </div>
+ {% extends 'Ekandra/base.html' %}
+{% load static %}
+{% load bootstrap5 %}
 
-                    <div class="mt-auto text-center"> {# Pousse le bouton vers le bas de la carte #}
-                        {% if user.is_authenticated %}
-                            <a href="{% url 'candidature_create' offre.id %}" class="btn btn-primary btn-lg w-75 postuler-btn">Postuler</a>
-                        {% else %}
-                            <a href="{% url 'login' %}" class="btn btn-secondary btn-lg w-75 postuler-btn">Se connecter pour postuler</a>
-                        {% endif %}
+
+{% block title %}Accueil - E-kandra{% endblock %}
+
+{% block content %}
+<style>
+/* Existing styles (provided by user, kept for context) */
+.hero {
+    background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)),
+                url('{% static "Ekandra/image/cv.avif" %}');
+    background-size: cover;
+    background-position: center;
+    color: white;
+    padding: 5rem 0 8rem;
+    position: relative;
+    animation: fadeIn 1s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0.8; }
+    to { opacity: 1; }
+}
+
+.hero::after {
+    content: "";
+    background: url('{% static "Ekandra/image/alter.png" %}') no-repeat;
+    background-size: contain;
+    opacity: 0.1;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+}
+
+.feature-card {
+    transition: all 0.3s ease;
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    position: relative;
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+}
+
+.feature-card__icon {
+    background: linear-gradient(135deg, #4b6cb7 0%, #182848 100%);
+    color: white;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    font-size: 1.8rem;
+    box-shadow: 0 5px 15px rgba(75, 108, 183, 0.3);
+}
+
+.category-card {
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.category-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+.category-card__icon {
+    background: #f8fafc;
+    color: #4b6cb7;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    margin-right: 15px;
+    transition: all 0.3s ease;
+}
+
+.category-card:hover .category-card__icon {
+    transform: scale(1.1);
+    background: linear-gradient(135deg, #4b6cb7 0%, #182848 100%);
+    color: white;
+}
+
+.testimonial-card {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.testimonial-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+{% comment %}  {% endcomment %}
+.section-title hr {
+    height: 40px;
+    margin-right: 10px;
+    background:rgb(0,0,0); /* Default black in light mode */
+    color:rgb(0,0,0); /* Default black in light mode */
+}
+body.dark-mode .section-title {
+    color: #e2e8f0; /* Ensure the main title text is light for dark mode */
+}
+
+body.dark-mode .section-title hr {
+    background: #4cc9f0 !important; /* Make the HR a vibrant accent color */
+    color: #4cc9f0 !important; /* Ensure color property also matches for consistency */
+    height: 4px !important; /* Make it a sleek line instead of a block */
+    width: 80px; /* Adjust width if needed for better visual */
+    margin: 0 auto 20px; /* Center it below the title, adjust margin as needed */
+    border: none !important; /* Remove any default border */
+    opacity: 0.8; /* Slight transparency for a modern look */
+}
+
+/* If the .features section itself has a distinct background in light mode */
+body.dark-mode .features {
+    background-color: #1a202c; /* Or a slightly lighter dark like #252a34 if it needs to contrast with body */
+    /* Add padding here if this section needs its own distinct dark background with padding */
+    /* padding: 3rem 0; */
+}
+
+/* Styles for .feature-card and its children within dark mode (already covered in previous responses, keeping for completeness) */
+body.dark-mode .feature-card {
+     background-color: #1a202c; /* Or a slightly lighter dark like #252a34 if it needs to contrast with body */
+    /* Add padding here if this section needs its own distinct dark background with padding */
+    /* padding: 3rem 0; */
+    box-shadow: 0 5px 20px rgba(0,0,0,0.4); /* Darker shadow */
+}
+
+body.dark-mode .feature-card:hover {
+    box-shadow: 0 15px 40px rgba(0,0,0,0.6);
+}
+
+body.dark-mode .feature-card__icon {
+    background: linear-gradient(135deg, #3a0ca3 0%, #4361ee 100%); /* Darker gradient for icons */
+    box-shadow: 0 5px 15px rgba(67, 97, 238, 0.4);
+}
+
+body.dark-mode .feature-card__title {
+    color: #4cc9f0; /* Accent color for titles */
+}
+
+body.dark-mode .feature-card__description {
+    color: #cbd5e0; /* Lighter text for descriptions */
+}
+
+/* Existing styles for .section-title and img (kept for context) */
+.section-title img {
+    height: 40px;
+    margin-right: 10px;
+}
+
+/* --- Dark Mode Styles for .categories section --- */
+
+/* Section Title */
+body.dark-mode .categories .section-title {
+    color: #e2e8f0; /* Ensure the title text is light */
+    
+}
+
+body.dark-mode .categories .section-title img {
+    /* Adjust the icon for dark mode. Filter helps make light icons visible on dark background. */
+    filter: invert(0.9) hue-rotate(180deg) brightness(0.8);
+    background: #4cc9f0 !important; /* Make the HR a vibrant accent color */
+    color: #4cc9f0 !important; /* Ensure color property also matches for consistency */
+    height: 4px !important; /* Make it a sleek line instead of a block */
+    width: 80px; /* Adjust width if needed for better visual */
+    margin: 0 auto 20px; /* Center it below the title, adjust margin as needed */
+    border: none !important; /* Remove any default border */
+    opacity: 0.8; /* Slight transparency for a modern look */
+}
+
+/* Category Cards */
+body.dark-mode .category-card {
+    background: #2d3748; /* Dark background for category cards */
+    box-shadow: 0 5px 20px rgba(0,0,0,0.4); /* Darker shadow for depth */
+}
+
+body.dark-mode .category-card:hover {
+    box-shadow: 0 10px 30px rgba(0,0,0,0.6); /* Even darker shadow on hover */
+}
+
+body.dark-mode .category-card__icon {
+    background: #4a5568; /* Darker background for the icon circle */
+    color: #4cc9f0; /* Accent color for the icon */
+}
+
+body.dark-mode .category-card:hover .category-card__icon {
+    background: linear-gradient(135deg, #3a0ca3 0%, #4361ee 100%); /* Maintain vibrant gradient on hover */
+    color: white;
+}
+
+body.dark-mode .category-card__title {
+    color: #e2e8f0; /* Light color for the category title */
+    
+}
+
+body.dark-mode .category-card__count {
+    color: #a0aec0; /* Slightly muted light color for the offer count */
+}
+
+/* Categories Footer (e.g., "Voir toutes les catégories" button) */
+body.dark-mode .categories__footer {
+    /* If this footer has a distinct background, adjust it here */
+    /* background-color: #1a202c; */
+    /* box-shadow: 0 5px 15px rgba(0,0,0,0.3); */
+    
+}
+
+body.dark-mode .btn--secondary {
+    background-color: transparent; /* Transparent background */
+    border: 1px solid #4361ee; /* Accent border */
+    color: #4361ee; /* Accent text color */
+}
+
+body.dark-mode .btn--secondary:hover {
+    background-color: #4361ee; /* Solid accent background on hover */
+    color: white; /* White text on hover */
+}
+{% comment %}  {% endcomment %}
+
+.testimonial-card__avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #4b6cb7;
+    transition: all 0.3s ease;
+}
+
+.testimonial-card:hover .testimonial-card__avatar {
+    transform: scale(1.05);
+    box-shadow: 0 5px 15px rgba(75, 108, 183, 0.3);
+}
+
+.cta-employer {
+    background: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)),
+                 url('{% static "Ekandra/image/people.avif" %}');
+    background-size: cover;
+    background-position: center;
+    color: white;
+    padding: 5rem 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.cta-employer::before {
+    content: "";
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    right: -50%;
+    bottom: -50%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+    transform: rotate(30deg);
+    animation: shine 8s infinite;
+}
+
+@keyframes shine {
+    0% { transform: translateX(-100%) rotate(30deg); }
+    100% { transform: translateX(100%) rotate(30deg); }
+}
+
+/* Animation pour les cartes */
+@keyframes cardEntrance {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.feature-card, .category-card, .testimonial-card {
+    animation: cardEntrance 0.6s ease-out;
+    animation-fill-mode: backwards;
+}
+
+/* Délais d'animation pour chaque carte */
+.feature-card:nth-child(1) { animation-delay: 0.1s; }
+.feature-card:nth-child(2) { animation-delay: 0.2s; }
+.feature-card:nth-child(3) { animation-delay: 0.3s; }
+.feature-card:nth-child(4) { animation-delay: 0.4s; }
+
+.category-card:nth-child(1) { animation-delay: 0.1s; }
+.category-card:nth-child(2) { animation-delay: 0.2s; }
+.category-card:nth-child(3) { animation-delay: 0.3s; }
+.category-card:nth-child(4) { animation-delay: 0.4s; }
+.category-card:nth-child(5) { animation-delay: 0.5s; }
+.category-card:nth-child(6) { animation-delay: 0.6s; }
+.category-card:nth-child(7) { animation-delay: 0.7s; }
+.category-card:nth-child(8) { animation-delay: 0.8s; }
+
+.testimonial-card:nth-child(1) { animation-delay: 0.2s; }
+.testimonial-card:nth-child(2) { animation-delay: 0.4s; }
+
+
+/* --- Dark Mode Styles --- */
+
+/* General Body Styles */
+body.dark-mode {
+    background-color: #1a202c; /* Dark background */
+    color: #e2e8f0; /* Default text color for dark mode */
+}
+body.dark-mode .categories {
+    background-color: #1a202c; /* Dark background */
+    color: #e2e8f0; /* Default text color for dark mode */
+}
+
+/* Hero Section */
+body.dark-mode .hero {
+    /* Background gradient and image are already dark, usually fine. */
+    /* If the overlay needs to be slightly darker: */
+    /* background: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)), url('...'); */
+    color: #e2e8f0; /* Ensure hero text is light */
+}
+
+body.dark-mode .hero::after {
+    filter: invert(0.9) hue-rotate(180deg) brightness(0.8); /* Adjust background pattern for dark mode */
+}
+
+body.dark-mode .hero__title .text-accent {
+    color: #4cc9f0; /* Keep accent color vibrant */
+}
+
+/* Search Form */
+body.dark-mode .search-form {
+    background-color: #2d3748; /* Dark background for the search form */
+    border-radius: 10px; /* Assuming it has a distinct background */
+    padding: 1.5rem; /* Add padding if it becomes a distinct box */
+    box-shadow: 0 5px 20px rgba(0,0,0,0.4);
+}
+
+body.dark-mode .input-group__field {
+    background-color: #4a5568; /* Darker input field background */
+    color: #e2e8f0; /* Light text in input fields */
+    border: 1px solid #6b7280; /* Subtle border */
+}
+
+body.dark-mode .input-group__field::placeholder {
+    color: #a0aec0; /* Lighter placeholder text */
+}
+
+body.dark-mode .input-group__field:focus {
+    border-color: #4cc9f0; /* Accent color on focus */
+    box-shadow: 0 0 0 0.25rem rgba(76, 201, 240, 0.25); /* Lighter focus shadow */
+}
+
+body.dark-mode .input-group__icon {
+    color: #a0aec0; /* Lighter icon color */
+}
+
+body.dark-mode .btn--primary {
+    background: linear-gradient(135deg, #3a0ca3, #4361ee); /* Dark mode specific button gradient */
+    border-color: #3a0ca3;
+    color: white;
+}
+
+body.dark-mode .btn--primary:hover {
+    background: linear-gradient(135deg, #4361ee, #3a0ca3);
+    border-color: #4361ee;
+}
+
+/* Trending Searches */
+body.dark-mode .trending-searches {
+    color: #cbd5e0; /* Light text for label */
+}
+
+body.dark-mode .trending-searches__link {
+    background-color: #4a5568; /* Darker background for tags */
+    color: #e2e8f0; /* Light text for tags */
+    border: 1px solid #6b7280; /* Subtle border for tags */
+}
+
+body.dark-mode .trending-searches__link:hover {
+    background-color: #5a6270;
+    color: #4cc9f0; /* Accent color on hover */
+    border-color: #4cc9f0;
+}
+
+/* Section Titles */
+body.dark-mode .section-title {
+    color: #e2e8f0; /* Main section titles */
+}
+
+body.dark-mode .section-title hr {
+    background: #e2e8f0 !important; /* Make HR visible */
+    color: #e2e8f0 !important;
+}
+
+body.dark-mode .section-title img {
+    filter: invert(0.9) hue-rotate(180deg) brightness(0.8); /* Adjust section title icons */
+}
+
+/* Feature Cards */
+body.dark-mode .feature-card  {
+    background: #2d3748; /* Dark background for cards */
+    box-shadow: 0 5px 20px rgba(0,0,0,0.4); /* Darker shadow */
+}
+
+body.dark-mode .feature-card:hover {
+    box-shadow: 0 15px 40px rgba(0,0,0,0.6);
+}
+
+body.dark-mode .feature-card__icon {
+    background: linear-gradient(135deg, #3a0ca3 0%, #4361ee 100%); /* Darker gradient for icons */
+    box-shadow: 0 5px 15px rgba(67, 97, 238, 0.4);
+}
+
+body.dark-mode .feature-card__title {
+    color: #4cc9f0; /* Accent color for titles */
+}
+
+body.dark-mode .feature-card__description {
+    color: #cbd5e0; /* Lighter text for descriptions */
+}
+
+/* Category Cards */
+body.dark-mode .category-card {
+    background: #2d3748; /* Dark background for category cards */
+    box-shadow: 0 5px 20px rgba(0,0,0,0.4);
+}
+
+body.dark-mode .category-card:hover {
+    box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+}
+
+body.dark-mode .category-card__icon {
+    background: #4a5568; /* Darker background for category icons */
+    color: #4cc9f0; /* Accent color for icons */
+}
+
+body.dark-mode .category-card:hover .category-card__icon {
+    background: linear-gradient(135deg, #3a0ca3 0%, #4361ee 100%); /* Hover gradient for icons */
+    color: white;
+}
+
+body.dark-mode .category-card__title {
+    color: #e2e8f0; /* Light text for titles */
+}
+
+body.dark-mode .category-card__count {
+    color: #a0aec0; /* Lighter grey for counts */
+}
+
+body.dark-mode .categories__footer {
+    background-color: #1a202c; /* Footer background if distinct */
+    padding: 20px; /* Adjust as needed */
+    border-radius: 10px; /* If it's a separate section */
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+body.dark-mode .btn--secondary {
+    background-color: transparent;
+    border: 1px solid #4361ee;
+    color: #4361ee;
+}
+
+body.dark-mode .btn--secondary:hover {
+    background-color: #4361ee;
+    color: white;
+}
+
+/* Testimonial Cards */
+body.dark-mode .testimonials {
+    background-color: #1a202c; /* Background for the testimonial section */
+}
+
+body.dark-mode .testimonial-card {
+    background: #2d3748; /* Dark background for testimonial cards */
+    box-shadow: 0 5px 20px rgba(0,0,0,0.4);
+}
+
+body.dark-mode .testimonial-card:hover {
+    box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+}
+
+body.dark-mode .testimonial-card__quote {
+    color: #e2e8f0; /* Light text for quotes */
+}
+
+body.dark-mode .testimonial-card__author {
+    color: #cbd5e0; /* Light text for author info */
+}
+
+body.dark-mode .testimonial-card__name {
+    color: #4cc9f0; /* Accent color for names */
+}
+
+body.dark-mode .testimonial-card__role {
+    color: #a0aec0; /* Lighter grey for roles */
+}
+
+body.dark-mode .testimonial-card__avatar {
+    border-color: #4cc9f0; /* Accent border for avatar */
+    box-shadow: 0 5px 15px rgba(76, 201, 240, 0.3);
+}
+
+/* Partners Section */
+body.dark-mode .partners__title {
+    color: #e2e8f0; /* Light text for partners title */
+}
+
+body.dark-mode .partners__logo {
+    filter: invert(0.9) hue-rotate(180deg) brightness(0.9); /* Invert and adjust brightness for light logos on dark background */
+}
+
+/* Call to Action (CTA) Employer Section */
+body.dark-mode .cta-employer {
+    /* Background is already dark, no changes needed */
+    color: #e2e8f0;
+}
+
+body.dark-mode .cta-employer__title {
+    color: #4cc9f0; /* Accent color for CTA title */
+}
+
+body.dark-mode .cta-employer__description {
+    color: #cbd5e0;
+}
+
+body.dark-mode .btn--white {
+    background-color: #e2e8f0; /* Light button for dark mode */
+    color: #1a202c; /* Dark text for button */
+    border-color: #e2e8f0;
+}
+
+body.dark-mode .btn--white:hover {
+    background-color: #cbd5e0; /* Slightly darker on hover */
+    border-color: #cbd5e0;
+}
+</style>
+
+<section class="hero" aria-labelledby="hero-title">
+    <div class="container">
+        <div class="hero__content">
+            <h1 id="hero-title" class="hero__title">
+                {% comment %} <img src="{% static 'Ekandra/image/pinguin.png' %}" alt="Icône emploi" style="height: 60px; margin-bottom: 20px;"> {% endcomment %}
+                Votre carrière, <span class="text-accent">votre chemin</span>
+            </h1>
+            <p class="hero__subtitle">
+                Des milliers d'opportunités vous attendent. Trouvez celle qui vous ressemble.
+            </p>
+            
+            {% comment %} <form class="search-form" role="search" aria-label="Recherche d'emploi">
+                <div class="search-form__group">
+                    <div class="input-group">
+                        <label for="job-search" class="sr-only">Poste ou mot-clé</label>
+                        <input 
+                            type="text" 
+                            id="job-search"
+                            class="input-group__field" 
+                            placeholder="Titre de poste, mots-clés, entreprise..."
+                            aria-describedby="job-search-help"
+                        >
+                        <span class="input-group__icon" aria-hidden="true">
+                            <i class="fas fa-briefcase"></i>
+                        </span>
                     </div>
+                    
+                    <div class="input-group">
+                        <label for="location-search" class="sr-only">Localisation</label>
+                        <input 
+                            type="text" 
+                            id="location-search"
+                            class="input-group__field" 
+                            placeholder="Ville, région ou télétravail"
+                            aria-describedby="location-search-help"
+                        >
+                        <span class="input-group__icon" aria-hidden="true">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </span>
+                    </div>
+                    
+                    <button type="submit" class="btn btn--primary btn--large">
+                        <i class="fas fa-search" aria-hidden="true"></i>
+                        <span>Rechercher</span>
+                    </button>
                 </div>
+            </form>
+            
+            <div class="trending-searches">
+                <span class="trending-searches__label">Recherches populaires :</span>
+                <nav class="trending-searches__nav" aria-label="Recherches populaires">
+                    <a href="#" class="trending-searches__link">Développeur Web</a>
+                    <a href="#" class="trending-searches__link">Chef de Projet</a>
+                    <a href="#" class="trending-searches__link">Commercial</a>
+                    <a href="#" class="trending-searches__link">Marketing Digital</a>
+                </nav>
             </div>
         </div>
-    {% empty %}
-        {# Ce bloc s'affiche si la liste 'offres' est vide #}
-        <div class="col-12 text-center py-5">
-            <i class="bi bi-emoji-frown display-4 text-muted mb-3"></i>
-            <p class="lead">Aucune offre d'emploi n'est disponible pour le moment.</p>
-            <p class="text-muted">Revenez bientôt, de nouvelles opportunités sont ajoutées régulièrement !</p>
+    </div> {% endcomment %}
+</section>
+
+<section class="features" aria-labelledby="features-title">
+    <div class="container">
+        <h2 id="features-title" class="section-title">
+            <hr  style="height: 40px; margin-right: 10px; background:rgb(0,0,0); color:rgb(0,0,0);">
+            Pourquoi choisir E-kandra ?
+        </h2>
+        
+        <div class="features__grid">
+            <article class="feature-card">
+                <div class="feature-card__icon" aria-hidden="true">
+                    <i class="fas fa-bullseye"></i>
+                </div>
+                <h3 class="feature-card__title">Offres ciblées</h3>
+                <p class="feature-card__description">
+                    Accédez à des opportunités qui correspondent précisément à vos compétences et aspirations.
+                </p>
+            </article>
+            
+            <article class="feature-card">
+                <div class="feature-card__icon" aria-hidden="true">
+                    <i class="fas fa-user-check"></i>
+                </div>
+                <h3 class="feature-card__title">Profil optimisé</h3>
+                <p class="feature-card__description">
+                    Créez un profil qui attire l'attention des recruteurs et met en valeur votre parcours.
+                </p>
+            </article>
+            
+            <article class="feature-card">
+                <div class="feature-card__icon" aria-hidden="true">
+                    <i class="fas fa-rocket"></i>
+                </div>
+                <h3 class="feature-card__title">Processus rapide</h3>
+                <p class="feature-card__description">
+                    Postulez en quelques clics et suivez l'avancement de vos candidatures en temps réel.
+                </p>
+            </article>
+            
+            <article class="feature-card">
+                <div class="feature-card__icon" aria-hidden="true">
+                    <i class="fas fa-headset"></i>
+                </div>
+                <h3 class="feature-card__title">Accompagnement</h3>
+                <p class="feature-card__description">
+                    Bénéficiez de conseils et de ressources pour booster votre recherche d'emploi.
+                </p>
+            </article>
         </div>
-    {% endfor %}
-</div>
+    </div>
+</section>
+
+<section class="categories" aria-labelledby="categories-title">
+    <div class="container">
+        <h2 id="categories-title" class="section-title">
+            Explorez par secteur d'activité
+        </h2>
+        
+        <div class="categories__grid">
+            <a href="#" class="category-card">
+                <div class="category-card__icon" aria-hidden="true">
+                    <i class="fas fa-code"></i>
+                </div>
+                <div class="category-card__content">
+                    <h3 class="category-card__title">IT & Développement</h3>
+                    <span class="category-card__count">15 000+ offres</span>
+                </div>
+            </a>
+            
+            <a href="#" class="category-card">
+                <div class="category-card__icon" aria-hidden="true">
+                    <i class="fas fa-bullhorn"></i>
+                </div>
+                <div class="category-card__content">
+                    <h3 class="category-card__title">Marketing & Communication</h3>
+                    <span class="category-card__count">8 000+ offres</span>
+                </div>
+            </a>
+            
+            <a href="#" class="category-card">
+                <div class="category-card__icon" aria-hidden="true">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="category-card__content">
+                    <h3 class="category-card__title">Finance & Comptabilité</h3>
+                    <span class="category-card__count">6 000+ offres</span>
+                </div>
+            </a>
+            
+            <a href="#" class="category-card">
+                <div class="category-card__icon" aria-hidden="true">
+                    <i class="fas fa-heart"></i>
+                </div>
+                <div class="category-card__content">
+                    <h3 class="category-card__title">Santé & Social</h3>
+                    <span class="category-card__count">5 000+ offres</span>
+                </div>
+            </a>
+            
+            <a href="#" class="category-card">
+                <div class="category-card__icon" aria-hidden="true">
+                    <i class="fas fa-building"></i>
+                </div>
+                <div class="category-card__content">
+                    <h3 class="category-card__title">Administration</h3>
+                    <span class="category-card__count">7 000+ offres</span>
+                </div>
+            </a>
+            
+            <a href="#" class="category-card">
+                <div class="category-card__icon" aria-hidden="true">
+                    <i class="fas fa-utensils"></i>
+                </div>
+                <div class="category-card__content">
+                    <h3 class="category-card__title">Hôtellerie & Restauration</h3>
+                    <span class="category-card__count">4 500+ offres</span>
+                </div>
+            </a>
+            
+            <a href="#" class="category-card">
+                <div class="category-card__icon" aria-hidden="true">
+                    <i class="fas fa-truck"></i>
+                </div>
+                <div class="category-card__content">
+                    <h3 class="category-card__title">Logistique & Transport</h3>
+                    <span class="category-card__count">9 000+ offres</span>
+                </div>
+            </a>
+            
+            <a href="#" class="category-card">
+                <div class="category-card__icon" aria-hidden="true">
+                    <i class="fas fa-palette"></i>
+                </div>
+                <div class="category-card__content">
+                    <h3 class="category-card__title">Design & Création</h3>
+                    <span class="category-card__count">3 000+ offres</span>
+                </div>
+            </a>
+        </div>
+        
+        <div class="categories__footer">
+            <a href="{% url 'offres' %}" class="btn btn--secondary">
+                Voir toutes les catégories
+                <i class="fas fa-arrow-right" aria-hidden="true"></i>
+            </a>
+        </div>
+    </div>
+</section>
+
+
+<section class="cta-employer" aria-labelledby="cta-title">
+    <div class="container">
+        <div class="cta-employer__content">
+            <h2 id="cta-title" class="cta-employer__title" style="color:white;">
+                Vous recrutez ? Trouvez vos futurs talents ici.
+            </h2>
+            <p class="cta-employer__description">
+                Déposez votre offre d'emploi et connectez-vous avec les meilleurs candidats qualifiés en France.
+            </p>
+            <a href="#" class="btn btn--white btn--large">
+                <i class="fas fa-upload" aria-hidden="true"></i>
+                Déposer une offre d'emploi
+            </a>
+        </div>
+    </div>
+</section>
 {% endblock %}
 
 {% block extra_css %}
-    <link rel="stylesheet" href="{% static 'Ekandra/css/offres.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'Ekandra/css/home.css' %}">
+{% endblock %}
+
+{% block extra_js %}
+    <script src="{% static 'Ekandra/js/home.js' %}"></script>
 {% endblock %}

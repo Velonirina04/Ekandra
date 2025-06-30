@@ -30,7 +30,49 @@ def home(request):
     context = get_base_context(request)
     context.update({'offres': offres})
     return render(request, 'Ekandra/home.html', context)
+def a_propos(request):
+    """
+    Vue pour afficher la page "À Propos de Nous".
+    """
+    return render(request, 'Ekandra/a_propos.html') 
+def contact(request):
+    """
+    Vue pour afficher la page "Contactez-nous".
+    Si vous implémentez un formulaire de contact, la logique irait ici.
+    """
+    # Example for a basic form, you'd replace this with a real Django form
+    # if request.method == 'POST':
+    #     form = ContactForm(request.POST)
+    #     if form.is_valid():
+    #         name = form.cleaned_data['name']
+    #         email = form.cleaned_data['email']
+    #         message = form.cleaned_data['message']
+    #         send_mail(
+    #             f'Message de contact de {name}',
+    #             f'Email: {email}\n\nMessage:\n{message}',
+    #             settings.EMAIL_HOST_USER, # From email
+    #             ['your_email@example.com'], # To email
+    #             fail_silently=False,
+    #         )
+    #         # Add a success message or redirect
+    #         return redirect('contact_success') # You'd need this URL
+    # else:
+    #     form = ContactForm()
+    
+    # context = {'form': form} # Pass the form to the template if used
+    context = {} # No form passed for now
 
+    return render(request, 'Ekandra/contact.html', context)
+def faq (request):
+    """
+    Vue pour afficher la page "Foire Aux Questions (FAQ)".
+    """
+    return render(request, 'Ekandra/faq.html')
+def credit(request):
+    """
+    Vue pour afficher la page "Crédits & Développeur".
+    """
+    return render(request, 'Ekandra/credit.html')
 def register(request):
     if request.method == 'POST':
         user_type = request.POST.get('user_type')
@@ -129,7 +171,12 @@ def profile(request):
         except Entreprise.DoesNotExist:
             messages.error(request, 'Profil non configuré.')
             return redirect('home')
-
+@login_required # Cette vue ne sera accessible qu'aux utilisateurs connectés
+def parametre(request):
+    """
+    Vue pour afficher la page des paramètres du compte.
+    """
+    return render(request, 'Ekandra/parametre.html')
 @login_required
 def offre_create(request):
     try:
@@ -172,29 +219,47 @@ def offres_view(request):
 
 @login_required
 def candidature_create(request, offre_id):
+    
     offre = get_object_or_404(OffreEmploi, id=offre_id, active=True)
-    lm = Candidature.lettre_motivation
-    cv = Candidature.cv
+
     try:
+       
         demandeur = Demandeur.objects.get(user=request.user)
+
+        if Candidature.objects.filter(demandeur=demandeur, offre=offre).exists():
+            messages.info(request, "Vous avez déjà postulé à cette offre.")
+            return redirect('offre_detail', offre_id=offre.id) 
+
         if request.method == 'POST':
-            form = CandidatureForm(request.POST)
+            form = CandidatureForm(request.POST, request.FILES) 
             if form.is_valid():
                 candidature = form.save(commit=False)
+
                 candidature.demandeur = demandeur
                 candidature.offre = offre
+                candidature.statut = 'en_attente' 
+
                 candidature.save()
-                messages.success(request, 'Candidature envoyée.')
-                return redirect('profile')
+
+                messages.success(request, 'Votre candidature a été envoyée avec succès.')
+                return redirect('profile') 
             else:
-                messages.error(request, 'Erreur dans le formulaire.')
+                messages.error(request, 'Erreur dans le formulaire. Veuillez vérifier les informations soumises.')
         else:
             form = CandidatureForm()
-        context = get_base_context(request)
-        context.update({'form': form, 'offre': offre})
-        return render(request, 'Ekandra/candidature_form.html', context)
+
+        context = {
+            'form': form,
+            'offre': offre,
+        }
+      
+        return render(request, 'Ekandra/candidature_form.html', context) 
+
     except Demandeur.DoesNotExist:
-        messages.error(request, 'Seuls les demandeurs peuvent postuler.')
+        messages.error(request, "Vous devez avoir un profil de demandeur d'emploi pour postuler à une offre. Veuillez compléter votre profil.")
+        return redirect('home') 
+    except Exception as e:
+        messages.error(request, f"Une erreur inattendue est survenue: {e}")
         return redirect('offres')
 
 @login_required
@@ -301,6 +366,8 @@ def chercher_utilisateur(request):
 def supprimer_offre(request, offeremploi_id):
     offer = get_object_or_404(OffreEmploi, id=offeremploi_id)
     user_entreprise = Entreprise.objects.get(user=request.user)
+    form = OffreEmploiForm(request.POST)
+    
     
 
     
@@ -314,8 +381,15 @@ def supprimer_offre(request, offeremploi_id):
         else:
             offer.delete()
             messages.success(request, "L'offre a été supprimée avec succès.")
+            return redirect('profile')
+        #     context = get_base_context(request) 
+        #     context.update({
+        # 'offre': offer,
+        # 'entreprise': user_entreprise, 
+        # 'form': form,
+        #                  })
             
-            return render(request, 'Ekandra/home.html', {'offre': offer})
+        #     return render(request, 'Ekandra/profile_entreprise.html', context)
 
     else:
         messages.error(request, "Vous n'avez pas la permission de supprimer cette offre.")
@@ -403,16 +477,23 @@ def voir_candidatures(request, candidature_id):
                 
                 candidature.statut = 'refusee'
                 candidature.save()
-                messages.success(request, f"Candidature de {candidature.demandeur.user.username} pour '{candidature.offre.titre}' refusée.")
+                messages.error(request, f"Candidature de {candidature.demandeur.user.username} pour '{candidature.offre.titre}' refusée.")
 
             else:
                 messages.error(request, "Action non reconnue.")
 
         except Candidature.DoesNotExist:
             messages.error(request, "Candidature introuvable.")
+        context = get_base_context(request) 
+        context.update({
+        'entreprise': entreprise,
+        'candidatures': candidatures,
+        'entreprise_offers': entreprise_offers, 
+                        })
 
         
-        return redirect('profile')
+        # return redirect('voir_candidatures')
+        return render(request,'Ekandra/voir_candidature.html',context)
 
 
 

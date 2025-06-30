@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'Ekandra',
     'django_bootstrap5',
+    'widget_tweaks',
     'channels',
     
 ]
@@ -129,14 +130,21 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = 'static/'
+# STATICFILES_DIRS = [
+#     BASE_DIR / "Ekandra/static",  # Chemin mis à jour
+# ]
 STATICFILES_DIRS = [
-    BASE_DIR / "Ekandra/static",  # Chemin mis à jour
+    os.path.join(BASE_DIR, 'static'), # For project-wide static files
+    os.path.join(BASE_DIR, 'Ekandra', 'static'), # If 'Ekandra' is an app with its own static folder
+    # Add other app static directories if they are not named 'static'
+    # e.g., os.path.join(BASE_DIR, 'your_other_app', 'static'),
 ]
-STATIC_ROOT = BASE_DIR / "staticfiles"
+# STATIC_ROOT = BASE_DIR / "staticfiles"
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
-
+ALLOWED_HOSTS =['192.168.43.248','0.0.0.0','localhost','127.0.0.1']
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 

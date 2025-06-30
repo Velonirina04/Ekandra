@@ -1,69 +1,196 @@
 {% extends 'Ekandra/base.html' %}
-{% load static %} 
+{% load static %}
 {% load bootstrap5 %}
 {% load i18n %}
+{% load my_filter %}
+{%block extra_css%}
+<style>
+    /* Ensure the base body styles apply from your global dark mode CSS */
 
+/* --- Dark Mode Styles for Message List Specific Elements --- */
 
+/* Header Section */
+body.dark-mode .header-section {
+    background-color: #2d3748 !important; /* Darker background for the header */
+    box-shadow: 0 5px 20px rgba(0,0,0,0.4) !important; /* Darker shadow */
+}
+
+body.dark-mode .header-section h1 {
+    color: #4cc9f0 !important; /* Accent color for the title */
+}
+
+body.dark-mode .header-section p {
+    color: #cbd5e0 !important; /* Lighter text for the lead paragraph */
+}
+
+/* Main Conversations Card */
+body.dark-mode .conversations-card {
+    background-color: #2d3748 !important; /* Dark background for the main card */
+    box-shadow: 0 10px 30px rgba(0,0,0,0.6) !important; /* Deeper shadow */
+}
+
+body.dark-mode .conversations-card .card-title {
+    background-color: #3a0ca3; /* A complementary dark accent for card title bar */
+    color: #e2e8f0 !important; /* Light text for the card title */
+    border-bottom-color: #4361ee !important; /* Accent border */
+}
+
+/* List Group Items (Individual Conversations) */
+body.dark-mode .list-group-item {
+    background-color: #2d3748; /* Default background for list items */
+    border-color: #4a5568 !important; /* Darker border between items */
+    color: #e2e8f0; /* Default text color for items */
+    transition: background-color 0.3s ease; /* Smooth transition for hover */
+}
+
+body.dark-mode .list-group-item.conversation-item-hover:hover {
+    background-color: #3a455a; /* Slightly lighter dark on hover */
+}
+
+body.dark-mode .list-group-item.unread-conversation {
+    background-color: #3a0ca3; /* Distinct background for unread conversations */
+}
+
+body.dark-mode .list-group-item.unread-conversation:hover {
+    background-color: #4361ee; /* Even lighter dark on hover for unread */
+}
+
+/* Avatar Placeholder */
+body.dark-mode .avatar-placeholder {
+    background-color: #4a5568; /* Darker background for avatar placeholder */
+    border-color: #4cc9f0 !important; /* Accent border for unread */
+}
+
+body.dark-mode .avatar-placeholder .text-muted {
+    color: #a0aec0 !important; /* Lighter icon color inside placeholder */
+}
+
+/* Conversation Details Text */
+body.dark-mode .conversation-details h6 {
+    color: #e2e8f0 !important; /* Light text for username */
+}
+
+body.dark-mode .conversation-details h6.text-dark {
+    color: #e2e8f0 !important; /* Explicitly ensure dark text becomes light */
+}
+
+body.dark-mode .last-message-snippet {
+    color: #a0aec0 !important; /* Muted light color for message snippet */
+}
+
+body.dark-mode .last-message-snippet.fw-bold {
+    color: #e2e8f0 !important; /* Stronger light color for unread snippet */
+}
+
+body.dark-mode .last-message-snippet .text-primary {
+    color: #4cc9f0 !important; /* Accent color for "You:" */
+}
+
+body.dark-mode .last-message-snippet .text-info {
+    color: #66d9ef !important; /* Complementary accent for sender username */
+}
+
+body.dark-mode .text-muted {
+    color: #a0aec0 !important; /* General muted text for date/no message */
+}
+
+/* Unread Badge */
+body.dark-mode .unread-badge {
+    background-color: #4cc9f0 !important; /* Accent color for the unread count badge */
+    color: #1a202c !important; /* Dark text on the light badge */
+}
+
+/* No Conversations State */
+body.dark-mode .p-5.text-center.text-muted {
+    background-color: #2d3748 !important; /* Dark background for this section */
+    color: #e2e8f0 !important; /* Light text */
+}
+
+body.dark-mode .p-5.text-center.text-muted .display-4 {
+    color: #4cc9f0 !important; /* Accent color for the icon */
+}
+
+body.dark-mode .p-5.text-center.text-muted p.text-secondary {
+    color: #cbd5e0 !important; /* Lighter text */
+}
+
+/* Card Footer Button */
+body.dark-mode .card-footer {
+    background-color: #1a202c !important; /* Dark background for footer */
+    border-top-color: #4a5568 !important; /* Darker border */
+}
+
+body.dark-mode .btn-primary.find-user-btn {
+    background: linear-gradient(135deg, #3a0ca3, #4361ee) !important; /* Accent gradient for the button */
+    border-color: #3a0ca3 !important;
+    color: white !important;
+}
+
+body.dark-mode .btn-primary.find-user-btn:hover {
+    background: linear-gradient(135deg, #4361ee, #3a0ca3) !important;
+    border-color: #4361ee !important;
+}
+</style>
+{%endblock%}
 {% block title %}{% trans "My Conversations" %}{% endblock %}
 
-
-{% comment %} {% block extra_head %}
-    {% bootstrap_css %}
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" href="{% static 'Ekandra/css/style.css' %}">
-    <link rel="stylesheet" href="{% static 'Ekandra/css/message_list.css' %}">
-
-{% endblock %} {% endcomment %}
 {% block content %}
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 <link rel="stylesheet" href="{% static 'Ekandra/css/message_list.css' %}">
 
-
-
-<div class="container my-4 mb-5">
-    
-    <div class="header-section text-center mb-5">
-        <h1 class="display-5 fw-bold text-primary mb-3"><i class="bi bi-envelope-fill me-3"></i> {% trans "Mes Messages" %}</h1>
+<div class="container my-5">
+    <div class="header-section text-center mb-5 p-4 bg-white rounded shadow-sm">
+        <h1 class="display-4 fw-bold text-primary mb-3">
+            <i class="bi bi-chat-dots-fill me-3"></i> {% trans "Mes Messages" %}
+        </h1>
+        <p class="lead text-secondary">
+            {% trans "Gérez toutes vos conversations en un seul endroit." %}
+        </p>
     </div>
 
-    
-    <div class="card mx-auto shadow-lg rounded-3 conversations-card"> 
+    <div class="card mx-auto shadow-lg rounded-3 conversations-card">
         <div class="card-body p-0">
-            
-            <h2 class="card-title p-4 mb-0 border-bottom text-secondary fw-bold text-center">{% trans "Conversations" %}</h2>
+            <h2 class="card-title p-4 mb-0 border-bottom text-primary fw-bold text-center">
+                {% trans "Mes Conversations Actives" %}
+            </h2>
 
             {% if conversations %}
                 <div class="list-group list-group-flush">
                     {% for conv in conversations %}
                         <a href="{% url 'message_conversation' conv.user.id %}"
-                           class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3 {% if conv.unread_count > 0 %}unread-conversation{% endif %}"
+                           class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3 px-4 {% if conv.unread_count > 0 %}unread-conversation{% endif %} conversation-item-hover"
                            data-user-id="{{ conv.user.id }}"
                            data-sender-username="{{ conv.user.username }}">
 
-                            
-                            <div class="conversation-details flex-grow-1 me-3">
-                                <h6 class="mb-1 fw-bold text-truncate">{{ conv.user.username }}</h6>
-                                {% if conv.last_message %}
-                                    <p class="mb-0 last-message-snippet text-muted small">
-                                        {% if conv.last_message.expediteur == request.user %}
-                                            <span class="fw-bold">{% trans "Vous" %}:</span>
-                                        {% else %}
-                                            <span class="fw-bold">{{ conv.last_message.expediteur.username }}:</span>
-                                        {% endif %}
-                                        {{ conv.last_message.contenu|truncatewords:10 }}
-                                    </p>
-                                {% else %}
-                                    <p class="mb-0 text-muted small">{% trans "Pas encore de message." %}</p>
-                                {% endif %}
+                            <div class="d-flex align-items-center flex-grow-1 me-3">
+                                <div class="avatar-placeholder me-3 {% if conv.unread_count > 0 %}border-primary{% endif %}">
+                                    <i class="bi bi-person-circle display-6 text-muted"></i>
+                                </div>
+                                <div class="conversation-details flex-grow-1">
+                                    <h6 class="mb-1 fw-bold text-truncate {% if conv.unread_count > 0 %}text-dark{% else %}text-secondary{% endif %}">
+                                        {{ conv.user.username }}
+                                    </h6>
+                                    {% if conv.last_message %}
+                                        <p class="mb-0 last-message-snippet small {% if conv.unread_count > 0 %}fw-bold text-dark{% else %}text-muted{% endif %}">
+                                            {% if conv.last_message.expediteur == request.user %}
+                                                <span class="text-primary">{% trans "Vous" %}:</span>
+                                            {% else %}
+                                                <span class="text-info">{{ conv.last_message.expediteur.username|split:" "|first }}:</span>
+                                            {% endif %}
+                                            {{ conv.last_message.contenu|truncatewords:8 }}
+                                        </p>
+                                    {% else %}
+                                        <p class="mb-0 text-muted small fst-italic">{% trans "Pas encore de message." %}</p>
+                                    {% endif %}
+                                </div>
                             </div>
 
-                            
                             <div class="text-end flex-shrink-0">
                                 {% if conv.last_message %}
-                                    <small class="text-muted d-block mb-1" id="ff">{{ conv.last_message.date_envoi|date:"d/m/Y" }}</small>
+                                    <small class="text-muted d-block mb-1">{{ conv.last_message.date_envoi|date:"d M Y" }}</small>
                                 {% endif %}
                                 {% if conv.unread_count > 0 %}
-                                    <span class="badge bg-primary rounded-pill unread-badge">{{ conv.unread_count }}</span>
+                                    <span class="badge bg-primary rounded-pill unread-badge animate__animated animate__bounceIn">{{ conv.unread_count }}</span>
                                 {% endif %}
                             </div>
                         </a>
@@ -71,13 +198,18 @@
                 </div>
             {% else %}
                 <div class="p-5 text-center text-muted">
-                    <p class="lead"><i class="bi bi-info-circle-fill me-2"></i> {% trans "Vous n'avez pas encore de message." %}</p>
-                    <p>{% trans "Touver un interlocuteur!" %}</p>
+                    <p class="lead mb-3">
+                        <i class="bi bi-chat-square-dots display-4 text-primary mb-3"></i>
+                        <br> {% trans "Vous n'avez pas encore de conversations actives." %}
+                    </p>
+                    <p class="text-secondary">
+                        {% trans "Démarrez une nouvelle conversation avec un autre utilisateur pour commencer." %}
+                    </p>
                 </div>
             {% endif %}
             <div class="card-footer text-center p-3">
-                <a href="{% url 'chercher_utilisateur' %}" class="btn btn-outline-primary btn-sm">
-                    <i class="bi bi-search me-2"></i> {% trans "Trouver interlocuteur" %}
+                <a href="{% url 'chercher_utilisateur' %}" class="btn btn-primary btn-lg rounded-pill find-user-btn">
+                    <i class="bi bi-search me-2"></i> {% trans "Trouver un interlocuteur" %}
                 </a>
             </div>
         </div>

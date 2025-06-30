@@ -1,0 +1,115 @@
+/* General Body & Background */
+body {
+    background-color: #f8f9fa; /* Light subtle background */
+    font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; /* Modern, readable font stack */
+    line-height: 1.6; /* Improved readability */
+}
+
+/* Header Section Styling */
+.header-section {
+    padding-top: 4rem;
+    padding-bottom: 2rem;
+    background: linear-gradient(135deg, #e0f2f7, #ffffff); /* Subtle gradient for header */
+    border-bottom: 1px solid #dee2e6; /* Light separator */
+    margin-bottom: 3.5rem !important; /* Ensure enough space below header */
+}
+
+.header-section h1 {
+    color: #0056b3; /* Stronger primary color for the title */
+    letter-spacing: -0.03em; /* Slightly tighter letter spacing for headlines */
+    font-size: 3.2rem; /* Make heading slightly bigger */
+}
+
+.header-section p.lead {
+    color: #555;
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+    font-size: 1.15rem; /* Slightly larger lead text */
+}
+
+/* Form Card Styling */
+.form-card {
+    border: none; /* Remove default card border */
+    border-radius: 1rem; /* More rounded corners for a softer look */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08); /* Stronger, softer shadow for depth */
+    overflow: hidden; /* Ensures rounded corners clip content */
+}
+
+.form-card .card-body {
+    padding: 3rem; /* More internal padding for the form */
+}
+
+/* Form Labels (django-bootstrap5 renders these with form-label) */
+.form-label {
+    font-weight: 600; /* Bolder labels */
+    color: #343a40; /* Darker text for labels */
+    font-size: 0.95rem; /* Slightly smaller for compactness */
+    /* margin-bottom is handled by django-bootstrap5's field rendering, no need for mb-1 here */
+}
+
+/* Form Inputs (django-bootstrap5 applies .form-control) */
+.form-control {
+    border-radius: 0.5rem; /* Rounded input fields */
+    padding: 0.75rem 1rem; /* More padding inside inputs */
+    font-size: 1rem;
+    border: 1px solid #ced4da;
+    transition: all 0.2s ease-in-out; /* Smooth transitions for focus states */
+}
+
+.form-control:focus {
+    border-color: #007bff; /* Primary color border on focus */
+    box-shadow: 0 0 0 0.25rem rgba(0, 123, 255, 0.25); /* Primary color shadow on focus */
+    background-color: #f0f8ff; /* Slight background change on focus */
+}
+
+/* Help Text (django-bootstrap5 wraps these in .form-text) */
+.form-text {
+    font-size: 0.85rem; /* Smaller help text */
+    color: #6c757d; /* Muted color */
+    margin-top: 0.4rem; /* Tighter margin */
+}
+
+/* Error Messages (django-bootstrap5 applies .is-invalid and .invalid-feedback) */
+.is-invalid + .invalid-feedback,
+.invalid-feedback { /* Ensure it's always visible when needed */
+    color: #dc3545; /* Bootstrap danger color for errors */
+    font-size: 0.875rem; /* Standard error font size */
+    margin-top: 0.25rem; /* Tighter margin */
+    font-weight: 500; /* Slightly bolder for prominence */
+    display: block; /* Ensure it overrides default hidden state for server errors */
+}
+
+
+/* Submit Button */
+.publish-btn {
+    background-color: #007bff; /* Primary button color */
+    border-color: #007bff;
+    padding: 0.8rem 1.5rem; /* More padding for a larger, more clickable button */
+    font-size: 1.2rem; /* Larger font size */
+    font-weight: bold;
+    border-radius: 0.75rem; /* More rounded button */
+    transition: all 0.3s ease; /* Smooth transitions for hover effects */
+    letter-spacing: 0.05em; /* Slight letter spacing for better readability */
+}
+
+.publish-btn:hover {
+    background-color: #0056b3; /* Darker shade on hover */
+    border-color: #0056b3;
+    transform: translateY(-2px); /* Subtle lift effect */
+    box-shadow: 0 5px 15px rgba(0, 123, 255, 0.3); /* Soft shadow on hover */
+}
+
+.publish-btn i {
+    vertical-align: middle; /* Align icon with text */
+}
+
+/* Responsive Adjustments (optional, Bootstrap handles most) */
+@media (max-width: 768px) {
+    .form-card .card-body {
+        padding: 2rem; /* Less padding on smaller screens */
+    }
+    .header-section h1 {
+        font-size: 2.5rem;
+    }
+}

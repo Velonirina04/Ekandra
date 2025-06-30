@@ -1,0 +1,136 @@
+/* General Body and Container Styles */
+body {
+    background-color: #f8f9fa; /* Light background for the whole page */
+    font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    color: #343a40;
+}
+
+.container {
+    max-width: 700px; /* Optimal width for a feedback form */
+}
+
+/* Header Section (consistent with other pages) */
+.header-section {
+    background-color: #ffffff;
+    border-bottom: 3px solid #007bff; /* Primary color emphasis */
+    padding: 2.5rem 1.5rem; /* More generous padding */
+    border-radius: 0.75rem; /* Rounded corners */
+    box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.05); /* Soft shadow */
+}
+
+.header-section h1 {
+    color: #007bff !important; /* Primary blue for main title */
+    font-weight: 700;
+}
+
+.header-section h1 .text-secondary {
+    color: #495057 !important; /* Darker grey for the company name */
+}
+
+.header-section .lead {
+    color: #6c757d !important; /* Secondary grey for lead text */
+}
+
+/* Rating Form Card */
+.rating-form-card {
+    border-radius: 1rem; /* More rounded */
+    box-shadow: 0 0.75rem 2rem rgba(0, 0, 0, 0.1) !important; /* Deeper shadow for main card */
+    background-color: #ffffff;
+    border: none;
+}
+
+.rating-form-card .card-title {
+    font-size: 1.8rem; /* Larger title for the form */
+    font-weight: 600;
+    color: #212529; /* Darker text for a softer heading */
+}
+
+/* Form Group & Labels */
+.form-group {
+    margin-bottom: 1.5rem; /* More space between fields */
+}
+
+.form-label {
+    font-weight: 600; /* Bolder labels */
+    color: #343a40; /* Darker color for labels */
+    margin-bottom: 0.75rem; /* Space below label */
+}
+
+/* Form Controls (Inputs, Textareas) */
+.form-control {
+    border-radius: 0.5rem; /* Slightly rounded inputs */
+    border: 1px solid #ced4da;
+    padding: 0.8rem 1rem;
+    font-size: 1rem;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-control:focus {
+    border-color: #007bff; /* Primary blue on focus */
+    box-shadow: 0 0 0 0.25rem rgba(0, 123, 255, 0.25);
+}
+
+/* Error Messages */
+.alert.alert-danger {
+    font-size: 0.9rem;
+    padding: 0.75rem 1rem;
+    margin-top: 0.5rem;
+    border-radius: 0.5rem;
+}
+
+/* Submit Button */
+.rate-submit-btn {
+    background-color: #007bff; /* Primary blue for submit */
+    border-color: #007bff;
+    font-weight: 600;
+    font-size: 1.25rem; /* Larger text */
+    padding: 0.8rem 2rem;
+    transition: all 0.3s ease;
+}
+
+.rate-submit-btn:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+    border-color: #0056b3;
+    transform: translateY(-2px); /* Slight lift */
+    box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2); /* Soft shadow on hover */
+}
+
+/* Back Button (consistent with other pages) */
+.back-button-animated {
+    background-color: transparent;
+    border-color: #6c757d;
+    color: #6c757d;
+    font-size: 1.1rem;
+    padding: 0.75rem 2rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    border-radius: 2rem; /* Rounded button */
+}
+
+.back-button-animated:hover {
+    background-color: #6c757d;
+    color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(108, 117, 125, 0.2);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 767.98px) {
+    .header-section h1 {
+        font-size: 2rem;
+    }
+    .header-section .lead {
+        font-size: 1rem;
+    }
+    .rating-form-card .card-title {
+        font-size: 1.5rem;
+    }
+    .rate-submit-btn {
+        font-size: 1.1rem;
+        padding: 0.7rem 1.5rem;
+    }
+    .back-button-animated {
+        width: 100%;
+        padding: 0.6rem 1.5rem;
+    }
+}

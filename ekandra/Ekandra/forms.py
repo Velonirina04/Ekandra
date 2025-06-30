@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.models import User
-from Ekandra.models import Demandeur, Entreprise, OffreEmploi, Candidature, Notation  # Import mis à jour
+from Ekandra.models import Demandeur, Entreprise, OffreEmploi, Candidature, Notation ,Message # Import mis à jour
 
 class DemandeurInscriptionForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput, label='Mot de passe')
@@ -66,6 +66,10 @@ class OffreEmploiForm(forms.ModelForm):
     class Meta:
         model = OffreEmploi
         fields = ['titre', 'description', 'salaire','date_fin']
+        title = forms.CharField(
+        label="Titre de l'offre",
+        widget=forms.TextInput(attrs={'class': 'form-control-lg'})
+    )
         widgets = {
             'description': forms.Textarea(attrs={'rows': 6}),
         }
@@ -96,7 +100,16 @@ class EntrepriseProfileUpdateForm(forms.ModelForm):
         }
 
 class MessageForm(forms.Form):
-    contenu = forms.CharField(widget=forms.Textarea(attrs={'rows': 4}), label="Message")
+    class Meta:
+        model: Message
+        fields = [ 'contenu']
+        widgets = {
+            'contenu': forms.Textarea(attrs={
+                'rows': 5, # Nombre de lignes visibles par défaut
+                'placeholder': 'Écrivez votre message ici...',
+                'class': 'form-control chat-message-input' # Ajoutez vos classes CSS ici
+                 }),
+            }
 
 class NotationForm(forms.ModelForm):
     class Meta:

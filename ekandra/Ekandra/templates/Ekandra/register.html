@@ -1,6 +1,10 @@
 {% extends 'Ekandra/base.html' %}
 {% load bootstrap5 %} 
 {% load static %} 
+{% load my_filter %} 
+{% load widget_tweaks %}
+{% comment %} 
+
 
 {% block title %}Inscription{% endblock %}
 
@@ -53,4 +57,672 @@ document.addEventListener('DOMContentLoaded', function() {
 {% block extra_css %}
     {# Link your custom style.css if it contains relevant styles (like .auth-container if you kept it and its styles) #}
     <link rel="stylesheet" href="{% static 'Ekandra/css/style.css' %}"> 
+{% endblock %} {% endcomment %}
+{% comment %} {% extends 'Ekandra/base.html' %} {% endcomment %}
+{% block extra_css %}
+<style>
+    /* Variables CSS harmonisées (keeping your existing variables for consistency) */
+:root {
+    --primary-color: #4361ee;
+    --primary-light: #e6ebff;
+    --secondary-color: #3a0ca3;
+    --accent-color: #4cc9f0;
+    --light-color: #f8f9fa;
+    --dark-color: #2d3748;
+    --gray-light: #e2e8f0;
+    --gray-medium: #94a3b8;
+    --success-color: #4bb543;
+    --error-color: #ef4444;
+    --warning-color: #f59e0b;
+    --border-radius: 8px;
+    --border-radius-sm: 4px;
+    --box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* --- Base Styles (keeping your existing ones) --- */
+.auth-page-wrapper {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    background-color: #f5f7ff;
+    background-image: url('{% static "Ekandra/image/work.svg" %}');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+}
+
+.auth-card {
+    border: none;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    overflow: hidden;
+    width: 100%;
+    max-width: 1000px;
+    display: flex;
+    transition: var(--transition);
+    background-color: white;
+}
+
+.auth-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+}
+
+/* Section illustration */
+.auth-illustration {
+    flex: 1;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    padding: 3rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    position: relative;
+    overflow: hidden;
+}
+
+.auth-illustration::before,
+.auth-illustration::after {
+    content: "";
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.auth-illustration::before {
+    top: -50px;
+    right: -50px;
+    width: 200px;
+    height: 200px;
+}
+
+.auth-illustration::after {
+    bottom: -80px;
+    left: -80px;
+    width: 250px;
+    height: 250px;
+}
+
+.illustration-img {
+    width: 100%;
+    max-width: 350px;
+    margin-bottom: 2rem;
+    filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.2));
+}
+
+/* Section formulaire */
+.auth-content {
+    flex: 1;
+    padding: 3rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.auth-header {
+    margin-bottom: 2.5rem;
+    text-align: center;
+}
+
+.auth-logo {
+    width: 80px;
+    height: 80px;
+    object-fit: contain;
+    margin-bottom: 1.5rem;
+}
+
+.auth-title {
+    font-weight: 700;
+    color: var(--dark-color);
+    margin-bottom: 0.75rem;
+    font-size: 1.75rem;
+}
+
+.auth-subtitle {
+    color: var(--gray-medium);
+    font-size: 1rem;
+    line-height: 1.5;
+}
+
+/* --- ENHANCED INPUT STYLES --- */
+
+.form-group {
+    position: relative;
+    margin-bottom: 1.75rem;
+    /* Adjusted for consistency with other spacing */
+}
+
+.input-wrapper {
+    position: relative;
+    padding-top: 15px;
+
+    /* Space for the floating label */
+}
+input{
+    border:black;
+
+}
+
+.form-control,
+.custom-select {
+    width: 100%;
+    padding: 1rem 3rem 1rem 3.5rem;
+    /* Padding for icon and text, and right arrow for select */
+    border: 2px solid var(--gray-light);
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+    transition: var(--transition);
+    background-color: white;
+    appearance: none;
+    /* For select element to remove default arrow */
+    outline: none;
+    /* Remove default focus outline */
+}
+
+.form-control:focus,
+.custom-select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px var(--primary-light);
+}
+
+.input-icon {
+    position: absolute;
+    left: 1.25rem;
+    top: 50%;
+    /* Vertically center relative to input area */
+    transform: translateY(-50%);
+    color: var(--gray-medium);
+    font-size: 1.25rem;
+    transition: var(--transition);
+    pointer-events: none;
+    /* Make icon non-interactive */
+    z-index: 2;
+    /* Ensure icon is above input */
+}
+
+.input-label {
+    position: absolute;
+    left: 3.5rem;
+    /* Align with input text start */
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--gray-medium);
+    font-size: 1rem;
+    pointer-events: none;
+    transition: all 0.2s ease-out;
+    background-color: white;
+    /* Ensure label covers input text if it's too long */
+    padding: 0 5px;
+    z-index: 1;
+    /* Below icon, above input field */
+}
+
+/* Floating label effect */
+.form-control:focus+.input-label,
+.form-control:not(:placeholder-shown)+.input-label,
+.custom-select:focus+.input-label,
+.custom-select:not([value=""]) + .input-label,
+.custom-select option:checked:not([value=""])+.input-label {
+    top: 0;
+    transform: translateY(-50%) scale(0.85);
+    color: var(--primary-color);
+    left: 1.5rem;
+    /* Move label slightly left when floating */
+}
+
+/* Floating label for select on page load if an option is pre-selected */
+.custom-select:not([value=""]) + .input-label {
+    top: 0;
+    transform: translateY(-50%) scale(0.85);
+    color: var(--primary-color);
+    left: 1.5rem;
+}
+
+
+/* Underline effect on focus */
+.input-underline {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: var(--primary-color);
+    transform: scaleX(0);
+    transition: transform 0.3s ease-out;
+    transform-origin: bottom left;
+    z-index: 3;
+    /* Ensure it's above input border */
+}
+
+.form-control:focus~.input-underline,
+.custom-select:focus~.input-underline {
+    transform: scaleX(1);
+}
+
+/* Error and Hint Messages */
+.input-hint,
+.input-error {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+    padding-left: 3.5rem;
+    /* Align with input text */
+}
+
+.input-hint {
+    color: var(--gray-medium);
+    border:black;
+}
+
+.input-error {
+    color: var(--error-color);
+}
+
+
+/* Password Toggle */
+.password-toggle {
+    position: absolute;
+    right: 1.25rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--gray-medium);
+    cursor: pointer;
+    font-size: 1.25rem;
+    transition: var(--transition);
+    z-index: 3;
+    /* Ensure it's clickable */
+}
+
+.password-toggle:hover {
+    color: var(--primary-color);
+}
+
+/* Custom Select Specific Styles */
+.select-icon {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--gray-medium);
+    font-size: 1.25rem;
+    pointer-events: none;
+    /* Ensure clicks pass through to select */
+    z-index: 2;
+}
+
+/* Adjust padding for select to accommodate icon and arrow */
+.custom-select {{% if offre.entreprise.moyenne is not None %}
+                                        <span class="ms-2 star-rating" role="img" aria-label="Note de {{ offre.entreprise.moyenne|floatformat:1 }} sur 5">
+                                            {% with rating_val=offre.entreprise.moyenne|add:0.0 %}
+                                            {% for i in "12345" %}
+                                                {% if rating_val >= forloop.counter %}
+                                                    <i class="bi bi-star-fill text-warning" aria-hidden="true"></i>
+                                                {% elif rating_val > forloop.counter|add:-1 and rating_val < forloop.counter %}
+                                                    <i class="bi bi-star-half text-warning" aria-hidden="true"></i>
+                                                {% else %}
+                                                    <i class="bi bi-star text-secondary" aria-hidden="true"></i>
+                                                {% endif %}
+                                            {% endfor %}
+                                            {% endwith %}
+                                            <span class="rating-text" itemprop="aggregateRating" itemtype="http://schema.org/AggregateRating" itemscope><span itemprop="ratingValue">{{ offre.entreprise.moyenne|floatformat:1 }}</span>/5</span>
+                                        </span>
+                                    {% else %}
+                                        <span class="text-muted ms-2">Non notée</span>
+                                    {% endif %}
+    padding-right: 3rem;
+    /* Space for the custom arrow icon */
+}
+
+/* Ensure the floating label for select behaves correctly when an option is selected */
+.custom-select:valid + .input-label { /* Use :valid for select if an option with value is selected */
+    top: 0;
+    transform: translateY(-50%) scale(0.85);
+    color: var(--primary-color);
+    left: 1.5rem;
+}
+
+
+/* --- Other Styles (keeping your existing ones) --- */
+
+/* Bouton amélioré */
+.auth-btn {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    border: none;
+    border-radius: var(--border-radius);
+    padding: 1rem;
+    font-size: 1rem;
+    font-weight: 600;
+    width: 100%;
+    margin-top: 1.5rem;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+}
+
+.auth-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(67, 97, 238, 0.3);
+}
+
+/* Footer */
+.auth-footer {
+    text-align: center;
+    margin-top: 2rem;
+    color: var(--gray-medium);
+    font-size: 0.9375rem;
+}
+
+.auth-link {
+    color: var(--primary-color);
+    font-weight: 600;
+    text-decoration: none;
+    transition: var(--transition);
+}
+
+.auth-link:hover {
+    color: var(--secondary-color);
+    text-decoration: underline;
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+    .auth-card {
+        flex-direction: column;
+        max-width: 600px;
+    }
+
+    .auth-illustration {
+        padding: 2.5rem 2rem;
+    }
+
+    .illustration-img {
+        max-width: 280px;
+    }
+}
+
+@media (max-width: 576px) {
+    .auth-page-wrapper {
+        padding: 1.5rem 1rem;
+    }
+
+    .auth-content,
+    .auth-illustration {
+        padding: 2rem 1.5rem;
+    }
+
+    .form-control,
+    .custom-select {
+        padding: 0.875rem 2.5rem 0.875rem 3rem;
+    }
+
+    .input-icon,
+    .select-icon {
+        left: 1rem;
+        font-size: 1.1rem;
+    }
+
+    .input-label {
+        left: 3rem;
+        /* Adjust for smaller padding */
+    }
+
+    .form-control:focus+.input-label,
+    .form-control:not(:placeholder-shown)+.input-label,
+    .custom-select:focus+.input-label,
+    .custom-select:not([value=""]) + .input-label,
+    .custom-select option:checked:not([value=""])+.input-label {
+        left: 1rem;
+        /* Adjust for smaller padding when floating */
+    }
+
+    .password-toggle {
+        right: 1rem;
+    }
+
+    .input-hint,
+    .input-error {
+        padding-left: 3rem;
+    }
+}
+</style>
+
+{% endblock %}
+
+{% block title %}Créer un compte - E-kandra{% endblock %}
+
+{% block content %}
+<div class="auth-page-wrapper">
+    <div class="auth-card">
+        <div class="auth-illustration d-none d-lg-flex">
+            <img src="{% static 'Ekandra/image/Inscription.svg' %}" alt="Illustration inscription" class="illustration-img animate__animated animate__fadeInLeft">
+            <h2 class="h3 mt-4 text-center">Commencez votre voyage avec E-kandra</h2>
+            <p class="text-center opacity-75">Créez un compte pour accéder à toutes les fonctionnalités</p>
+
+            <div class="mt-4">
+                <div class="d-flex align-items-center mb-3">
+                    <i class="bi bi-check-circle-fill me-2"></i>
+                    <span>Accédez à des milliers d'offres</span>
+                </div>
+                <div class="d-flex align-items-center mb-3">
+                    <i class="bi bi-check-circle-fill me-2"></i>
+                    <span>Suivez vos candidatures</span>
+                </div>
+                <div class="d-flex align-items-center">
+                    <i class="bi bi-check-circle-fill me-2"></i>
+                    <span>Recevez des recommandations</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="auth-content animate__animated animate__fadeInRight">
+            <div class="auth-header">
+                <img src="{% static 'Ekandra/image/Ekandra.svg' %}" alt="Logo E-kandra" class="auth-logo">
+                <h1 class="auth-title">Créer un compte</h1>
+                <p class="auth-subtitle">Rejoignez notre communauté en quelques étapes</p>
+            </div>
+
+            <form method="post" novalidate>
+                {% csrf_token %}
+
+                <div class="form-group">
+                    <div class="input-wrapper">
+                        <i class="bi bi-person-circle input-icon"></i>
+                        <select name="user_type" id="user_type" class="custom-select" required>
+                            <option value="" disabled selected hidden></option>
+                            <option value="demandeur" {% if user_type == 'demandeur' %}selected{% endif %}>Demandeur d'emploi</option>
+                            <option value="entreprise" {% if user_type == 'entreprise' %}selected{% endif %}>Entreprise / Recruteur</option>
+                        </select>
+                        <label for="user_type" class="input-label">Type de compte</label>
+                        <span class="select-icon"><i class="bi bi-chevron-down"></i></span>
+                        <div class="input-underline"></div>
+                    </div>
+                    <div class="input-hint">
+                        <i class="bi bi-info-circle"></i> Choisissez le type de profil qui correspond à votre besoin
+                    </div>
+                </div>
+
+                {% for field in form %}
+                <div class="form-group">
+                    <div class="input-wrapper">
+                        {% if field.name == 'username' %}
+                        <i class="bi bi-person-fill input-icon"></i>
+                        {% elif field.name == 'email' %}
+                        <i class="bi bi-envelope-fill input-icon"></i>
+                        {% elif field.name == 'password' %}
+                        <i class="bi bi-lock-fill input-icon"></i>
+                        {% elif field.name == 'password2' %}
+                        <i class="bi bi-shield-lock input-icon"></i>
+                        {% else %}
+                        <i class="bi bi-card-text input-icon"></i>
+                        {% endif %}
+
+                        {{ field | add_class:"form-control" | attr:"placeholder: " }}
+                        <label for="{{ field.id_for_label }}" class="input-label">
+                            {{ field.label }}
+                        </label>
+
+                        {% if field.name == 'password' or field.name == 'password2' %}
+                        <button type="button" class="password-toggle" aria-label="Toggle password visibility">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                        {% endif %}
+
+                        <div class="input-underline"></div>
+                    </div>
+
+                    {% if field.help_text %}
+                    <div class="input-hint">
+                        <i class="bi bi-info-circle"></i> {{ field.help_text }}
+                    </div>
+                    {% endif %}
+
+                    {% if field.errors %}
+                    <div class="input-error">
+                        <i class="bi bi-exclamation-circle"></i> {{ field.errors.0 }}
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+
+                <button type="submit" class="btn auth-btn">
+                    <i class="bi bi-person-plus-fill me-2"></i> Créer mon compte
+                </button>
+
+                <div class="auth-footer">
+                    <p class="mb-0">Vous avez déjà un compte ?
+                        <a href="{% url 'login' %}" class="auth-link">Connectez-vous</a>
+                    </p>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Function to update floating label and underline
+        function updateInputState(inputElement) {
+            const wrapper = inputElement.closest('.input-wrapper');
+            if (!wrapper) return;
+
+            const label = wrapper.querySelector('.input-label');
+            const icon = wrapper.querySelector('.input-icon');
+            const underline = wrapper.querySelector('.input-underline');
+
+            const hasValue = inputElement.value !== '' && inputElement.value !== undefined && inputElement.value !== null;
+
+            if (label) {
+                if (hasValue || inputElement === document.activeElement) {
+                    label.style.top = '0';
+                    label.style.transform = 'translateY(-50%) scale(0.85)';
+                    label.style.color = 'var(--primary-color)';
+                    label.style.left = '1.5rem';
+                } else {
+                    label.style.top = '50%';
+                    label.style.transform = 'translateY(-50%)';
+                    label.style.color = 'var(--gray-medium)';
+                    label.style.left = '3.5rem'; // Default position
+                }
+            }
+
+            if (icon) {
+                icon.style.color = inputElement === document.activeElement || hasValue ? 'var(--primary-color)' : 'var(--gray-medium)';
+            }
+
+            if (underline) {
+                underline.style.transform = inputElement === document.activeElement ? 'scaleX(1)' : 'scaleX(0)';
+            }
+
+            inputElement.style.borderColor = inputElement === document.activeElement || hasValue ? 'var(--primary-color)' : 'var(--gray-light)';
+            inputElement.style.boxShadow = inputElement === document.activeElement ? '0 0 0 3px var(--primary-light)' : 'none';
+        }
+
+        // Initialize state for all inputs and selects on load
+        document.querySelectorAll('.form-control, .custom-select').forEach(input => {
+            // Add event listeners
+            input.addEventListener('focus', () => updateInputState(input));
+            input.addEventListener('blur', () => updateInputState(input));
+            input.addEventListener('input', () => updateInputState(input));
+            input.addEventListener('change', () => updateInputState(input)); // For select elements
+
+            // Set initial state
+            updateInputState(input);
+        });
+
+        // Gestion du changement de type d'utilisateur avec animation améliorée
+        const userTypeSelect = document.getElementById('user_type');
+        if (userTypeSelect) {
+            userTypeSelect.addEventListener('change', function() {
+                const authContent = document.querySelector('.auth-content');
+                if (authContent) {
+                    authContent.style.opacity = '0';
+                    authContent.style.transform = 'translateY(20px)';
+                    authContent.style.transition = 'all 0.3s ease-out';
+
+                    setTimeout(() => {
+                        const url = new URL(window.location.href);
+                        url.searchParams.set('user_type', this.value);
+                        window.location.href = url.toString();
+                    }, 300);
+                }
+            });
+        }
+
+        // Gestion améliorée du toggle password
+        document.querySelectorAll('.password-toggle').forEach(toggle => {
+            toggle.addEventListener('click', function() {
+                const input = this.closest('.input-wrapper').querySelector('input');
+                const icon = this.querySelector('i');
+
+                // Animation du changement d'icône
+                icon.style.transform = 'scale(0.8)';
+                setTimeout(() => {
+                    icon.style.transform = 'scale(1)';
+
+                    if (input.type === 'password') {
+                        input.type = 'text';
+                        icon.classList.replace('bi-eye', 'bi-eye-slash');
+                    } else {
+                        input.type = 'password';
+                        icon.classList.replace('bi-eye-slash', 'bi-eye');
+                    }
+                }, 100);
+            });
+
+            // Effet hover
+            toggle.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-50%) scale(1.1)';
+            });
+
+            toggle.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(-50%) scale(1)';
+            });
+        });
+
+        // Animation d'entrée au chargement
+        const authContent = document.querySelector('.auth-content');
+        if (authContent) {
+            authContent.style.opacity = '0';
+            authContent.style.transform = 'translateY(20px)';
+
+            setTimeout(() => {
+                authContent.style.transition = 'all 0.4s ease-out';
+                authContent.style.opacity = '1';
+                authContent.style.transform = 'translateY(0)';
+            }, 100);
+        }
+    });
+</script>
 {% endblock %}

@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Avg
 from django.contrib.auth.models import User
 from django.core.validators import FileExtensionValidator, MinValueValidator, MaxValueValidator
 
@@ -21,6 +22,16 @@ class Entreprise(models.Model):
     siret = models.CharField(max_length=14,unique=False)
     photo_profil = models.ImageField(upload_to='profils/', blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    @property
+    def moyenne(self):
+        """
+        Calculates the average rating for the enterprise based on all associated notations.
+        Ensures the returned value is a float with a dot as decimal separator.
+        """
+        average = self.notation_set.aggregate(Avg('note'))['note__avg']
+        # Ensure it's a float, and return 0.0 if None
+        return float(average) if average is not None else 0.0
+
 
     def __str__(self):
         return f"{self.nom} (Entreprise)"
@@ -39,8 +50,8 @@ class OffreEmploi(models.Model):
 
 class Candidature(models.Model):
     demandeur = models.ForeignKey(Demandeur, on_delete=models.CASCADE)
-    cv = models.FileField(upload_to='cvs/', validators=[FileExtensionValidator(['pdf'])], blank=True, null=True)
     offre = models.ForeignKey(OffreEmploi, on_delete=models.CASCADE)
+    cv = models.FileField(upload_to='cvs/', validators=[FileExtensionValidator(['pdf'])], blank=True, null=True)
     lettre_motivation = models.FileField(upload_to='cvs/', validators=[FileExtensionValidator(['pdf'])], blank=True, null=True)
     date_candidature = models.DateTimeField(auto_now_add=True)
     statut = models.CharField(max_length=50, choices=[

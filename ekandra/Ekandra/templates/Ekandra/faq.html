@@ -1,0 +1,326 @@
+{% extends 'Ekandra/base.html' %}
+{% load static %}
+{% load bootstrap5 %}
+{% load i18n %}
+
+{% block title %}{% trans "Foire Aux Questions (FAQ)" %}{% endblock %}
+
+{% block content %}
+<style>
+    /* --- Light Mode Variables (Default) --- */
+    :root {
+        --light-page-bg: #f5f7fa;
+        --light-header-bg-start: #f0f2f5;
+        --light-header-bg-end: #e2e4e8;
+        --light-text-primary: #1e293b;
+        --light-text-secondary: #64748b;
+        --light-card-bg: #ffffff;
+        --light-card-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+        --light-icon-color: #3b82f6; /* Primary blue for icons */
+        --light-link-color: #3b82f6;
+        --light-link-hover-color: #2563eb;
+        --light-border-color: #e2e8f0;
+        --light-heading-color: #1e293b;
+        --light-accordion-header-bg: #f8fafc;
+        --light-accordion-button-color: #1e293b;
+        --light-accordion-button-active-bg: #e2e8f0;
+        --light-accordion-button-active-color: #3b82f6;
+
+        /* Apply light mode variables by default */
+        --page-bg: var(--light-page-bg);
+        --header-bg-start: var(--light-header-bg-start);
+        --header-bg-end: var(--light-header-bg-end);
+        --text-primary: var(--light-text-primary);
+        --text-secondary: var(--light-text-secondary);
+        --card-bg: var(--light-card-bg);
+        --card-shadow: var(--light-card-shadow);
+        --icon-color: var(--light-icon-color);
+        --link-color: var(--light-link-color);
+        --link-hover-color: var(--light-link-hover-color);
+        --border-color: var(--light-border-color);
+        --heading-color: var(--light-heading-color);
+        --accordion-header-bg: var(--light-accordion-header-bg);
+        --accordion-button-color: var(--light-accordion-button-color);
+        --accordion-button-active-bg: var(--light-accordion-button-active-bg);
+        --accordion-button-active-color: var(--light-accordion-button-active-color);
+    }
+
+    /* --- Dark Mode Variables (Override for body.dark-mode and system preference) --- */
+    body.dark-mode :root, /* For JS toggle */
+    @media (prefers-color-scheme: dark) { /* For system preference */
+        :root {
+            --dark-page-bg: #1a202c;
+            --dark-header-bg-start: #2d3748;
+            --dark-header-bg-end: #1a202c;
+            --dark-text-primary: #f1f5f9;
+            --dark-text-secondary: #a0aec0;
+            --dark-card-bg: #2d3748;
+            --dark-card-shadow: 0 5px 25px rgba(0, 0, 0, 0.5);
+            --dark-icon-color: #4361ee; /* Vibrant blue for dark mode icons */
+            --dark-link-color: #4361ee;
+            --dark-link-hover-color: #6a8cff;
+            --dark-border-color: #4a5568;
+            --dark-heading-color: #e2e8f0;
+            --dark-accordion-header-bg: #4a5568;
+            --dark-accordion-button-color: #f1f5f9;
+            --dark-accordion-button-active-bg: #6b7280;
+            --dark-accordion-button-active-color: #4361ee;
+
+            /* Override general variables with dark mode ones */
+            --page-bg: var(--dark-page-bg);
+            --header-bg-start: var(--dark-header-bg-start);
+            --header-bg-end: var(--dark-header-bg-end);
+            --text-primary: var(--dark-text-primary);
+            --text-secondary: var(--dark-text-secondary);
+            --card-bg: var(--dark-card-bg);
+            --card-shadow: var(--dark-card-shadow);
+            --icon-color: var(--dark-icon-color);
+            --link-color: var(--dark-link-color);
+            --link-hover-color: var(--dark-link-hover-color);
+            --border-color: var(--dark-border-color);
+            --heading-color: var(--dark-heading-color);
+            --accordion-header-bg: var(--dark-accordion-header-bg);
+            --accordion-button-color: var(--dark-accordion-button-color);
+            --accordion-button-active-bg: var(--dark-accordion-button-active-bg);
+            --accordion-button-active-color: var(--dark-accordion-button-active-color);
+        }
+    }
+
+    /* Global body transition for smooth mode change */
+    body {
+        transition: background-color 0.3s ease, color 0.3s ease;
+        background-color: var(--page-bg);
+        color: var(--text-primary);
+    }
+
+    /* Header Section */
+    .header-section {
+        background: linear-gradient(135deg, var(--header-bg-start) 0%, var(--header-bg-end) 100%);
+        border-radius: 0 0 20px 20px;
+        padding: 4rem 2rem;
+        margin-bottom: 3rem;
+        text-align: center;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        animation: fadeInDown 0.8s ease-out;
+    }
+
+    .header-section h1 {
+        font-size: 3.5rem;
+        font-weight: 700;
+        color: var(--icon-color);
+        margin-bottom: 1rem;
+    }
+
+    .header-section p {
+        font-size: 1.25rem;
+        color: var(--text-secondary);
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    .header-section .bi-question-circle-fill {
+        font-size: 3rem;
+        color: var(--icon-color);
+        margin-right: 15px;
+        animation: bounce 2s infinite;
+    }
+
+    @keyframes bounce {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
+    }
+
+    /* FAQ Accordion Styling */
+    .accordion-item {
+        border: 1px solid var(--border-color);
+        border-radius: 10px;
+        margin-bottom: 15px;
+        overflow: hidden; /* Ensures rounded corners are applied */
+        box-shadow: var(--card-shadow);
+        transition: all 0.3s ease;
+        animation: fadeInUp 0.8s ease-out both;
+    }
+
+    .accordion-item:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--card-shadow);
+    }
+
+    .accordion-header {
+        background-color: var(--accordion-header-bg);
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .accordion-button {
+        background-color: var(--accordion-header-bg) !important;
+        color: var(--accordion-button-color) !important;
+        font-weight: 600;
+        font-size: 1.15rem;
+        padding: 18px 25px;
+        border: none;
+        transition: all 0.3s ease;
+        box-shadow: none !important; /* Remove default Bootstrap focus shadow */
+    }
+
+    .accordion-button:not(.collapsed) {
+        color: var(--accordion-button-active-color) !important;
+        background-color: var(--accordion-button-active-bg) !important;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .accordion-button::after {
+        filter: var(--accordion-arrow-filter, none); /* Optional: Adjust arrow color for dark mode */
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%233b82f6'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e") !important;
+    }
+    body.dark-mode .accordion-button::after {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%234361ee'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e") !important;
+    }
+    
+    .accordion-body {
+        background-color: var(--card-bg);
+        color: var(--text-primary);
+        padding: 20px 25px;
+        font-size: 1rem;
+        line-height: 1.6;
+    }
+
+    /* Animation delays for individual accordion items */
+    .accordion-item:nth-child(1) { animation-delay: 0.3s; }
+    .accordion-item:nth-child(2) { animation-delay: 0.4s; }
+    .accordion-item:nth-child(3) { animation-delay: 0.5s; }
+    .accordion-item:nth-child(4) { animation-delay: 0.6s; }
+    .accordion-item:nth-child(5) { animation-delay: 0.7s; }
+    .accordion-item:nth-child(6) { animation-delay: 0.8s; }
+    /* Add more if you have more items */
+
+    /* Animations (re-used from previous templates) */
+    @keyframes fadeInDown {
+        from { opacity: 0; transform: translateY(-30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .header-section h1 {
+            font-size: 2.5rem;
+        }
+        .header-section p {
+            font-size: 1rem;
+        }
+        .accordion-button {
+            font-size: 1rem;
+            padding: 15px 20px;
+        }
+        .accordion-body {
+            padding: 15px 20px;
+        }
+    }
+</style>
+
+<div class="container my-5">
+    {# Header Section #}
+    <div class="header-section">
+        <h1 class="mb-3">
+            <i class="bi bi-question-circle-fill me-3"></i>{% trans "Questions Fréquemment Posées" %}
+        </h1>
+        <p class="lead">
+            {% trans "Trouvez rapidement les réponses à vos questions les plus courantes concernant l'utilisation de notre plateforme." %}
+        </p>
+    </div>
+
+    {# FAQ Accordion #}
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="accordion" id="faqAccordion">
+
+                {# Question 1 #}
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingOne">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                            {% trans "Comment créer un compte ?" %}
+                        </button>
+                    </h2>
+                    <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            {% blocktrans %}Pour créer un compte, cliquez sur le bouton "S'inscrire" dans le coin supérieur droit. Remplissez les informations requises telles que votre nom, adresse e-mail et mot de passe. Une fois le formulaire soumis, vous recevrez peut-être un e-mail de confirmation pour vérifier votre adresse.{% endblocktrans %}
+                        </div>
+                    </div>
+                </div>
+
+                {# Question 2 #}
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingTwo">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                            {% trans "Comment postuler à une offre d'emploi ?" %}
+                        </button>
+                    </h2>
+                    <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            {% blocktrans %}Après avoir trouvé une offre qui vous intéresse, cliquez sur son titre pour voir les détails. Si l'offre vous convient, cliquez sur le bouton "Postuler". Vous devrez peut-être télécharger votre CV ou remplir un formulaire de candidature en ligne. Assurez-vous d'avoir un profil complet pour augmenter vos chances.{% endblocktrans %}
+                        </div>
+                    </div>
+                </div>
+
+                {# Question 3 #}
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingThree">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                            {% trans "Est-ce que l'inscription est gratuite ?" %}
+                        </button>
+                    </h2>
+                    <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            {% blocktrans %}Oui, l'inscription pour les candidats est entièrement gratuite. Vous pouvez créer votre profil, rechercher des offres et postuler sans aucun frais. Des options payantes peuvent exister pour les recruteurs souhaitant publier des offres premium ou accéder à des fonctionnalités avancées.{% endblocktrans %}
+                        </div>
+                    </div>
+                </div>
+
+                {# Question 4 #}
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingFour">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                            {% trans "Comment publier une offre d'emploi en tant qu'entreprise ?" %}
+                        </button>
+                    </h2>
+                    <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            {% blocktrans %}Les entreprises peuvent créer un compte recruteur et accéder à leur tableau de bord. De là, vous trouverez une option "Publier une offre". Remplissez tous les détails du poste, les exigences et les informations sur votre entreprise. Les offres peuvent être gratuites ou payantes selon le type et la visibilité souhaitée.{% endblocktrans %}
+                        </div>
+                    </div>
+                </div>
+                
+                {# Question 5 #}
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingFive">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
+                            {% trans "Comment puis-je modifier mon profil ?" %}
+                        </button>
+                    </h2>
+                    <div id="collapseFive" class="accordion-collapse collapse" aria-labelledby="headingFive" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            {% blocktrans %}Connectez-vous à votre compte et accédez à votre page "Profil". Vous y trouverez des options pour modifier vos informations personnelles, votre CV, votre expérience professionnelle, vos compétences et vos préférences. N'oubliez pas d'enregistrer les modifications.{% endblocktrans %}
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+    {# If create_offre.css contains GLOBAL styles, keep it. Otherwise, remove if it's only for the offer creation page. #}
+    <link rel="stylesheet" href="{% static 'Ekandra/css/create_offre.css' %}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+{% endblock %}
+
+{% block extra_js %}
+    {% bootstrap_javascript %} {# Essential for Bootstrap's accordion functionality #}
+    <script src="{% static 'Ekandra/js/sombre.js' %}"></script>
+    {# Any page-specific JS can go here #}
+{% endblock %}

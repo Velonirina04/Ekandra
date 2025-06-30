@@ -1,115 +1,279 @@
 {% extends 'Ekandra/base.html' %}
 {% load static %}
+{% load bootstrap5 %} {# Make sure bootstrap5 is loaded for its benefits #}
+{% load i18n %}
 
-{% block title %}Détails Candidature{% endblock %}
-
-{% block content %}
-     <link rel="stylesheet" href="{% static 'Ekandra/css/voir_candidature.css' %}"> 
-
-<div class="container mt-4 mb-5"> 
-    <h1 class="text-center mb-4 text-primary"><i class="bi bi-file-earmark-text me-2"></i> Détails de la candidature</h1> 
-
-   
-    <div class="card mx-auto shadow-sm rounded" style="max-width: 700px;"> 
-        <div class="card-body p-4"> 
-            <h4 class="text-secondary mb-3"><i class="bi bi-info-circle me-2"></i> Informations générales</h4>
-
-            <p class="card-text mb-2">
-                <strong>Offre :</strong>
-                <a href="{% url 'offres'%}" class="text-decoration-none text-primary fw-bold">
-                    <i class="bi bi-briefcase me-1"></i> {{ candidature.offre.titre }}
-                </a>
-            </p>
-
-            <p class="card-text mb-2">
-                <strong>Entreprise :</strong>
-            
-                <a href="{% url 'profile' %}" class="text-decoration-none text-secondary">
-                    <i class="bi bi-building me-1"></i> {{ candidature.offre.entreprise.nom }}
-                </a>
-            </p>
-
-            <p class="card-text mb-2">
-                <strong>Demandeur :</strong>
-                
-                 <a href="{% url 'profile' %}" class="text-decoration-none text-muted">
-                     <i class="bi bi-person-circle me-1"></i> {{ candidature.demandeur.nom|default:"N/A" }}
-                 </a>
-            </p>
-
-            <p class="card-text mb-3">
-                <strong>Date de candidature :</strong> {{ candidature.date_candidature|date:"d/m/Y" }}
-            </p>
-
-            <hr class="my-3"> 
-
-            
-             <h4 class="text-primary mb-3"><i class="bi bi-check-circle-fill me-2"></i> Statut de la candidature</h4>
-
-            <p class="card-text mb-3">
-                <strong>Statut :</strong>
-                
-                 {% if candidature.statut == 'acceptee' %}
-                     <span class="badge bg-success fs-6"><i class="bi bi-check-circle me-1"></i> {{ candidature.get_statut_display }}</span> 
-                 {% elif candidature.statut == 'refusee' %}
-                      <span class="badge bg-danger fs-6"><i class="bi bi-x-circle me-1"></i> {{ candidature.get_statut_display }}</span> 
-                 {% elif candidature.statut == 'en_attente' %}
-                      <span class="badge bg-warning text-dark fs-6"><i class="bi bi-clock me-1"></i> {{ candidature.get_statut_display }}</span> 
-                 {% else %} 
-                       <span class="badge bg-secondary fs-6"><i class="bi bi-info-circle me-1"></i> {{ candidature.get_statut_display }}</span> 
-                 {% endif %}
-            </p>
-
-            <hr class="my-3"> 
-
-            
-            <h4 class="text-secondary mb-3"><i class="bi bi-file-text me-2"></i> Lettre de motivation</h4>
-
-            
-                
-            {% if  candidature.lettre_motivation %}
-            <form method="post">
-                {% csrf_token %}
-                <div class=" mb-3"> 
-                     {{ candidature.lettre_motivation}}
-                    <button type="submit"  class="btn btn-primary" title="Télécharger le LM de {{ candidature.demandeur.nom|default:'ce demandeur' }}"><i class="bi bi-download me-1"></i> Télécharger le LM</button> {# Changed button to primary #}
-                </div>
-                </form>
-            {% else %}
-                <p class="card-text mb-3 text-muted">Aucune lettre de motivation fournie.</p>
-            {% endif %}
-
-            <hr class="my-3"> 
-
-            
-            <h4 class="text-secondary mb-3"><i class="bi bi-file-earmark-arrow-down me-2"></i> Curriculum Vitae</h4>
-
-            {% if  candidature.cv %}
-                <p class="card-text mb-0">
-                    {# mbola ts mandea#}
-                    <a href="#" class="btn btn-primary" title="Télécharger le CV de {{ candidature.demandeur.nom|default:'ce demandeur' }}"><i class="bi bi-download me-1"></i> Télécharger le CV</a> {# Changed button to primary #}
-                </p>
-            {% else %}
-                 <p class="card-text mb-0 text-muted">Aucun CV disponible pour cette candidature.</p>
-            {% endif %}
-
-
-        </div> 
-    </div> 
-
-    
-    <div class="text-center mt-4"> 
-         
-         <a href="{% url 'profile' %}" class="btn btn-secondary"><i class="bi bi-arrow-left me-2"></i> Retour au profil demandeur</a> {# Link back to demandeur profile #}
-    </div>
-
-
-</div> 
-{% endblock %}
+{% block title %}{% trans "Détails de la candidature" %}{% endblock %}
 
 {% block extra_css %}
+    {# Link to base CSS for this page (light mode default styles) #}
+    <link rel="stylesheet" href="{% static 'Ekandra/css/voir_candidature.css' %}">
+
+    {# Dark Mode Styles Embedded Directly #}
+    <style>
+        /* --- Dark Mode Variables (Activated by body.dark-mode class or system preference) --- */
     
-     <link rel="stylesheet" href="{% static 'Ekandra/css/style.css' %}"> 
-     <link rel="stylesheet" href="{% static 'Ekandra/css/voir_candidature.css' %}"> 
-    
+            :root {
+                --page-bg: #1a202c; /* Dark background for the overall page */
+                --card-bg: #2d3748; /* Dark background for the details card */
+                --card-shadow: 0 5px 25px rgba(0, 0, 0, 0.5); /* Deeper shadow */
+                --header-bg: #2d3748; /* Dark header section background */
+                --header-shadow: 0 2px 15px rgba(0, 0, 0, 0.4); /* Stronger header shadow */
+                --text-primary: #f1f5f9; /* Light primary text color */
+                --text-secondary: #a0aec0; /* Muted light secondary text color */
+                --border-color: #4a5568; /* General border color */
+
+                /* Dark mode specific Bootstrap-like color adjustments */
+                --bs-primary: #4361ee; /* A vibrant blue for dark mode primary */
+                --bs-success: #10b981; /* Keep success green similar */
+                --bs-warning: #f59e0b; /* Keep warning yellow similar */
+                --bs-danger: #ef4444; /* Keep danger red similar */
+                --bs-secondary: #a0aec0; /* Lighter secondary for dark mode */
+                --bs-outline-primary: #4361ee; /* For outline primary buttons */
+                --bs-outline-secondary: #a0aec0; /* For outline secondary buttons */
+
+                /* RGB values for subtle backgrounds in dark mode */
+                --bs-success-rgb: 16, 185, 129;
+                --bs-danger-rgb: 239, 68, 68;
+                --bs-warning-rgb: 245, 158, 11;
+                --bs-secondary-rgb: 100, 116, 139;
+            }
+        
+
+        /* Specific styles that need to be overridden for dark mode directly within this page.
+           These use !important to ensure they override Bootstrap or other external styles. */
+        body.dark-mode {
+            background-color: var(--page-bg) !important;
+            color: var(--text-primary) !important;
+        }
+        body.dark-mode .header-section {
+            background-color: var(--header-bg) !important;
+            box-shadow: var(--header-shadow) !important;
+        }
+        body.dark-mode .header-section .display-4 {
+            color: var(--bs-primary) !important;
+        }
+        body.dark-mode .header-section .lead {
+            color: var(--text-secondary) !important;
+        }
+        body.dark-mode .header-section .lead .fw-bold {
+            color: var(--text-primary) !important;
+        }
+
+        body.dark-mode .details-card {
+            background-color: var(--card-bg) !important;
+            border-color: var(--border-color) !important;
+            box-shadow: var(--card-shadow) !important;
+        }
+        body.dark-mode .details-card h3 {
+            color: var(--bs-primary) !important; /* Ensure headings are primary text color */
+        }
+
+        body.dark-mode .info-item .info-label,
+        body.dark-mode .document-section .document-label {
+            color: var(--text-secondary) !important; /* Labels are secondary text */
+        }
+        body.dark-mode .info-item .text-dark, /* For plain text info like date */
+        body.dark-mode .info-item .text-muted, /* For plain text info like demandeur name */
+        body.dark-mode .document-section .text-muted { /* For "Non fournie" text */
+             color: var(--text-primary) !important; /* Ensure these are visible in dark mode */
+        }
+
+        body.dark-mode .text-primary { /* For links to offers/companies */
+            color: var(--bs-primary) !important;
+        }
+
+        body.dark-mode .text-dark { /* For entreprise name link if it defaults to text-dark */
+            color: var(--text-primary) !important;
+        }
+
+        body.dark-mode .text-muted { /* For the applicant's name, if it stays text-muted */
+            color: var(--text-primary) !important;
+        }
+
+        /* Status Badges */
+        body.dark-mode .bg-success-subtle { background-color: rgba(var(--bs-success-rgb), .2) !important; }
+        body.dark-mode .text-success { color: var(--bs-success) !important; }
+
+        body.dark-mode .bg-danger-subtle { background-color: rgba(var(--bs-danger-rgb), .2) !important; }
+        body.dark-mode .text-danger { color: var(--bs-danger) !important; }
+
+        body.dark-mode .bg-warning-subtle { background-color: rgba(var(--bs-warning-rgb), .2) !important; }
+        body.dark-mode .text-warning { color: var(--bs-warning) !important; }
+
+        body.dark-mode .bg-secondary-subtle { background-color: rgba(var(--bs-secondary-rgb), .2) !important; }
+        body.dark-mode .text-secondary { color: var(--bs-secondary) !important; }
+
+        /* Buttons */
+        body.dark-mode .download-btn {
+            color: var(--bs-outline-primary) !important;
+            border-color: var(--bs-outline-primary) !important;
+        }
+        body.dark-mode .download-btn:hover {
+            background-color: var(--bs-outline-primary) !important;
+            color: var(--card-bg) !important; /* Text becomes card background color */
+        }
+
+        body.dark-mode .back-button-animated { /* Also for "Noter l'entreprise" if it uses this class */
+            color: var(--bs-outline-secondary) !important;
+            border-color: var(--bs-outline-secondary) !important;
+        }
+        body.dark-mode .back-button-animated:hover {
+            background-color: var(--bs-outline-secondary) !important;
+            color: var(--page-bg) !important; /* Text becomes page background color */
+        }
+        body.dark-mode .btn-primary { /* For "Noter l'entreprise" if it uses btn-primary */
+            background-color: var(--bs-primary) !important;
+            border-color: var(--bs-primary) !important;
+            color: #ffffff !important;
+        }
+        body.dark-mode .btn-primary:hover {
+            filter: brightness(1.1);
+        }
+
+        /* HR Separator */
+        body.dark-mode hr {
+            border-top: 1px solid var(--border-color) !important;
+        }
+
+        /* Icon colors */
+        body.dark-mode .bi {
+            color: inherit; /* Icons should inherit the text color of their parent */
+        }
+        body.dark-mode .text-primary .bi {
+            color: var(--bs-primary) !important;
+        }
+        body.dark-mode .text-secondary .bi {
+            color: var(--text-secondary) !important;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    {# Header Section #}
+    <div class="header-section text-center mb-5 p-4 bg-white rounded shadow-sm">
+        <h1 class="display-4 fw-bold text-primary mb-3">
+            <i class="bi bi-file-earmark-text-fill me-3"></i> {% trans "Détails de la candidature" %}
+        </h1>
+        <p class="lead text-secondary">
+            {% trans "Informations complètes sur votre postulation à l'offre" %}
+            "<span class="fw-bold">{{ candidature.offre.titre }}</span>"
+        </p>
+    </div>
+
+    {# Main Details Card #}
+    <div class="card mx-auto shadow-lg rounded-3 details-card">
+        <div class="card-body p-4">
+
+            <h3 class="text-secondary mb-4"><i class="bi bi-info-circle me-3"></i> {% trans "Informations générales" %}</h3>
+
+            <div class="info-item mb-3">
+                <span class="info-label">{% trans "Offre" %} :</span>
+                <a href="{% url 'candidature_create' candidature.offre.id %}" class="text-decoration-none text-primary fw-bold">
+                    <i class="bi bi-briefcase-fill me-1"></i> {{ candidature.offre.titre }}
+                </a>
+            </div>
+
+            <div class="info-item mb-3">
+                <span class="info-label">{% trans "Entreprise" %} :</span>
+                {# Assuming 'entreprise_profile' is the URL name for an enterprise's profile #}
+                {% comment %} <a href="{% url 'profile' candidature.offre.entreprise.id %}" class="text-decoration-none text-dark"> {% endcomment %}
+                <a href="#" class="text-decoration-none text-dark">
+                    <i class="bi bi-building-fill me-1"></i> {{ candidature.offre.entreprise.nom }}
+                </a>
+            </div>
+
+            <div class="info-item mb-3">
+                <span class="info-label">{% trans "Demandeur" %} :</span>
+                {# Assuming 'profile_demandeur' is the URL name for the demandeur's own profile #}
+                <a href="{% url 'profile' %}" class="text-decoration-none text-muted">
+                    <i class="bi bi-person-circle me-1"></i> {{ candidature.demandeur.nom}}
+                </a>
+            </div>
+
+            <div class="info-item mb-4">
+                <span class="info-label">{% trans "Date de candidature" %} :</span>
+                <span class="text-dark">{{ candidature.date_candidature|date:"d M Y à H:i" }}</span>
+            </div>
+
+            <hr class="my-4">
+
+            {# Application Status Section #}
+            <h3 class="text-primary mb-4"><i class="bi bi-patch-check-fill me-3"></i> {% trans "Statut de la candidature" %}</h3>
+
+            <div class="status-item mb-3">
+                <span class="info-label">{% trans "Statut actuel" %} :</span>
+                {% if candidature.statut == 'acceptee' %}
+                    <span class="badge bg-success-subtle text-success fs-5 py-2 px-3 rounded-pill">
+                        <i class="bi bi-check-circle-fill me-1"></i> {{ candidature.get_statut_display }}
+                    </span>
+                {% elif candidature.statut == 'refusee' %}
+                    <span class="badge bg-danger-subtle text-danger fs-5 py-2 px-3 rounded-pill">
+                        <i class="bi bi-x-circle-fill me-1"></i> {{ candidature.get_statut_display }}
+                    </span>
+                {% elif candidature.statut == 'en_attente' %}
+                    <span class="badge bg-warning-subtle text-warning fs-5 py-2 px-3 rounded-pill">
+                        <i class="bi bi-clock-fill me-1"></i> {{ candidature.get_statut_display }}
+                    </span>
+                {% else %}
+                    <span class="badge bg-secondary-subtle text-secondary fs-5 py-2 px-3 rounded-pill">
+                        <i class="bi bi-info-circle-fill me-1"></i> {{ candidature.get_statut_display }}
+                    </span>
+                {% endif %}
+            </div>
+
+            <hr class="my-4">
+
+            {# Documents Section #}
+            <h3 class="text-secondary mb-4"><i class="bi bi-paperclip me-3"></i> {% trans "Documents joints" %}</h3>
+
+            <div class="document-section mb-3">
+                <div class="d-flex align-items-center mb-2">
+                    <span class="document-label me-3"><i class="bi bi-file-earmark-text me-2"></i> {% trans "Lettre de motivation" %} :</span>
+                    {% if candidature.lettre_motivation %}
+                        <a href="{{ candidature.lettre_motivation.url }}" class="btn btn-outline-primary btn-sm rounded-pill download-btn" download>
+                            <i class="bi bi-download me-1"></i> {% trans "Télécharger" %}
+                        </a>
+                    {% else %}
+                        <span class="text-muted">{% trans "Non fournie" %}</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="document-section mb-3">
+                <div class="d-flex align-items-center">
+                    <span class="document-label me-3"><i class="bi bi-file-earmark-arrow-down me-2"></i> {% trans "Curriculum Vitae (CV)" %} :</span>
+                    {% if candidature.cv %}
+                        <a href="{{ candidature.cv.url }}" class="btn btn-outline-primary btn-sm rounded-pill download-btn" download>
+                            <i class="bi bi-download me-1"></i> {% trans "Télécharger" %}
+                        </a>
+                    {% else %}
+                        <span class="text-muted">{% trans "Non disponible" %}</span>
+                    {% endif %}
+                </div>
+            </div>
+
+        </div> {# End card-body #}
+    </div> {# End main details card #}
+
+    {# Action Buttons #}
+    <div class="text-center mt-5">
+        <a href="{% url 'profile' %}" class="btn btn-outline-secondary btn-lg rounded-pill back-button-animated me-3">
+            <i class="bi bi-arrow-left-circle me-2"></i> {% trans "Retour au profil" %}
+        </a>
+        {# Optionally add actions like 'Rate Company' if relevant from this page #}
+        {% if candidature.statut == 'acceptee' or candidature.statut == 'refusee' %}
+            <a href="{% url 'noter_entreprise' entreprise_id=candidature.offre.entreprise.pk %}" class="btn btn-primary btn-lg rounded-pill back-button-animated">
+                <i class="bi bi-star-fill me-2"></i> {% trans "Noter l'entreprise" %}
+            </a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+    {% bootstrap_javascript %}
+    <script src="{% static 'Ekandra/js/sombre.js' %}"></script>
+    {# Any specific JS for this page if needed #}
 {% endblock %}

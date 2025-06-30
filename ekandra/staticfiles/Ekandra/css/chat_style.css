@@ -1,0 +1,378 @@
+/* --- Root Variables & Base Styles --- */
+:root {
+    --chat-bg: #f5f7fa; 
+    --chat-container-bg: #ffffff;
+    --chat-border-color: #e0e5ea;
+    --chat-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    
+    --sent-bubble-bg: #3b82f6;
+    --sent-bubble-text: #ffffff;
+    --received-bubble-bg: #eceff1;
+    --received-bubble-text: #334155;
+    
+    --text-color-primary: #1e293b;
+    --text-color-secondary: #64748b;
+    
+    --header-height: 60px; 
+    --input-height: 60px;  
+
+    --bs-primary: #3b82f6;
+    --bs-primary-rgb: 59, 130, 246;
+    --bs-secondary: #64748b;
+    --bs-light-rgb: 248, 250, 252;
+    --bs-dark-rgb: 30, 41, 59;
+    --bs-gray-100: #f8fafc;
+    --bs-gray-200: #e2e8f0;
+    --bs-gray-300: #cbd5e1;
+    --bs-gray-400: #94a3b8;
+    --bs-gray-500: #64748b;
+    --bs-gray-600: #475569;
+    --bs-gray-700: #334155;
+    --bs-gray-800: #1e293b;
+    --bs-gray-900: #0f172a;
+    --bs-success: #10b981;
+    --bs-info: #0ea5e9;
+    --bs-warning: #f59e0b;
+    --bs-danger: #ef4444;
+}
+
+body {
+    font-family: 'Inter', Arial, sans-serif; 
+}
+
+
+/* --- Chat Wrapper (Main Container) --- */
+.chat-container-scope { 
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 768px; 
+    height: 90vh; 
+    max-height: 800px;
+    background-color: var(--chat-container-bg);
+    border-radius: 1rem;
+    box-shadow: var(--chat-shadow);
+    overflow: hidden;
+    position: relative;
+    margin: 20px auto; 
+}
+
+/* --- Chat Header --- */
+.chat-container-scope .chat-header { 
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 1rem; 
+    background-color: var(--chat-container-bg);
+    border-bottom: 1px solid var(--chat-border-color);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    min-height: var(--header-height);
+}
+
+.chat-container-scope .chat-back-btn { 
+    background-color: var(--chat-bg);
+    color: var(--text-color-secondary);
+    border: 1px solid var(--chat-border-color);
+    padding: 0.4rem 0.8rem; 
+    border-radius: 0.5rem;
+    font-size: 0.85rem; 
+    transition: all 0.2s ease;
+}
+.chat-container-scope .chat-back-btn:hover { 
+    background-color: var(--chat-border-color);
+    color: var(--text-color-primary);
+}
+
+.chat-container-scope .chat-title { 
+    font-size: 1.2rem; 
+    font-weight: 600;
+    color: var(--text-color-primary);
+    margin: 0;
+    flex-grow: 1;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.chat-container-scope .chat-title .bi { 
+    color: var(--bs-primary);
+    font-size: 1.35rem; 
+    vertical-align: middle;
+}
+
+.chat-container-scope .destinataire-username { 
+    color: var(--bs-primary);
+    font-weight: 700;
+}
+
+.chat-container-scope .header-placeholder { 
+    width: 60px; 
+}
+
+/* --- Chat Log Area (Messages) --- */
+.chat-container-scope .chat-log-area { 
+    flex-grow: 1;
+    padding: 1rem 1.5rem; 
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    background-color: var(--chat-container-bg);
+}
+
+.chat-container-scope .no-messages-placeholder { 
+    text-align: center;
+    color: var(--text-color-secondary);
+    padding: 2rem 1rem; 
+    font-size: 1rem; 
+}
+.chat-container-scope .no-messages-placeholder .bi { 
+    font-size: 2rem; 
+    margin-bottom: 0.75rem; 
+    color: var(--chat-border-color);
+}
+
+/* --- Message Item Styling --- */
+.chat-container-scope .message-item { 
+    display: flex; /* Utilise Flexbox */
+    flex-direction: column; /* Empile bulle et métadonnées verticalement */
+    margin-bottom: 0.75rem; 
+    position: relative;
+    
+    /* ATTENTION: Supprimons max-width ici. La bulle seule gérera sa propre largeur */
+    /* max-width: 85%; <--- Supprimé */
+
+    /* CLÉ POUR L'ADAPTATION DE LA LARGEUR DANS UN CONTENEUR FLEX */
+    /* Ceci est CRUCIAL pour que les bulles se "shrink-wrap" même si elles sont dans un flex item */
+    flex-shrink: 0; /* Empêche les éléments de rétrécir plus que leur contenu */
+    flex-basis: auto; /* Définit la taille de base avant la distribution de l'espace */
+    width: fit-content; /* Assure que l'item lui-même s'adapte au contenu de sa bulle */
+}
+
+.chat-container-scope .message-sent { 
+    align-self: flex-end; /* Aligne l'item du message à droite */
+}
+
+.chat-container-scope .message-received { 
+    align-self: flex-start; /* Aligne l'item du message à gauche */
+}
+
+.chat-container-scope .message-bubble { 
+    padding: 0.6rem 1rem; 
+    border-radius: 1.2rem;
+    font-size: 0.9rem; 
+    line-height: 1.3; 
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    position: relative;
+    
+    /* PROPRIÉTÉS CLÉS POUR LA LARGEUR ADAPTATIVE DU FOND */
+    display: inline-block; /* Crucial: fait que la bulle prend juste la largeur de son contenu */
+    word-break: break-word;/* Plus robuste pour les longues chaînes sans espaces (URLs) */
+    overflow-wrap: break-word; /* Alternative moderne à word-break */
+    white-space: pre-wrap; /* Préserve les retours à la ligne et les espaces multiples */
+    max-width: 100%;/* Permet à la bulle de prendre 100% de la largeur de son parent (.message-item) */
+    /* Le max-width général de 85% sera maintenant appliqué sur .message-item si nécessaire, ou on le gère ici */
+    max-width: calc(100% - 20px); /* Une astuce si 85% n'est pas suffisant pour un bon padding, ou simplement laisser 100% et gérer l'item */
+    /* Recommandation: Gardons max-width: 85% directement ici pour la bulle */
+    max-width: 85%; /* La bulle ne dépassera jamais 85% de la largeur du .chat-log-area */
+    text-align: left; /* Assure que le texte interne est toujours aligné à gauche */
+    min-width: 0; /* Très important en Flexbox pour permettre aux éléments de réduire leur largeur au minimum de leur contenu */
+}
+
+.chat-container-scope .message-sent .message-bubble { 
+    background-color: var(--sent-bubble-bg);
+    color: var(--sent-bubble-text);
+    border-top-right-radius: 0.4rem; 
+}
+
+.chat-container-scope .message-received .message-bubble { 
+    background-color: var(--received-bubble-bg);
+    color: var(--received-bubble-text);
+    border: 1px solid var(--chat-border-color);
+    border-top-left-radius: 0.4rem;
+}
+
+.chat-container-scope .message-meta { 
+    font-size: 0.65rem; 
+    color: var(--text-color-secondary);
+    margin-top: 0.2rem; 
+    opacity: 0.8;
+}
+
+.chat-container-scope .message-sent .message-meta { 
+    margin-right: 0.5rem; 
+}
+
+.chat-container-scope .message-received .message-meta { 
+    margin-left: 0.5rem; 
+}
+
+/* --- Chat Input Form --- */
+.chat-container-scope .chat-input-form { 
+    display: flex;
+    align-items: flex-end;
+    padding: 0.5rem 1rem; 
+    background-color: var(--chat-container-bg);
+    border-top: 1px solid var(--chat-border-color);
+    position: sticky;
+    bottom: 0;
+    z-index: 10;
+    min-height: var(--input-height);
+}
+
+.chat-container-scope .chat-textarea { 
+    flex-grow: 1;
+    border: 1px solid var(--chat-border-color);
+    border-radius: 1.5rem;
+    padding: 0.6rem 1rem; 
+    font-size: 0.9rem; 
+    resize: none;
+    min-height: 38px; 
+    max-height: 100px; 
+    overflow-y: auto;
+    line-height: 1.3; 
+    margin-right: 0.75rem; 
+    transition: all 0.2s ease;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-color: var(--chat-bg);
+    color: var(--text-color-primary);
+}
+
+.chat-container-scope .chat-textarea:focus { 
+    outline: none;
+    border-color: var(--bs-primary);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+    background-color: var(--chat-container-bg);
+}
+
+.chat-container-scope .chat-textarea::placeholder { 
+    color: var(--text-color-secondary);
+    opacity: 0.7;
+}
+
+.chat-container-scope .chat-send-btn { 
+    background-color: var(--bs-primary);
+    color: var(--sent-bubble-text);
+    border: none;
+    border-radius: 50%;
+    width: 42px; 
+    height: 42px; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem; 
+    cursor: pointer;
+    flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    transition: all 0.2s ease;
+}
+
+.chat-container-scope .chat-send-btn:hover { 
+    background-color: #2563eb;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    transform: translateY(-1px);
+}
+.chat-container-scope .chat-send-btn:active { 
+    transform: translateY(0);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* --- Responsive Adjustments --- */
+@media (max-width: 767.98px) {
+    .chat-container-scope { 
+        width: 100%;
+        height: 100vh; 
+        max-width: none;
+        border-radius: 0;
+        box-shadow: none;
+        margin: 0; 
+    }
+
+    .chat-container-scope .chat-header, 
+    .chat-container-scope .chat-input-form { 
+        padding: 0.5rem 0.8rem; 
+    }
+
+    .chat-container-scope .chat-title { 
+        font-size: 1.1rem; 
+    }
+    
+    .chat-container-scope .chat-title .bi { 
+        font-size: 1.2rem; 
+    }
+
+    .chat-container-scope .chat-log-area { 
+        padding: 0.8rem 1rem; 
+    }
+
+    .chat-container-scope .message-bubble { 
+        padding: 0.5rem 0.9rem; 
+        font-size: 0.85rem; 
+    }
+
+    .chat-container-scope .chat-textarea { 
+        padding: 0.5rem 0.9rem; 
+        margin-right: 0.5rem; 
+        min-height: 36px; 
+        max-height: 90px; 
+    }
+
+    .chat-container-scope .chat-send-btn { 
+        width: 40px; 
+        height: 40px; 
+        font-size: 1.1rem; 
+    }
+    .chat-container-scope .message-item { 
+        /* Sur mobile, on donne une max-width directement à l'item aussi */
+        max-width: 90%; 
+    }
+}
+
+/* --- Dark Mode Adaptation --- */
+@media (prefers-color-scheme: dark) {
+    .chat-container-scope { 
+        --chat-bg: #1e293b;
+        --chat-container-bg: #0f172a;
+        --chat-border-color: #334155;
+        --chat-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        
+        --sent-bubble-bg: #4c62b6;
+        --sent-bubble-text: #ffffff;
+        --received-bubble-bg: #334155;
+        --received-bubble-text: #e2e8f0;
+        
+        --text-color-primary: #f1f5f9;
+        --text-color-secondary: #94a3b8;
+    }
+
+    .chat-container-scope .chat-back-btn { 
+        background-color: var(--chat-border-color);
+        color: var(--text-color-secondary);
+        border-color: var(--chat-border-color);
+    }
+    .chat-container-scope .chat-back-btn:hover { 
+        background-color: #475569;
+        color: var(--text-color-primary);
+    }
+
+    .chat-container-scope .chat-textarea { 
+        background-color: var(--chat-border-color);
+        border-color: var(--chat-border-color);
+        color: var(--text-color-primary);
+    }
+
+    .chat-container-scope .chat-textarea:focus { 
+        background-color: var(--chat-container-bg);
+        box-shadow: 0 0 0 3px rgba(76, 98, 182, 0.3);
+    }
+
+    .chat-container-scope .chat-send-btn { 
+        background-color: var(--sent-bubble-bg);
+    }
+    .chat-container-scope .chat-send-btn:hover { 
+        background-color: #3d519b;
+    }
+}

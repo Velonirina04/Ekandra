@@ -2,30 +2,563 @@
 {% load bootstrap5 %} 
 {% load static %} 
 
-{% block title %}Connexion{% endblock %}
+{% block extra_head %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+
+
+{% endblock %}
+{%block extra_css%}
+<style>
+    :root {
+        --primary-color: #4361ee;
+        --secondary-color: #3a0ca3;
+        --accent-color: #4cc9f0;
+        --light-color: #f8f9fa;
+        --dark-color: #212529;
+        --success-color: #4bb543;
+        --error-color: #ff3333;
+        --border-radius: 12px;
+        --box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+
+    body {
+        background-color: #f5f7ff;
+        background-image: url('{% static "Ekandra/image/auth-bg.svg" %}');
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+        font-family: 'Inter', sans-serif;
+    }
+
+    .login-container {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+    }
+
+    .login-card {
+        border: none;
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+        overflow: hidden;
+        width: 100%;
+        max-width: 1000px;
+        display: flex;
+        transition: var(--transition);
+        background-color: white;
+    }
+
+    .login-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+    }
+
+    .login-illustration {
+        flex: 1;
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        padding: 3rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        color: white;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .login-illustration::before {
+        content: "";
+        position: absolute;
+        top: -50px;
+        right: -50px;
+        width: 200px;
+        height: 200px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+    }
+
+    .login-illustration::after {
+        content: "";
+        position: absolute;
+        bottom: -80px;
+        left: -80px;
+        width: 250px;
+        height: 250px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+    }
+
+    .illustration-img {
+        width: 100%;
+        max-width: 350px;
+        margin-bottom: 2rem;
+        filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.2));
+    }
+
+    .login-content {
+        flex: 1;
+        padding: 3rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .login-header {
+        margin-bottom: 2rem;
+        text-align: center;
+    }
+
+    .login-logo {
+        width: 80px;
+        margin-bottom: 1rem;
+    }
+
+    .login-title {
+        font-weight: 700;
+        color: var(--dark-color);
+        margin-bottom: 0.5rem;
+    }
+
+    .login-subtitle {
+        color: #6c757d;
+        font-size: 1rem;
+    }
+
+    .form-label {
+        font-weight: 500;
+        color: var(--dark-color);
+        margin-bottom: 0.5rem;
+    }
+
+    .form-control {
+        border-radius: var(--border-radius);
+        padding: 0.75rem 1rem;
+        border: 1px solid #e0e0e0;
+        transition: var(--transition);
+    }
+
+    .form-control:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 0.25rem rgba(67, 97, 238, 0.25);
+    }
+
+    .password-toggle {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        cursor: pointer;
+        color: #6c757d;
+    }
+
+    .login-btn {
+        background-color: var(--primary-color);
+        border: none;
+        border-radius: var(--border-radius);
+        padding: 0.75rem;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        transition: var(--transition);
+        width: 100%;
+        margin-top: 1rem;
+    }
+
+    .login-btn:hover {
+        background-color: var(--secondary-color);
+        transform: translateY(-2px);
+    }
+
+    .login-footer {
+        text-align: center;
+        margin-top: 1.5rem;
+        color: #6c757d;
+    }
+
+    .login-link {
+        color: var(--primary-color);
+        font-weight: 600;
+        text-decoration: none;
+        transition: color 0.2s;
+    }
+
+    .login-link:hover {
+        color: var(--secondary-color);
+        text-decoration: underline;
+    }
+
+    .divider {
+        display: flex;
+        align-items: center;
+        margin: 1.5rem 0;
+        color: #adb5bd;
+    }
+
+    .divider::before,
+    .divider::after {
+        content: "";
+        flex: 1;
+        border-bottom: 1px solid #e0e0e0;
+    }
+
+    .divider::before {
+        margin-right: 1rem;
+    }
+
+    .divider::after {
+        margin-left: 1rem;
+    }
+
+    .social-login {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+
+    .social-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        background: white;
+        border: 1px solid #e0e0e0;
+        transition: var(--transition);
+    }
+
+    .social-btn:hover {
+        background: #f8f9fa;
+        transform: translateY(-2px);
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 992px) {
+        .login-card {
+            flex-direction: column;
+            max-width: 500px;
+        }
+        
+        .login-illustration {
+            padding: 2rem;
+        }
+        
+        .illustration-img {
+            max-width: 250px;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .login-container {
+            padding: 1rem;
+        }
+        
+        .login-content, .login-illustration {
+            padding: 1.5rem;
+        }
+    }
+        .form-group {
+        position: relative;
+        margin-bottom: 1.5rem;
+    }
+
+    .input-container {
+        position: relative;
+        padding-top: 8px;
+    }
+
+    .input-icon {
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #6c757d;
+        z-index: 2;
+        transition: all 0.3s ease;
+    }
+
+    /* Style des inputs */
+    #{{ form.username.id_for_label }},
+    #{{ form.password.id_for_label }} {
+        width: 100%;
+        padding: 16px 16px 16px 40px;
+        border: none;
+        border-radius: 4px 4px 0 0;
+        background-color: #f8f9fa;
+        font-size: 16px;
+        transition: all 0.3s ease;
+        box-shadow: none;
+    }
+
+    #{{ form.username.id_for_label }}:focus,
+    #{{ form.password.id_for_label }}:focus {
+        background-color: #fff;
+        box-shadow: 0 2px 10px rgba(67, 97, 238, 0.15);
+        outline: none;
+    }
+
+    /* Effet underline animé */
+    .underline {
+        position: absolute;
+        bottom: 0;
+        left: 40px;
+        right: 0;
+        height: 2px;
+        background-color: #e0e0e0;
+        overflow: hidden;
+    }
+
+    .underline::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 2px;
+        background: linear-gradient(90deg, #4361ee, #3a0ca3);
+        transform: scaleX(0);
+        transform-origin: left;
+        transition: transform 0.3s ease;
+    }
+
+    #{{ form.username.id_for_label }}:focus ~ .underline::after,
+    #{{ form.password.id_for_label }}:focus ~ .underline::after {
+        transform: scaleX(1);
+    }
+
+    /* Labels flottants */
+    .floating-label-text {
+        position: absolute;
+        left: 40px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #6c757d;
+        font-size: 16px;
+        pointer-events: none;
+        transition: all 0.3s ease;
+        z-index: 1;
+    }
+
+    #{{ form.username.id_for_label }}:focus ~ .floating-label-text,
+    #{{ form.username.id_for_label }}:not(:placeholder-shown) ~ .floating-label-text,
+    #{{ form.password.id_for_label }}:focus ~ .floating-label-text,
+    #{{ form.password.id_for_label }}:not(:placeholder-shown) ~ .floating-label-text {
+        top: 8px;
+        transform: translateY(0);
+        font-size: 12px;
+        color: #4361ee;
+    }
+
+    /* Bouton toggle password */
+    .password-toggle {
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        cursor: pointer;
+        color: #6c757d;
+        transition: all 0.3s ease;
+        z-index: 2;
+    }
+
+    .password-toggle:hover {
+        color: #3a0ca3;
+    }
+
+    /* Messages d'erreur */
+    .error-message {
+        color: #dc3545;
+        font-size: 14px;
+        margin-top: 6px;
+        display: flex;
+        align-items: center;
+    }
+
+    /* Lien mot de passe oublié */
+    .forgot-password-link {
+        color: #6c757d;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        font-size: 14px;
+    }
+
+    .forgot-password-link:hover {
+        color: #3a0ca3;
+        text-decoration: underline;
+    }
+</style>
+{%endblock%}
+
+{% block title %}Connexion - E-kandra{% endblock %}
 
 {% block content %}
+<div class="login-container animate__animated animate__fadeIn">
+    <div class="login-card">
+        <!-- Illustration Section -->
+        <div class="login-illustration d-none d-lg-flex">
+            <img src="{% static 'Ekandra/image/work.svg' %}" alt="Illustration connexion" class="illustration-img animate__animated animate__fadeInLeft">
+            <h2 class="h3 mt-4 text-center">Bienvenue sur E-kandra</h2>
+            <p class="text-center opacity-75">Connectez-vous pour accéder à votre espace personnel et découvrir nos services</p>
+            
+            <div class="mt-4">
+                <div class="d-flex align-items-center mb-3">
+                    <i class="bi bi-check-circle-fill me-2"></i>
+                    <span>Accès à toutes vos candidatures</span>
+                </div>
+                <div class="d-flex align-items-center mb-3">
+                    <i class="bi bi-check-circle-fill me-2"></i>
+                    <span>Alertes personnalisées</span>
+                </div>
+                <div class="d-flex align-items-center">
+                    <i class="bi bi-check-circle-fill me-2"></i>
+                    <span>Suivi en temps réel</span>
+                </div>
+            </div>
+        </div>
 
-<div class="container mt-5 mb-5"> 
+        <!-- Form Section -->
+        <div class="login-content animate__animated animate__fadeInRight">
+            <div class="login-header">
+                <img src="{% static 'Ekandra/image/Ekandra.svg' %}" alt="Logo E-kandra" class="login-logo">
+                <h1 class="login-title">Connectez-vous</h1>
+                <p class="login-subtitle">Entrez vos identifiants pour accéder à votre compte</p>
+            </div>
 
-    <div class="card mx-auto shadow-lg rounded" style="max-width: 600px;">
-        
-        <div class="card-body p-4">
-
-            <h1 class="text-center mb-4 text-primary"><i class="bi bi-box-arrow-in-right me-2"></i> Connexion</h1> 
-
-            <form method="post">
+            <form method="post" novalidate>
                 {% csrf_token %}
-                {% bootstrap_form form %}
-
-                <button type="submit" class="btn btn-primary w-100 mt-3"><i class="bi bi-key me-2"></i> Se connecter</button> 
+                
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {% for error in form.non_field_errors %}
+                            <p class="mb-0">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
 
                 
-                <p class="mt-3 text-center text-muted">Pas de compte ? <a href="{% url 'register' %}" class="text-decoration-none text-primary fw-bold">Inscrivez-vous</a></p>
+<div class="mb-4">
+    <!-- Champ Nom d'utilisateur/Email -->
+    <div class="form-group floating-label">
+        <div class="input-container">
+            <i class="bi bi-person-fill input-icon"></i>
+            {{ form.username }}
+            <label for="{{ form.username.id_for_label }}" class="floating-label-text">Nom d'utilisateur ou Email</label>
+            <div class="underline"></div>
+        </div>
+        {% if form.username.errors %}
+        <div class="error-message animate__animated animate__fadeIn">
+            <i class="bi bi-exclamation-circle-fill me-1"></i>
+            {{ form.username.errors.0 }}
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Champ Mot de passe -->
+    <div class="form-group floating-label mt-4">
+        <div class="input-container">
+            <i class="bi bi-lock-fill input-icon"></i>
+            {{ form.password }}
+            <label for="{{ form.password.id_for_label }}" class="floating-label-text">Mot de passe</label>
+            <div class="underline"></div>
+            <i class="bi bi-eye-fill password-toggle" id="togglePassword" aria-label="Afficher le mot de passe"></i>
+        </div>
+        {% if form.password.errors %}
+        <div class="error-message animate__animated animate__fadeIn">
+            <i class="bi bi-exclamation-circle-fill me-1"></i>
+            {{ form.password.errors.0 }}
+        </div>
+        {% endif %}
+        <div class="text-end mt-2">
+            {% comment %} <a href="{% url 'password_reset' %}" class="forgot-password-link"> {% endcomment %}
+            <a href="#" class="forgot-password-link">
+                <small>Mot de passe oublié ?</small>
+            </a>
+        </div>
+    </div>
+</div>
+                
+                <div class="mb-3 form-check">
+                    <input type="checkbox" class="form-check-input" id="rememberMe" name="remember_me">
+                    <label class="form-check-label" for="rememberMe">Se souvenir de moi</label>
+                </div>
+                
+                <button type="submit" class="btn login-btn">
+                    <i class="bi bi-box-arrow-in-right me-2"></i> Se connecter
+                </button>
+
+                <div class="divider">ou</div>
+
+                <div class="social-login">
+                    <a href="#" class="social-btn" title="Se connecter avec Google">
+                        <i class="bi bi-google text-danger"></i>
+                    </a>
+                    <a href="#" class="social-btn" title="Se connecter avec Facebook">
+                        <i class="bi bi-facebook text-primary"></i>
+                    </a>
+                    <a href="#" class="social-btn" title="Se connecter avec LinkedIn">
+                        <i class="bi bi-linkedin text-info"></i>
+                    </a>
+                </div>
             </form>
-        </div> 
-    </div> 
 
-</div> 
+            <div class="login-footer">
+                <p class="mb-0">Nouveau sur E-kandra ? 
+                    <a href="{% url 'register' %}" class="login-link">Créer un compte</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
 
+<script>
+    // Toggle password visibility
+    const togglePassword = document.querySelector('#togglePassword');
+    const password = document.querySelector('#id_password');
+    
+    togglePassword.addEventListener('click', function() {
+        const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+        password.setAttribute('type', type);
+        this.classList.toggle('bi-eye-slash-fill');
+        this.classList.toggle('bi-eye-fill');
+    });
+
+    // Add animation to form elements
+    document.addEventListener('DOMContentLoaded', function() {
+        const inputs = document.querySelectorAll('.form-control');
+        inputs.forEach((input, index) => {
+            input.style.opacity = '0';
+            input.style.transform = 'translateY(10px)';
+            setTimeout(() => {
+                input.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+                input.style.opacity = '1';
+                input.style.transform = 'translateY(0)';
+            }, 100 + (index * 100));
+        });
+    });
+    // Animation pour les labels flottants au chargement
+    document.addEventListener('DOMContentLoaded', function() {
+        const usernameField = document.getElementById('{{ form.username.id_for_label }}');
+        const passwordField = document.getElementById('{{ form.password.id_for_label }}');
+        
+        // Ajout de placeholder vide si nécessaire
+        if (usernameField.value === '') {
+            usernameField.placeholder = ' ';
+        }
+        if (passwordField.value === '') {
+            passwordField.placeholder = ' ';
+        }
+        
+        // Toggle password visibility
+        const togglePassword = document.getElementById('togglePassword');
+        togglePassword.addEventListener('click', function() {
+            const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordField.setAttribute('type', type);
+            this.classList.toggle('bi-eye-slash-fill');
+            this.classList.toggle('bi-eye-fill');
+        });
+    });
+</script>
 {% endblock %}

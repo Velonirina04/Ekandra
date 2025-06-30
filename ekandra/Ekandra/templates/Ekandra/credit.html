@@ -1,0 +1,449 @@
+{% extends 'Ekandra/base.html' %}
+{% load static %}
+{% load bootstrap5 %}
+{% load i18n %}
+
+{% block title %}{% trans "Crédits & Développeur" %}{% endblock %}
+
+{% block content %}
+<style>
+    /* --- Light Mode Variables (Defaults) --- */
+    :root {
+        --light-page-bg: #f5f7fa;
+        --light-header-bg-start: #f0f2f5;
+        --light-header-bg-end: #e2e4e8;
+        --light-text-primary: #1e293b;
+        --light-text-secondary: #64748b;
+        --light-card-bg: #ffffff;
+        --light-card-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+        --light-icon-color: #3b82f6; /* Primary blue for icons/accents */
+        --light-link-color: #3b82f6;
+        --light-link-hover-color: #2563eb;
+        --light-border-color: #e2e8f0;
+        --light-heading-color: #1e293b;
+        --light-developer-name-color: #3b82f6;
+        --light-role-color: #6c757d;
+        --light-social-icon-color: #6c757d;
+        --light-social-icon-hover-color: #3b82f6;
+        --light-tech-item-hover-bg: #3b82f6; /* Hover background for tech items */
+        --light-tech-item-hover-text: white; /* Hover text color for tech items */
+
+        /* Apply light mode variables by default */
+        --page-bg: var(--light-page-bg);
+        --header-bg-start: var(--light-header-bg-start);
+        --header-bg-end: var(--light-header-bg-end);
+        --text-primary: var(--light-text-primary);
+        --text-secondary: var(--light-text-secondary);
+        --card-bg: var(--light-card-bg);
+        --card-shadow: var(--light-card-shadow);
+        --icon-color: var(--light-icon-color);
+        --link-color: var(--light-link-color);
+        --link-hover-color: var(--light-link-hover-color);
+        --border-color: var(--light-border-color);
+        --heading-color: var(--light-heading-color);
+        --developer-name-color: var(--light-developer-name-color);
+        --role-color: var(--light-role-color);
+        --social-icon-color: var(--light-social-icon-color);
+        --social-icon-hover-color: var(--light-social-icon-hover-color);
+        --tech-item-hover-bg: var(--light-tech-item-hover-bg);
+        --tech-item-hover-text: var(--light-tech-item-hover-text);
+    }
+
+    /* --- Dark Mode Variables (Override) --- */
+    body.dark-mode :root,
+    @media (prefers-color-scheme: dark) {
+        :root {
+            --dark-page-bg: #1a202c;
+            --dark-header-bg-start: #2d3748;
+            --dark-header-bg-end: #1a202c;
+            --dark-text-primary: #f1f5f9;
+            --dark-text-secondary: #a0aec0;
+            --dark-card-bg: #2d3748;
+            --dark-card-shadow: 0 5px 25px rgba(0, 0, 0, 0.5);
+            --dark-icon-color: #4361ee;
+            --dark-link-color: #4361ee;
+            --dark-link-hover-color: #6a8cff;
+            --dark-border-color: #4a5568;
+            --dark-heading-color: #e2e8f0;
+            --dark-developer-name-color: #4361ee;
+            --dark-role-color: #a0aec0;
+            --dark-social-icon-color: #a0aec0;
+            --dark-social-icon-hover-color: #4361ee;
+            --dark-tech-item-hover-bg: #4361ee; /* Hover background for tech items */
+            --dark-tech-item-hover-text: white; /* Hover text color for tech items */
+
+
+            /* Override general variables with dark mode ones */
+            --page-bg: var(--dark-page-bg);
+            --header-bg-start: var(--dark-header-bg-start);
+            --header-bg-end: var(--dark-header-bg-end);
+            --text-primary: var(--dark-text-primary);
+            --text-secondary: var(--dark-text-secondary);
+            --card-bg: var(--dark-card-bg);
+            --card-shadow: var(--dark-card-shadow);
+            --icon-color: var(--dark-icon-color);
+            --link-color: var(--dark-link-color);
+            --link-hover-color: var(--dark-link-hover-color);
+            --border-color: var(--dark-border-color);
+            --heading-color: var(--dark-heading-color);
+            --developer-name-color: var(--dark-developer-name-color);
+            --role-color: var(--dark-role-color);
+            --social-icon-color: var(--dark-social-icon-color);
+            --social-icon-hover-color: var(--dark-social-icon-hover-color);
+            --tech-item-hover-bg: var(--dark-tech-item-hover-bg);
+            --tech-item-hover-text: var(--dark-tech-item-hover-text);
+        }
+    }
+
+    /* Global body transition */
+    body {
+        transition: background-color 0.3s ease, color 0.3s ease;
+        background-color: var(--page-bg);
+        color: var(--text-primary);
+    }
+
+    /* Header Section */
+    .header-section {
+        background: linear-gradient(135deg, var(--header-bg-start) 0%, var(--header-bg-end) 100%);
+        border-radius: 0 0 20px 20px;
+        padding: 4rem 2rem;
+        margin-bottom: 3rem;
+        text-align: center;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        animation: fadeInDown 0.8s ease-out;
+    }
+
+    .header-section h1 {
+        font-size: 3.5rem;
+        font-weight: 700;
+        color: var(--icon-color);
+        margin-bottom: 1rem;
+    }
+
+    .header-section p {
+        font-size: 1.25rem;
+        color: var(--text-secondary);
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    .header-section .bi-code-slash {
+        font-size: 3rem;
+        color: var(--icon-color);
+        margin-right: 15px;
+        animation: rotateIn 1s ease-out;
+    }
+
+    @keyframes rotateIn {
+        from { opacity: 0; transform: rotate(-90deg); }
+        to { opacity: 1; transform: rotate(0deg); }
+    }
+
+    /* Developer Card Styling */
+    .dev-card {
+        background-color: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 15px;
+        box-shadow: var(--card-shadow);
+        padding: 2.5rem;
+        text-align: center;
+        transition: all 0.3s ease;
+        animation: fadeInUp 0.8s ease-out 0.2s both;
+    }
+
+    .dev-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 30px rgba(0,0,0,0.1);
+    }
+
+    .dev-card img.profile-pic {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 4px solid var(--icon-color);
+        margin-bottom: 1.5rem;
+        animation: zoomIn 1s ease-out;
+    }
+
+    @keyframes zoomIn {
+        from { opacity: 0; transform: scale(0.8); }
+        to { opacity: 1; transform: scale(1); }
+    }
+
+    .dev-card h2 {
+        font-size: 2.2rem;
+        font-weight: 700;
+        color: var(--developer-name-color);
+        margin-bottom: 0.5rem;
+    }
+
+    .dev-card p.role {
+        font-size: 1.2rem;
+        color: var(--role-color);
+        margin-bottom: 1.5rem;
+    }
+
+    .dev-card p.bio {
+        font-size: 1rem;
+        color: var(--text-primary);
+        line-height: 1.6;
+        margin-bottom: 2rem;
+    }
+
+    .dev-card .social-links a {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        background-color: transparent;
+        border: 2px solid var(--social-icon-color);
+        color: var(--social-icon-color);
+        font-size: 1.5rem;
+        margin: 0 8px;
+        transition: all 0.3s ease;
+        text-decoration: none;
+    }
+
+    .dev-card .social-links a:hover {
+        background-color: var(--social-icon-hover-color);
+        border-color: var(--social-icon-hover-color);
+        color: white;
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(var(--icon-color-rgb, 59, 130, 246), 0.3); /* Uses RGB version for shadow */
+    }
+    body.dark-mode .dev-card .social-links a:hover {
+        box-shadow: 0 5px 15px rgba(67, 97, 238, 0.4); /* Dark mode specific shadow */
+    }
+
+    /* Technologies Section */
+    .technologies-section {
+        margin-top: 3rem;
+        text-align: center;
+        animation: fadeInUp 0.8s ease-out 0.4s both;
+    }
+
+    .technologies-section h3 {
+        font-size: 2rem;
+        font-weight: 600;
+        color: var(--heading-color);
+        margin-bottom: 1.5rem;
+    }
+
+    .tech-list {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 15px;
+    }
+
+    /* --- Key changes for Tech Item with Hover Logo to fill the entire space --- */
+    .tech-item {
+        background-color: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        padding: 10px 20px; /* Initial padding for text */
+        color: var(--text-primary);
+        font-weight: 500;
+        transition: all 0.3s ease;
+        box-shadow: var(--card-shadow);
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-width: 120px;
+        min-height: 80px; /* Ensure enough space for logo to expand */
+        text-align: center;
+        cursor: pointer; /* Indicate it's interactive */
+    }
+
+    .tech-item .tech-name {
+        transition: opacity 0.3s ease, transform 0.3s ease;
+        opacity: 1;
+        transform: translateY(0);
+        white-space: nowrap;
+        margin-bottom: 0;
+        z-index: 1; /* Ensure text is above logo initially */
+    }
+
+    .tech-item .tech-logo {
+        position: absolute;
+        top: 0; /* Position at the top edge */
+        left: 0; /* Position at the left edge */
+        width: 100%; /* Take full width */
+        height: 100%; /* Take full height */
+        object-fit: contain; /* Ensure logo fits without cropping */
+        opacity: 0; /* Start hidden */
+        transform: scale(0.5); /* Start smaller */
+        transition: opacity 0.3s ease, transform 0.3s ease;
+        z-index: 0; /* Behind text initially */
+        padding: 5px; /* Add a little padding to the logo inside the container */
+    }
+
+    .tech-item:hover {
+        transform: translateY(-3px);
+        background-color: var(--tech-item-hover-bg);
+        border-color: var(--tech-item-hover-bg);
+        color: var(--tech-item-hover-text); /* Text color changes immediately on hover */
+    }
+
+    .tech-item:hover .tech-name {
+        opacity: 0; /* Make text disappear */
+        transform: translateY(10px); /* Small translation for smoother fade out */
+    }
+
+    .tech-item:hover .tech-logo {
+        opacity: 1; /* Make logo appear */
+        transform: scale(1); /* Scale to full size */
+        z-index: 2; /* Bring logo to front */
+    }
+    /* --- End Key changes --- */
+
+    /* Animations (re-used) */
+    @keyframes fadeInDown {
+        from { opacity: 0; transform: translateY(-30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .header-section h1 {
+            font-size: 2.5rem;
+        }
+        .header-section p {
+            font-size: 1rem;
+        }
+        .dev-card {
+            padding: 1.5rem;
+        }
+        .dev-card img.profile-pic {
+            width: 120px;
+            height: 120px;
+        }
+        .dev-card h2 {
+            font-size: 1.8rem;
+        }
+        .dev-card p.role {
+            font-size: 1rem;
+        }
+        .dev-card p.bio {
+            font-size: 0.9rem;
+        }
+        .dev-card .social-links a {
+            width: 40px;
+            height: 40px;
+            font-size: 1.3rem;
+        }
+        .technologies-section h3 {
+            font-size: 1.6rem;
+        }
+        .tech-item {
+            padding: 8px 15px;
+            font-size: 0.9rem;
+            min-width: 100px;
+            min-height: 70px;
+        }
+        .tech-item .tech-logo {
+            padding: 3px; /* Adjust padding for smaller screens */
+        }
+    }
+</style>
+
+<div class="container my-5">
+    {# Header Section #}
+    <div class="header-section">
+        <h1 class="mb-3">
+            <i class="bi bi-code-slash me-3"></i>{% trans "Crédits & Développeur" %}
+        </h1>
+        <p class="lead">
+            {% blocktrans %}Découvrez les personnes passionnées derrière la création et la maintenance de cette plateforme.{% endblocktrans %}
+        </p>
+    </div>
+
+    {# Developer Information Card #}
+    <div class="row justify-content-center mb-5">
+        <div class="col-md-8 col-lg-6">
+            <div class="dev-card">
+                {# Assurez-vous d'avoir une image statique ou un lien dynamique ici #}
+                <img src="{% static 'Ekandra/img/votre_photo_developpeur.jpg' %}" alt="Photo du Développeur" class="profile-pic">
+                {# Si vous n'avez pas de photo, vous pouvez utiliser un avatar générique de Bootstrap Icons #}
+                {# <i class="bi bi-person-circle display-1 text-primary mb-3"></i> #}
+
+                <h2>Nom du Développeur</h2> {# Remplacez par le nom réel #}
+                <p class="role text-muted">Lead Développeur / Architecte Logiciel</p> {# Adaptez le rôle #}
+                <p class="bio">
+                    {% blocktrans %}Je suis un développeur web passionné avec 6 années d'expérience dans la création d'applications robustes et conviviales. J'ai conçu et mis en œuvre cette plateforme en utilisant Django et Bootstrap, avec pour objectif de faciliter la connexion entre employeurs et talents à Madagascar. Mon expertise couvre le développement backend, le frontend réactif et l'optimisation des bases de données. Je m'engage à améliorer continuellement l'expérience utilisateur et les performances du site.{% endblocktrans %}
+                </p>
+
+                <div class="social-links">
+                    <a href="https://linkedin.com/in/votre_profil" target="_blank" title="LinkedIn"><i class="bi bi-linkedin"></i></a>
+                    <a href="https://github.com/Velonirna04" target="_blank" title="GitHub"><i class="bi bi-github"></i></a>
+                    <a href="mailto:andriamasymarcelo@gmail.com" title="Email"><i class="bi bi-envelope-fill"></i></a>
+                    {# Ajoutez d'autres liens si nécessaire, ex: Twitter, portfolio personnel #}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Technologies Used Section #}
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="technologies-section">
+                <h3>{% trans "Technologies Utilisées" %}</h3>
+                <div class="tech-list">
+                    {# MODIFICATIONS CI-DESSOUS : Ajoutez une image pour chaque technologie #}
+                    <span class="tech-item">
+                        <span class="tech-name">Python</span>
+                        <img src="{% static 'Ekandra/image/logo/python.jpeg' %}" alt="Python Logo" class="tech-logo">
+                    </span>
+                    <span class="tech-item">
+                        <span class="tech-name">Django</span>
+                        <img src="{% static 'Ekandra/image/logo/django.png' %}" alt="Django Logo" class="tech-logo">
+                    </span>
+                    <span class="tech-item">
+                        <span class="tech-name">HTML5</span>
+                        <img src="{% static 'Ekandra/image/logo/html5.png' %}" alt="HTML5 Logo" class="tech-logo">
+                    </span>
+                    <span class="tech-item">
+                        <span class="tech-name">CSS3</span>
+                        <img src="{% static 'Ekandra/image/logo/css3.png' %}" alt="CSS3 Logo" class="tech-logo">
+                    </span>
+                    <span class="tech-item">
+                        <span class="tech-name">Bootstrap 5</span>
+                        <img src="{% static 'Ekandra/image/logo/bootstrap.png' %}" alt="Bootstrap Logo" class="tech-logo">
+                    </span>
+                    <span class="tech-item">
+                        <span class="tech-name">JavaScript</span>
+                        <img src="{% static 'Ekandra/image/logo/js.png' %}" alt="JavaScript Logo" class="tech-logo">
+                    </span>
+                    <span class="tech-item">
+                        <span class="tech-name">SQLite</span>
+                        <img src="{% static 'Ekandra/image/logo/sqlite.jpeg' %}" alt="SQLite Logo" class="tech-logo">
+                    </span>
+
+                    {# Ajoutez d'autres technologies pertinentes avec leurs images #}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+    {# Gardez ceci si vous avez des styles globaux dans ce fichier #}
+    <link rel="stylesheet" href="{% static 'Ekandra/css/create_offre.css' %}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+{% endblock %}
+
+{% block extra_js %}
+    {% bootstrap_javascript %}
+    <script src="{% static 'Ekandra/js/sombre.js' %}"></script>
+{% endblock %}

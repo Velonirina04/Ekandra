@@ -1,26 +1,160 @@
 {% extends 'Ekandra/base.html' %}
-{% block title %}Noter l’entreprise{% endblock %}
+{% load bootstrap5 %}
+{% load static %}
+{% load i18n %} {# Make sure i18n is loaded for translation #}
+
+{% block title %}{% trans "Noter l'entreprise" %}{% endblock %}
+
+{% block extra_css %}
+    {# Link to base CSS for this page (light mode default styles) #}
+    <link rel="stylesheet" href="{% static 'Ekandra/css/noter.css' %}">
+
+    {# Dark Mode Styles Embedded Directly #}
+    <style>
+        /* --- Dark Mode Variables (Activated by body.dark-mode class or system preference) --- */
+        
+            :root {
+                --page-bg: #1a202c; /* Dark background for the overall page */
+                --card-bg: #2d3748; /* Dark background for the rating form card */
+                --card-shadow: 0 5px 25px rgba(0, 0, 0, 0.5); /* Deeper shadow */
+                --header-bg: #2d3748; /* Dark header section background */
+                --header-shadow: 0 2px 15px rgba(0, 0, 0, 0.4); /* Stronger header shadow */
+                --text-primary: #f1f5f9; /* Light primary text color */
+                --text-secondary: #a0aec0; /* Muted light secondary text color */
+                --border-color: #4a5568; /* General border color */
+                --input-bg: #4a5568; /* Dark input field background */
+                --input-border: #6b7280; /* Dark input field border */
+
+                /* Dark mode specific Bootstrap-like color adjustments */
+                --bs-primary: #4361ee; /* A vibrant blue for dark mode primary */
+                --bs-secondary: #a0aec0; /* Lighter secondary for dark mode */
+                --bs-outline-secondary: #a0aec0; /* Lighter outline secondary */
+            }
+        
+
+        /* Specific styles that need to be overridden for dark mode directly within this page.
+           These use !important to ensure they override Bootstrap or other external styles. */
+        body.dark-mode {
+            background-color: var(--page-bg) !important;
+            color: var(--text-primary) !important;
+        }
+        body.dark-mode .header-section {
+            background-color: var(--header-bg) !important;
+            box-shadow: var(--header-shadow) !important;
+        }
+        body.dark-mode .header-section .display-4 {
+            color: var(--bs-primary) !important;
+        }
+        body.dark-mode .header-section .lead {
+            color: var(--text-secondary) !important;
+        }
+        body.dark-mode .header-section .lead .text-secondary { /* For {{ entreprise.nom }} */
+            color: var(--text-primary) !important; /* Make it stand out */
+        }
+
+        body.dark-mode .rating-form-card {
+            background-color: var(--card-bg) !important;
+            border-color: var(--border-color) !important;
+            box-shadow: var(--card-shadow) !important;
+        }
+        body.dark-mode .rating-form-card .card-title {
+            color: var(--text-primary) !important; /* "Votre avis compte !" */
+        }
+
+        body.dark-mode .form-label {
+            color: var(--text-primary) !important; /* Label text color */
+        }
+        body.dark-mode .form-control,
+        body.dark-mode .form-select { /* Include select for potential rating dropdowns */
+            background-color: var(--input-bg) !important;
+            color: var(--text-primary) !important;
+            border-color: var(--input-border) !important;
+        }
+        body.dark-mode .form-control:focus,
+        body.dark-mode .form-select:focus {
+            background-color: var(--card-bg) !important;
+            border-color: var(--bs-primary) !important;
+            box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.25) !important;
+        }
+        body.dark-mode .form-control::placeholder {
+            color: var(--text-secondary) !important;
+        }
+
+        /* Submit Button */
+        body.dark-mode .rate-submit-btn {
+            background-color: var(--bs-primary) !important; /* Use primary for submit */
+            border-color: var(--bs-primary) !important;
+            color: #ffffff !important;
+        }
+        body.dark-mode .rate-submit-btn:hover {
+            filter: brightness(1.1);
+        }
+
+        /* Back Button */
+        body.dark-mode .back-button-animated {
+            color: var(--bs-outline-secondary) !important;
+            border-color: var(--bs-outline-secondary) !important;
+        }
+        body.dark-mode .back-button-animated:hover {
+            background-color: var(--bs-outline-secondary) !important;
+            color: var(--page-bg) !important; /* Text becomes page background color */
+        }
+
+        /* Bootstrap specific adjustments for dark mode text colors in forms */
+        body.dark-mode .form-text { /* For help text below inputs */
+            color: var(--text-secondary) !important;
+        }
+    </style>
+{% endblock %}
+
 {% block content %}
-<h1>Noter {{ entreprise.nom }}</h1>
-<div class="card" style="max-width: 600px;">
-    <div class="card-body">
-        <form method="post">
-            {% csrf_token %}
-            {% for field in form %}
-                <div class="form-group">
-                    <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
-                    {{ field }}
-                    {% if field.errors %}
-                        <div class="alert alert-danger mt-2">
-                            {{ field.errors }}
-                        </div>
-                    {% endif %}
-                </div>
-            {% endfor %}
-            <div class="d-grid gap-2 mt-4">
-                     <button type="submit" class="btn btn-primary btn-lg">Enregistrer votre note</button>
-            </div>
-        </form>
+<div class="container my-5">
+
+    {# Header Section #}
+    <div class="header-section text-center mb-5 p-4 bg-white rounded shadow-sm">
+        <h1 class="display-4 fw-bold text-primary mb-3">
+            <i class="bi bi-star-fill me-3"></i> {% trans "Noter" %} <span class="text-secondary">{{ entreprise.nom }}</span>
+        </h1>
+        <p class="lead text-secondary">
+            {% trans "Partagez votre expérience et aidez la communauté." %}
+        </p>
     </div>
+
+    {# Rating Form Card #}
+    <div class="card mx-auto shadow-lg rounded-3 rating-form-card">
+        <div class="card-body p-4">
+            <h2 class="card-title text-center text-dark mb-4">
+                {% trans "Votre avis compte !" %}
+            </h2>
+
+            <form method="post">
+                {% csrf_token %}
+
+                {# Render form fields using django-bootstrap5 for better rendering #}
+                {% bootstrap_form form %}
+
+                <div class="d-grid gap-2 mt-4">
+                    <button type="submit" class="btn btn-primary btn-lg rounded-pill rate-submit-btn">
+                        <i class="bi bi-save me-2"></i> {% trans "Soumettre votre note" %}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {# Back Button #}
+    <p class="mt-5 text-center">
+        {# Assuming a URL to go back to the demandeur's profile or the company's profile #}
+        <a href="{% url 'profile' %}" class="btn btn-outline-secondary btn-lg rounded-pill back-button-animated">
+            <i class="bi bi-arrow-left-circle me-2"></i> {% trans "Retour au profil" %}
+        </a>
+    </p>
+
 </div>
+{% endblock %}
+
+{% block extra_js %}
+    {% bootstrap_javascript %}
+    <script src="{% static 'Ekandra/js/sombre.js' %}"></script>
+    {# Add any specific JS for star ratings or form validation here if you implement it #}
 {% endblock %}

@@ -1,129 +1,373 @@
 {% extends 'Ekandra/base.html' %}
-{% load bootstrap5 %} 
-{% load static %} 
-
+{% load bootstrap5 %}
+{% load static %}
 
 {% block title %}Conversation avec {{ destinataire.username }}{% endblock %}
 
 {% block extra_head %}
-    <link rel="stylesheet" href="{% static 'Ekandra/css/style.css' %}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     {% bootstrap_css %}
-   
+    {# Link to your main chat styles #}
+    <link rel="stylesheet" href="{% static 'Ekandra/css/chat_style.css' %}">
 {% endblock %}
 
 {% block content %}
-<div class="container mx-auto p-4">
-    <h1 class="text-center mb-4 text-primary"><i class="bi bi-chat-dots me-2"></i> Conversation avec {{ destinataire.username }}</h1>  
+<div class="chat-wrapper chat-container-scope">
+    <div class="chat-header">
+        <a href="#" class="btn btn-sm btn-light chat-back-btn">
+            <i class="bi bi-arrow-left me-2"></i> Retour
+        </a>
+        <h1 class="chat-title">
+            <i class="bi bi-chat-dots me-2"></i> Conversation avec
+            <span class="destinataire-username">{{ destinataire.username }}</span>
+        </h1>
+        <div class="header-placeholder"></div>
+    </div>
 
-    
-    <div id="chat-log" class="border rounded p-3 mb-3 overflow-auto"> 
-    
+    <div id="chat-log" class="chat-log-area">
         {% for message in messages %}
-            <div class="mb-2 {% if message.expediteur == request.user %}text-end{% else %}text-start{% endif %}"> 
-            <p class="d-inline-block p-2 rounded-3 {% if message.expediteur == request.user %}bg-primary text-white{% else %}bg-light text-dark{% endif %}"> 
-                 {{ message.contenu }}
-                </p><br>
-                <small class="text-muted">{{ message.expediteur.username }} - {{ message.date_envoi|date:"H:i" }}</small> 
+            <div class="message-item {% if message.expediteur == request.user %}message-sent{% else %}message-received{% endif %}">
+                <div class="message-bubble">
+                    {{ message.contenu }}
+                </div>
+                <div class="message-meta">
+                    <span class="message-sender">{{ message.expediteur.username }}</span>
+                    <span class="message-timestamp">{{ message.date_envoi|date:"H:i" }}</span>
+                </div>
+            </div>
+        {% empty %}
+            <div class="no-messages-placeholder">
+                <i class="bi bi-info-circle"></i>
+                <p>Aucun message pour l'instant. Soyez le premier à engager la conversation !</p>
             </div>
         {% endfor %}
     </div>
 
-    
-    <form id="chat-form" class="d-flex"> 
-        <input type="text" id="chat-message-input" class="form-control flex-grow-1 rounded-start" placeholder="Écrivez votre message..."> 
-        <button type="submit" class="btn btn-primary flex-shrink-0"><i class="bi bi-send"></i></button>  
+    <form id="chat-form" class="chat-input-form">
+        <textarea
+            id="chat-message-input"
+            class="chat-textarea"
+            placeholder="Écrivez votre message..."
+            rows="1"
+            oninput="autoExpandTextarea(this)"
+            maxlength="500"
+            aria-label="Champ de saisie du message"
+        ></textarea>
+        <button type="submit" class="chat-send-btn" aria-label="Envoyer le message">
+            <i class="bi bi-send-fill"></i>
+        </button>
     </form>
 </div>
-
-
-{% bootstrap_javascript %}
-
-<script>
-    const recipientId = {{ destinataire.id }};
-    const chatSocket = new WebSocket(
-        'ws://' + window.location.host +
-        '/ws/chat/' + recipientId + '/'
-    );
-
-    function formatTimestamp(isoString) {
-        const date = new Date(isoString);
-        const hours = date.getHours().toString().padStart(2, '0');
-        const minutes = date.getMinutes().toString().padStart(2, '0');
-        return `${hours}:${minutes}`;
-    }
-
-    chatSocket.onmessage = function(e) {
-        const data = JSON.parse(e.data);
-        const message = data['message'];
-        const senderUsername = data['sender_username'];
-        const timestamp = data['timestamp']; 
-        const chatLog = document.querySelector('#chat-log');
-        const currentUser = "{{ request.user.username }}";
-
-        const messageElement = document.createElement('div');
-        messageElement.classList.add('mb-2');
-
-        if (senderUsername === currentUser) {
-            messageElement.classList.add('text-end');
-        } else {
-            messageElement.classList.add('text-start');
-        }
-
-        const metaSpan = document.createElement('small');
-        metaSpan.classList.add('text-muted');
-        metaSpan.textContent = `${senderUsername} - ${formatTimestamp(timestamp)}`;
-        messageElement.appendChild(metaSpan);
-
-        const contentPara = document.createElement('p');
-        contentPara.classList.add('d-inline-block', 'p-2', 'rounded-3'); 
-         if (senderUsername === currentUser) {
-            contentPara.classList.add('bg-primary', 'text-white');
-        } else {
-            contentPara.classList.add('bg-light', 'text-dark');
-        }
-        contentPara.textContent = message;
-        messageElement.appendChild(contentPara);
-
-        chatLog.appendChild(messageElement);
-
-        chatLog.scrollTop = chatLog.scrollHeight;
-    };
-
-    chatSocket.onclose = function(e) {
-        console.error('Chat socket closed unexpectedly');
-    };
-
-    document.querySelector('#chat-message-input').focus();
-    document.querySelector('#chat-message-input').onkeyup = function(e) {
-        if (e.keyCode === 13) {  
-            document.querySelector('#chat-form button[type="submit"]').click();
-        }
-    };
-
-    document.querySelector('#chat-form').onsubmit = function(e) {
-        e.preventDefault();
-        const messageInput = document.querySelector('#chat-message-input');
-        const message = messageInput.value;
-        if (message.trim() === '') {
-             console.log("Cannot send empty message.");
-             return;
-        }
-        chatSocket.send(JSON.stringify({
-            'message': message
-        }));
-        messageInput.value = '';
-    };
-
-    window.onload = function() {
-        const chatLog = document.querySelector('#chat-log');
-        chatLog.scrollTop = chatLog.scrollHeight;
-    };
-
-</script>
 {% endblock %}
+
+{% block extra_js %}
+    {% bootstrap_javascript %}
+
+    <script>
+        const recipientId = {{ destinataire.id }};
+        const wsProtocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
+        const chatSocket = new WebSocket(
+            wsProtocol + window.location.host +
+            '/ws/chat/' + recipientId + '/'
+        );
+
+        function formatTimestamp(isoString) {
+            const date = new Date(isoString);
+            const hours = date.getHours().toString().padStart(2, '0');
+            const minutes = date.getMinutes().toString().padStart(2, '0');
+            return `${hours}:${minutes}`;
+        }
+
+        function autoExpandTextarea(textarea) {
+            textarea.style.height = 'auto'; // Reset height to recalculate
+            // Limit the maximum height of the textarea (e.g., 100px)
+            textarea.style.height = (textarea.scrollHeight < 100 ? textarea.scrollHeight : 100) + 'px';
+        }
+
+        chatSocket.onmessage = function(e) {
+            const data = JSON.parse(e.data);
+            const message = data['message'];
+            const senderUsername = data['sender_username'];
+            const timestamp = data['timestamp'];
+            const chatLog = document.querySelector('#chat-log');
+            const currentUser = "{{ request.user.username }}";
+
+            const messageItem = document.createElement('div');
+            messageItem.classList.add('message-item');
+
+            const messageBubble = document.createElement('div');
+            messageBubble.classList.add('message-bubble');
+            messageBubble.textContent = message; // Use textContent for security
+
+            const messageMeta = document.createElement('div');
+            messageMeta.classList.add('message-meta');
+
+            const senderSpan = document.createElement('span');
+            senderSpan.classList.add('message-sender');
+            senderSpan.textContent = senderUsername;
+
+            const timestampSpan = document.createElement('span');
+            timestampSpan.classList.add('message-timestamp');
+            timestampSpan.textContent = formatTimestamp(timestamp);
+
+            messageMeta.appendChild(senderSpan);
+            messageMeta.append(' '); // Add a space between sender and timestamp
+            messageMeta.appendChild(timestampSpan);
+
+            // Set CSS class based on sender
+            if (senderUsername === currentUser) {
+                messageItem.classList.add('message-sent');
+            } else {
+                messageItem.classList.add('message-received');
+            }
+
+            messageItem.appendChild(messageBubble);
+            messageItem.appendChild(messageMeta);
+
+            chatLog.appendChild(messageItem);
+            chatLog.scrollTop = chatLog.scrollHeight; // Scroll to bottom
+        };
+
+        chatSocket.onclose = function(e) {
+            console.error('Chat socket closed unexpectedly:', e);
+            // Add reconnection logic or error message display here
+        };
+
+        chatSocket.onerror = function(error) {
+            console.error('WebSocket Error:', error);
+            // Handle WebSocket connection errors
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const messageInput = document.querySelector('#chat-message-input');
+            const chatLog = document.querySelector('#chat-log');
+
+            // Initialize textarea height and scroll chat log on page load
+            autoExpandTextarea(messageInput);
+            chatLog.scrollTop = chatLog.scrollHeight;
+
+            // Focus on the message input field
+            messageInput.focus();
+
+            // Handle message submission with 'Enter' key (without 'Shift')
+            messageInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault(); // Prevent default newline in textarea
+                    document.querySelector('#chat-form').requestSubmit(); // Submit the form
+                }
+            });
+
+            // Handle message form submission
+            document.querySelector('#chat-form').addEventListener('submit', function(e) {
+                e.preventDefault(); // Prevent page reload
+                const message = messageInput.value.trim();
+                if (message === '') {
+                    console.warn("Attempted to send empty message.");
+                    return; // Do not send empty messages
+                }
+                chatSocket.send(JSON.stringify({
+                    'message': message
+                }));
+                messageInput.value = ''; // Clear input field
+                messageInput.style.height = 'auto'; // Reset textarea height
+            });
+        });
+    </script>
+    {# Ensure sombre.js is loaded if it's responsible for dark mode toggle #}
+    <script src="{% static 'Ekandra/js/sombre.js' %}"></script>
+{% endblock %}
+
 {% block extra_css %}
-     <link rel="stylesheet" href="{% static 'Ekandra/css/chat_style.css' %}"> 
+    {# Link to your main chat styles (already done in extra_head, but repeated here for context of CSS block) #}
+    <link rel="stylesheet" href="{% static 'Ekandra/css/chat_style.css' %}">
+    <style>
+        /* --- Base Dark Mode Adjustments (if not already in global CSS) --- */
+        body.dark-mode {
+            background-color: #1a202c; /* Main background for dark mode */
+            color: #e2e8f0; /* Default text color */
+        }
 
-{% endblock extra_css %}
+        /* --- Specific Page Element Styles for Dark Mode --- */
 
+        /* Chat Wrapper/Container */
+        body.dark-mode .chat-wrapper {
+            background-color: #2d3748; /* Dark background for the chat container */
+            box-shadow: 0 5px 25px rgba(0,0,0,0.5); /* Deeper shadow for pop-out effect */
+            border: 1px solid #4a5568; /* Subtle border */
+        }
 
+        /* Chat Header */
+        body.dark-mode .chat-header {
+            background: linear-gradient(90deg, #3a0ca3, #4361ee); /* Vibrant gradient for header */
+            border-bottom: 1px solid #4361ee; /* Matching border */
+            color: #f8f9fa; /* Pure white text */
+        }
+
+        body.dark-mode .chat-header .chat-title .bi {
+            color: #f8f9fa; /* White icon in header */
+        }
+
+        body.dark-mode .chat-header .destinataire-username {
+            color: #f8f9fa; /* White username */
+        }
+
+        body.dark-mode .chat-back-btn {
+            background-color: rgba(255, 255, 255, 0.1); /* Slightly transparent white button */
+            color: #f8f9fa; /* White text/icon */
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        body.dark-mode .chat-back-btn:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+            color: #fff;
+        }
+
+        /* Chat Log Area */
+        body.dark-mode .chat-log-area {
+            background-color: #1a202c; /* Darker background for the message log */
+            border-top: 1px solid #4a5568; /* Subtle top border */
+            border-bottom: 1px solid #4a5568; /* Subtle bottom border */
+        }
+
+        /* --- Core Message Alignment Styles (Light Mode) --- */
+        /* These should ideally be in Ekandra/css/chat_style.css */
+        .message-item {
+            display: flex;
+            flex-direction: column;
+            max-width: 75%;
+            margin-bottom: 10px;
+        }
+
+        .message-bubble {
+            padding: 8px 12px;
+            border-radius: 18px;
+            word-wrap: break-word;
+            white-space: pre-wrap;
+            font-size: 0.95rem;
+            line-height: 1.4;
+            position: relative;
+        }
+
+        .message-meta {
+            font-size: 0.75rem;
+            color: #888;
+            margin-top: 2px;
+            padding: 0 8px;
+        }
+
+        .message-sender {
+            font-weight: bold;
+            margin-right: 5px;
+        }
+
+        /* Sent Messages (Current User) */
+        .message-sent {
+            align-self: flex-end;
+            margin-right: 5px;
+        }
+
+        .message-sent .message-bubble {
+            background-color: #007bff; /* Primary blue for sent messages */
+            color: white;
+            border-bottom-right-radius: 4px;
+            border-top-right-radius: 18px;
+            border-bottom-left-radius: 18px;
+            border-top-left-radius: 18px;
+        }
+
+        .message-sent .message-meta {
+            text-align: right;
+        }
+
+        /* Received Messages (Other User) */
+        .message-received {
+            align-self: flex-start;
+            margin-left: 5px;
+        }
+
+        .message-received .message-bubble {
+            background-color: #e2e6ea; /* Light gray for received messages */
+            color: #333;
+            border-bottom-left-radius: 4px;
+            border-top-right-radius: 18px;
+            border-bottom-right-radius: 18px;
+            border-top-left-radius: 18px;
+        }
+
+        .message-received .message-meta {
+            text-align: left;
+        }
+
+        /* --- Dark Mode Overrides for Message Alignment --- */
+        /* These should also ideally be in Ekandra/css/chat_style.css under body.dark-mode */
+        body.dark-mode .message-bubble {
+            /* Base dark mode bubble colors are already defined in your provided CSS */
+            /* Ensure border-radius adjustments are consistent */
+        }
+
+        body.dark-mode .message-sent .message-bubble {
+            background-color: #4361ee; /* Your accent color */
+            color: white;
+            border-bottom-right-radius: 4px;
+            border-top-right-radius: 18px;
+            border-bottom-left-radius: 18px;
+            border-top-left-radius: 18px;
+        }
+
+        body.dark-mode .message-received .message-bubble {
+            background-color: #4a5568; /* Darker gray for received messages */
+            color: #e2e8f0; /* Light text on dark gray */
+            border-bottom-left-radius: 4px;
+            border-top-right-radius: 18px;
+            border-bottom-right-radius: 18px;
+            border-top-left-radius: 18px;
+        }
+
+        body.dark-mode .message-meta {
+            color: #a0aec0; /* Muted light gray for meta info in dark mode */
+        }
+
+        /* No Messages Placeholder */
+        body.dark-mode .no-messages-placeholder {
+            color: #a0aec0; /* Muted light gray */
+        }
+
+        body.dark-mode .no-messages-placeholder .bi {
+            color: #4cc9f0; /* Accent color for icon */
+        }
+
+        /* Chat Input Form */
+        body.dark-mode .chat-input-form {
+            background-color: #2d3748; /* Dark background for input area */
+            border-top: 1px solid #4a5568; /* Subtle top border */
+        }
+
+        body.dark-mode .chat-textarea {
+            background-color: #4a5568; /* Darker textarea background */
+            color: #e2e8f0; /* Light text */
+            border: 1px solid #6b7280; /* Subtle border */
+            resize: none; /* Keep resize off */
+        }
+
+        body.dark-mode .chat-textarea::placeholder {
+            color: #a0aec0; /* Lighter placeholder text */
+        }
+
+        body.dark-mode .chat-textarea:focus {
+            border-color: #4cc9f0; /* Accent color on focus */
+            box-shadow: 0 0 0 0.2rem rgba(76, 201, 240, 0.25); /* Lighter focus shadow */
+            background-color: #4a5568; /* Keep consistent background on focus */
+        }
+
+        /* Send Button */
+        body.dark-mode .chat-send-btn {
+            background: linear-gradient(135deg, #3a0ca3, #4361ee); /* Accent gradient for send button */
+            border: none;
+            color: white;
+        }
+
+        body.dark-mode .chat-send-btn:hover {
+            background: linear-gradient(135deg, #4361ee, #3a0ca3); /* Invert gradient on hover */
+        }
+    </style>
+{% endblock %}

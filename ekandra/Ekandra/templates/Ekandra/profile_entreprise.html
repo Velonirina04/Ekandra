@@ -8,7 +8,7 @@
 {% block content %}
 <div class="container mt-4"> 
     <div class="bg-light p-3 rounded shadow-sm mb-4">
-        <h1 class="mb-0 text-primary">Profil de {{ entreprise.nom|default:"[Nom de l'entreprise]" }} le {{to_date}}</h1> {# Added text-primary color #}
+        <h1 class="mb-0 text-primary text-center">Profil de {{ entreprise.nom|default:"[Nom de l'entreprise]" }}</h1> {# Added text-primary color #}
     </div>
 
 
@@ -44,7 +44,7 @@
                     <span class="star-rating me-2">
                         {% for i in "12345" %}
                             {% if i <= moyenne|floatformat:0 %}
-                                <i class="bi bi-star-fill"></i>
+                                <i class="bi bi-star-fill text-warning"></i>
                             {% else %}
                                 <i class="bi bi-star"></i>
                             {% endif %}
@@ -84,10 +84,11 @@
 
             
             <div class="collapse {% if profile_incomplete %}show{% endif %}" id="collapseProfileForm">
-                <h3 class="mb-3 text-center ext-secondary">Formulaire de mise à jour</h3>
                 <div class="card shadow-sm rounded" style="max-width: 600px;">
                     <div class="card-body">
                         <form method="post" enctype="multipart/form-data">
+                <h3 class="mb-3 text-center ext-secondary">Formulaire de mise à jour</h3>
+
                             {% csrf_token %}
                             {% bootstrap_form form %} 
                             <button type="submit" class="btn btn-success mt-3 w-100"><i class="bi bi-check-circle me-1"></i> Enregistrer les modifications</button>
@@ -164,7 +165,7 @@
                             <span class="star-rating">
                                 {% for i in "12345" %}
                                     {% if i|add:0 <= notation.note %}
-                                        <i class="bi bi-star-fill"></i>
+                                        <i class="bi bi-star-fill text-warning"></i>
                                     {% else %}
                                         <i class="bi bi-star"></i>
                                     {% endif %}
@@ -187,6 +188,314 @@
 
 {% block extra_css %}
     <link rel="stylesheet" href="{% static 'Ekandra/css/style.css' %}">
+    <style>
+        /* Ensure base body styles apply from your global dark mode CSS */
+body.dark-mode {
+    background-color: #1a202c; /* Main background for dark mode */
+    color: #e2e8f0; /* Default text color */
+}
+body.dark-mode .card {
+    background-color: #1a202c; /* Main background for dark mode */
+    color: #e2e8f0; /* Default text color */
+}
+body.dark-mode .card:hover {
+    background-color: #3a455a; /* Slightly lighter dark on hover */
+    color: #e2e8f0; /* Lighter text on hover */
+    border-color: #4a5568;
+}
+
+/* --- Specific Page Element Styles for Dark Mode --- */
+
+/* Header Section */
+body.dark-mode .bg-light {
+    background-color: #2d3748 !important; /* Darker background for header */
+    box-shadow: 0 3px 15px rgba(0,0,0,0.3) !important; /* Darker shadow */
+}
+
+body.dark-mode .text-primary {
+    color: #4cc9f0 !important; /* Accent color for primary text */
+}
+
+/* Alerts */
+body.dark-mode .alert {
+    border-width: 1px;
+    border-style: solid;
+    opacity: 0.9;
+}
+
+body.dark-mode .alert-warning {
+    background-color: rgba(255, 193, 7, 0.2); /* Muted warning yellow */
+    color: #ffc107;
+    border-color: #ffc107;
+}
+
+body.dark-mode .alert-info {
+    background-color: rgba(23, 162, 184, 0.2); /* Muted info cyan */
+    color: #17a2b8;
+    border-color: #17a2b8;
+}
+
+/* Profile Overview Card */
+body.dark-mode .card.mb-4 {
+    background-color: #2d3748; /* Dark background for the card */
+    box-shadow: 0 5px 20px rgba(0,0,0,0.4); /* Darker shadow */
+    color: #e2e8f0; /* Light text */
+    border: 1px solid #4a5568; /* Subtle border */
+}
+
+body.dark-mode .card-body p {
+    color: #e2e8f0; /* Ensure paragraph text is light */
+}
+
+body.dark-mode .card-body strong {
+    color: #4cc9f0; /* Accent color for bold labels */
+}
+
+body.dark-mode .profile-photo {
+    border-color: #4a5568 !important; /* Darker border for profile photo */
+}
+
+body.dark-mode .bi-building {
+    color: #a0aec0 !important; /* Lighter muted color for default icon */
+}
+
+body.dark-mode hr {
+    border-color: #4a5568; /* Darker horizontal rule */
+}
+
+/* Star Rating */
+body.dark-mode .star-rating .bi-star-fill {
+    color: #ffd700 !important; /* Gold color for filled stars */
+}
+
+body.dark-mode .star-rating .bi-star {
+    color: #a0aec0 !important; /* Muted color for empty stars */
+}
+
+body.dark-mode .text-secondary {
+    color: #a0aec0 !important; /* Muted light color for secondary text (score) */
+}
+
+/* Navigation Tabs */
+body.dark-mode .nav-tabs {
+    border-bottom-color: #4a5568; /* Darker border for tabs */
+}
+
+body.dark-mode .nav-link {
+    background-color: #2d3748; /* Dark background for inactive tabs */
+    color: #a0aec0; /* Muted text color for inactive tabs */
+    border-color: #4a5568; /* Darker border */
+    border-bottom: 1px solid #4a5568; /* Ensure bottom border is visible */
+}
+
+body.dark-mode .nav-link:hover {
+    background-color: #3a455a; /* Slightly lighter dark on hover */
+    color: #e2e8f0; /* Lighter text on hover */
+    border-color: #4a5568;
+}
+
+body.dark-mode .nav-link.active {
+    background-color: #1a202c !important; /* Primary dark background for active tab */
+    color: #4cc9f0 !important; /* Accent color for active tab text */
+    border-color: #4a5568 !important; /* Consistent border for active tab */
+    border-bottom-color: #1a202c !important; /* Hides bottom border for active tab */
+}
+
+body.dark-mode .nav-link .bi {
+    color: inherit; /* Inherit color from parent nav-link */
+}
+
+/* Tab Pane Content - General */
+body.dark-mode .tab-pane h2 {
+    color: #e2e8f0 !important; /* Light text for tab section titles */
+}
+
+body.dark-mode .tab-pane p {
+    color: #e2e8f0; /* Ensure detailed description text is light */
+}
+
+/* Modify Profile Button & Form */
+body.dark-mode .btn-primary {
+    background: linear-gradient(135deg, #3a0ca3, #4361ee) !important; /* Accent gradient for primary buttons */
+    border-color: #3a0ca3 !important;
+    color: white !important;
+}
+
+body.dark-mode .btn-primary:hover {
+    background: linear-gradient(135deg, #4361ee, #3a0ca3) !important;
+    border-color: #4361ee !important;
+}
+
+body.dark-mode .collapse .card {
+    background-color: #2d3748; /* Dark background for form card */
+    box-shadow: 0 5px 20px rgba(0,0,0,0.4); /* Darker shadow */
+    color: #e2e8f0; /* Default text color within form */
+    border: 1px solid #4a5568; /* Subtle border */
+}
+
+body.dark-mode .collapse .card h3 {
+    color: #e2e8f0 !important; /* Light text for form title */
+}
+
+/* Form Controls (Inputs, Selects, etc.) */
+body.dark-mode .form-control {
+    background-color: #4a5568; /* Darker input background */
+    color: #e2e8f0; /* Light text in inputs */
+    border-color: #6b7280; /* Subtle border */
+}
+
+body.dark-mode .form-control::placeholder {
+    color: #a0aec0; /* Lighter placeholder text */
+}
+
+body.dark-mode .form-control:focus {
+    border-color: #4cc9f0; /* Accent color on focus */
+    box-shadow: 0 0 0 0.25rem rgba(76, 201, 240, 0.25); /* Lighter focus shadow */
+    background-color: #4a5568; /* Keep background consistent on focus */
+}
+
+body.dark-mode .form-label {
+    color: #e2e8f0; /* Light text for form labels */
+}
+
+body.dark-mode .help-text {
+    color: #a0aec0 !important; /* Lighter muted text for help text */
+}
+
+/* Save Changes Button */
+body.dark-mode .btn-success {
+    background-color: #28a745 !important; /* Standard success green (adjust if you have a dark mode green) */
+    border-color: #28a745 !important;
+    color: white !important;
+}
+
+body.dark-mode .btn-success:hover {
+    background-color: #218838 !important;
+    border-color: #1e7e34 !important;
+}
+
+/* Offers Tab - Table & Button */
+body.dark-mode .btn-success { /* Re-applying for the "Publier une nouvelle offre" button */
+    background-color: #28a745 !important;
+    border-color: #28a745 !important;
+    color: white !important;
+}
+
+body.dark-mode .table {
+    color: #e2e8f0; /* Default text color for table content */
+    background-color: #2d3748; /* Default background for table */
+    border-color: #4a5568; /* Border color for table */
+}
+
+body.dark-mode .table thead th,
+body.dark-mode .table-primary {
+    background-color: #3a0ca3 !important; /* Dark accent for table header */
+    color: white !important; /* White text for header */
+    border-color: #4361ee !important; /* Accent border for header */
+}
+
+body.dark-mode .table-striped tbody tr:nth-of-type(odd) {
+    background-color: #2d3748; /* Odd rows background */
+}
+
+body.dark-mode .table-striped tbody tr:nth-of-type(even) {
+    background-color: #1a202c; /* Even rows background */
+}
+
+body.dark-mode .table-hover tbody tr:hover {
+    background-color: #3a455a; /* Lighter dark on hover */
+}
+
+body.dark-mode .table td a {
+    color: #4cc9f0 !important; /* Accent color for links in table */
+}
+
+/* Table Badges (Status) */
+body.dark-mode .badge {
+    opacity: 0.9;
+    color: white !important; /* Default badge text color in dark mode */
+}
+
+body.dark-mode .badge.bg-success {
+    background-color: #28a745 !important;
+}
+body.dark-mode .badge.bg-danger {
+    background-color: #dc3545 !important;
+}
+body.dark-mode .badge.bg-warning {
+    background-color: #ffc107 !important;
+    color: #1a202c !important; /* Dark text for warning badge */
+}
+
+/* Table Action Buttons */
+body.dark-mode .btn-sm.btn-outline-primary {
+    border-color: #4361ee;
+    color: #4361ee;
+}
+body.dark-mode .btn-sm.btn-outline-primary:hover {
+    background-color: #4361ee;
+    color: white;
+}
+
+body.dark-mode .btn-sm.btn-outline-danger {
+    border-color: #dc3545;
+    color: #dc3545;
+}
+body.dark-mode .btn-sm.btn-outline-danger:hover {
+    background-color: #dc3545;
+    color: white;
+}
+
+body.dark-mode .btn-sm.btn-outline-success {
+    border-color: #28a745;
+    color: #28a745;
+}
+body.dark-mode .btn-sm.btn-outline-success:hover {
+    background-color: #28a745;
+    color: white;
+}
+
+body.dark-mode .table .text-muted.py-4 {
+    color: #a0aec0 !important; /* Muted text for "no offers" message */
+    background-color: #2d3748; /* Match card background */
+}
+
+/* Evaluations Tab */
+body.dark-mode .evaluations h2 { /* Assuming a class for the evaluations section */
+    color: #e2e8f0;
+}
+
+body.dark-mode .evaluations .card {
+    background-color: #2d3748; /* Dark background for each evaluation card */
+    box-shadow: 0 3px 10px rgba(0,0,0,0.2); /* Subtle dark shadow */
+    border: 1px solid #4a5568; /* Subtle border */
+}
+
+body.dark-mode .evaluations .card-title {
+    color: #e2e8f0; /* Light text for demandeur name */
+}
+
+body.dark-mode .evaluations .card-title .bi {
+    color: #a0aec0 !important; /* Muted color for person icon */
+}
+
+body.dark-mode .evaluations .card-text {
+    color: #cbd5e0; /* Slightly lighter text for comments */
+}
+
+body.dark-mode .evaluations .text-muted {
+    color: #a0aec0 !important; /* Muted light text for date */
+}
+
+body.dark-mode .evaluations .bi-calendar {
+    color: #a0aec0 !important; /* Muted icon for calendar */
+}
+
+body.dark-mode .evaluations .py-4 {
+    color: #a0aec0 !important; /* Muted text for "no evaluations" message */
+    background-color: #2d3748; /* Match card background */
+}
+    </style>
 {% endblock %}
 
 {% block extra_js %}

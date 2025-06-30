@@ -1,32 +1,164 @@
 {% extends 'Ekandra/base.html' %}
-{% load bootstrap5 %} 
-{% load static %} 
+{% load bootstrap5 %}
+{% load static %}
+{% load i18n %}
 
-{% block title %}Postuler{% endblock %}
+{% block title %}{% trans "Postuler à l'offre" %}{% endblock %}
+
+{% block extra_css %}
+    {# Link to base CSS for this form (light mode default styles) #}
+    <link rel="stylesheet" href="{% static 'Ekandra/css/candidature_form.css' %}">
+
+    {# Dark Mode Styles Embedded Directly #}
+    <style>
+        /* --- Dark Mode Variables (Activated by body.dark-mode class or system preference) --- */
+            :root {
+                --page-bg: #1a202c; /* Dark background for the overall page */
+                --card-bg: #2d3748; /* Dark background for the form card */
+                --card-shadow: 0 5px 25px rgba(0, 0, 0, 0.5); /* Deeper shadow */
+                --header-bg: #2d3748; /* Dark header section background */
+                --header-shadow: 0 2px 15px rgba(0, 0, 0, 0.4); /* Stronger header shadow */
+                --text-primary: #f1f5f9; /* Light primary text color */
+                --text-secondary: #a0aec0; /* Muted light secondary text color */
+                --border-color: #4a5568; /* Darker border color */
+                --input-bg: #4a5568; /* Dark input field background */
+                --input-border: #6b7280; /* Dark input field border */
+
+                /* Dark mode specific Bootstrap-like color adjustments */
+                --bs-primary: #4361ee; /* A vibrant blue for dark mode primary */
+                --bs-success: #10b981; /* Keep success green similar or adjust if needed */
+                --bs-secondary: #a0aec0; /* Lighter secondary for dark mode */
+                --bs-outline-secondary: #a0aec0; /* Lighter outline secondary */
+            }
+        
+
+        /* Specific styles that need to be overridden for dark mode directly within this page.
+           These use !important to ensure they override Bootstrap or other external styles. */
+        body.dark-mode {
+            background-color: var(--page-bg) !important;
+            color: var(--text-primary) !important;
+        }
+        body.dark-mode .header-section {
+            background-color: var(--header-bg) !important;
+            box-shadow: var(--header-shadow) !important;
+        }
+        body.dark-mode .header-section .display-4 {
+            color: var(--bs-primary) !important;
+        }
+        body.dark-mode .header-section .lead {
+            color: var(--text-secondary) !important;
+        }
+        body.dark-mode .header-section .lead .fw-bold {
+            color: var(--text-primary) !important;
+        }
+
+        body.dark-mode .application-form-card {
+            background-color: var(--card-bg) !important;
+            border-color: var(--border-color) !important;
+            box-shadow: var(--card-shadow) !important;
+        }
+        body.dark-mode .application-form-card .card-title {
+            color: var(--bs-primary) !important;
+        }
+
+        body.dark-mode .form-label {
+            color: var(--text-primary) !important;
+        }
+        body.dark-mode .form-control,
+        body.dark-mode .form-select {
+            background-color: var(--input-bg) !important;
+            color: var(--text-primary) !important;
+            border-color: var(--input-border) !important;
+        }
+        body.dark-mode .form-control:focus,
+        body.dark-mode .form-select:focus {
+            background-color: var(--card-bg) !important; /* Slightly lighter on focus */
+            border-color: var(--bs-primary) !important; /* Primary color border on focus */
+            box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.25) !important; /* Primary color shadow */
+        }
+        body.dark-mode .form-control::placeholder {
+            color: var(--text-secondary) !important;
+        }
+
+        body.dark-mode .apply-btn {
+            background-color: var(--bs-success) !important;
+            border-color: var(--bs-success) !important;
+            color: #ffffff !important; /* Ensure white text on success button */
+        }
+        body.dark-mode .apply-btn:hover {
+            filter: brightness(1.1);
+        }
+
+        body.dark-mode .back-button-animated {
+            color: var(--bs-outline-secondary) !important;
+            border-color: var(--bs-outline-secondary) !important;
+        }
+        body.dark-mode .back-button-animated:hover {
+            background-color: var(--bs-outline-secondary) !important;
+            color: var(--page-bg) !important; /* Text becomes page background color */
+        }
+
+        /* Bootstrap specific adjustments for dark mode text colors in forms */
+        body.dark-mode .form-text { /* For help text below inputs */
+            color: var(--text-secondary) !important;
+        }
+        body.dark-mode .input-group-text {
+            background-color: var(--input-bg) !important;
+            border-color: var(--input-border) !important;
+            color: var(--text-primary) !important;
+        }
+        body.dark-mode .form-check-label {
+            color: var(--text-primary) !important;
+        }
+    </style>
+{% endblock %}
 
 {% block content %}
+<div class="container my-5">
 
-<div class="container mt-4 mb-5"> 
+    {# Header Section #}
+    <div class="header-section text-center mb-5 p-4 bg-white rounded shadow-sm">
+        <h1 class="display-4 fw-bold text-primary mb-3">
+            <i class="bi bi-briefcase-fill me-3"></i> {% trans "Postuler à l'offre" %}
+        </h1>
+        <p class="lead text-secondary">
+            "{{ offre.titre }}" {% trans "chez" %} <span class="fw-bold">{{ offre.entreprise.nom }}</span>
+        </p>
+    </div>
 
-    
-    <h1 class="mb-4 text-primary text-center"><i class="bi bi-briefcase me-2"></i> Postuler à "{{ offre.titre }}"</h1> 
-
-    
-    <div class="card mx-auto shadow-sm rounded" style="max-width: 600px;">
-    
+    {# Application Form Card #}
+    <div class="card mx-auto shadow-lg rounded-3 application-form-card">
         <div class="card-body p-4">
+            <h2 class="card-title text-center text-primary mb-4">
+                {% trans "Formulaire de candidature" %}
+            </h2>
 
-            <form method="post">
+            <form method="post" enctype="multipart/form-data"> {# Ensure enctype is present if you add file uploads later #}
                 {% csrf_token %}
 
-                
+                {# Render form fields using django-bootstrap5 #}
                 {% bootstrap_form form %}
 
-             
-                <button type="submit" class="btn btn-success w-100 mt-3"><i class="bi bi-send me-2"></i> Postuler</button> 
+                {# Submit Button #}
+                <button type="submit" class="btn btn-success btn-lg w-100 mt-4 rounded-pill apply-btn">
+                    <i class="bi bi-send-fill me-2"></i> {% trans "Soumettre ma candidature" %}
+                </button>
             </form>
-        </div> 
-    </div> 
+        </div>
+    </div>
 
-</div> 
+    {# Back Button #}
+    <p class="mt-5 text-center">
+        <a href="{% url 'offres' %}" class="btn btn-outline-secondary btn-lg rounded-pill back-button-animated">
+            <i class="bi bi-arrow-left-circle me-2"></i> {% trans "Retour à l'offre" %}
+        </a>
+    </p>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+    {% bootstrap_javascript %}
+    <script src="{% static 'Ekandra/js/sombre.js' %}"></script>
+    {# Any specific JS for this form can go here if needed #}
 {% endblock %}

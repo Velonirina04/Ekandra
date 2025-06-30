@@ -1,0 +1,335 @@
+{% extends 'Ekandra/base.html' %}
+{% load static %}
+{% load bootstrap5 %}
+{% load i18n %}
+
+{% block title %}{% trans "Paramètres du Compte" %}{% endblock %}
+
+{% block content %}
+<style>
+    /* --- Light Mode Variables (Defaults) --- */
+    :root {
+        --light-page-bg: #f5f7fa;
+        --light-header-bg-start: #f0f2f5;
+        --light-header-bg-end: #e2e4e8;
+        --light-text-primary: #1e293b;
+        --light-text-secondary: #64748b;
+        --light-card-bg: #ffffff;
+        --light-card-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+        --light-icon-color: #3b82f6; /* Primary blue for icons/accents */
+        --light-link-color: #3b82f6;
+        --light-link-hover-color: #2563eb;
+        --light-border-color: #e2e8f0;
+        --light-heading-color: #1e293b;
+        --light-settings-card-bg: #ffffff;
+        --light-settings-card-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        --light-settings-item-border: #e2e8f0;
+        --light-settings-item-hover-bg: #f0f4f8;
+        --light-settings-icon-color: #64748b;
+        --light-settings-arrow-color: #94a3b8;
+    }
+
+    /* --- Dark Mode Variables (Override) --- */
+    body.dark-mode :root,
+    @media (prefers-color-scheme: dark) {
+        :root {
+            --dark-page-bg: #1a202c;
+            --dark-header-bg-start: #2d3748;
+            --dark-header-bg-end: #1a202c;
+            --dark-text-primary: #f1f5f9;
+            --dark-text-secondary: #a0aec0;
+            --dark-card-bg: #2d3748;
+            --dark-card-shadow: 0 5px 25px rgba(0, 0, 0, 0.5);
+            --dark-icon-color: #4361ee;
+            --dark-link-color: #4361ee;
+            --dark-link-hover-color: #6a8cff;
+            --dark-border-color: #4a5568;
+            --dark-heading-color: #e2e8f0;
+            --dark-settings-card-bg: #2d3748;
+            --dark-settings-card-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+            --dark-settings-item-border: #4a5568;
+            --dark-settings-item-hover-bg: #3c4b60;
+            --dark-settings-icon-color: #a0aec0;
+            --dark-settings-arrow-color: #7b8eab;
+
+            /* Override general variables with dark mode ones */
+            --page-bg: var(--dark-page-bg);
+            --header-bg-start: var(--dark-header-bg-start);
+            --header-bg-end: var(--dark-header-bg-end);
+            --text-primary: var(--dark-text-primary);
+            --text-secondary: var(--dark-text-secondary);
+            --card-bg: var(--dark-card-bg);
+            --card-shadow: var(--dark-card-shadow);
+            --icon-color: var(--dark-icon-color);
+            --link-color: var(--dark-link-color);
+            --link-hover-color: var(--dark-link-hover-color);
+            --border-color: var(--dark-border-color);
+            --heading-color: var(--dark-heading-color);
+            --settings-card-bg: var(--dark-settings-card-bg);
+            --settings-card-shadow: var(--dark-settings-card-shadow);
+            --settings-item-border: var(--dark-settings-item-border);
+            --settings-item-hover-bg: var(--dark-settings-item-hover-bg);
+            --settings-icon-color: var(--dark-settings-icon-color);
+            --settings-arrow-color: var(--dark-settings-arrow-color);
+        }
+    }
+
+    /* Global body transition */
+    body {
+        transition: background-color 0.3s ease, color 0.3s ease;
+        background-color: var(--page-bg);
+        color: var(--text-primary);
+    }
+
+    /* Header Section */
+    .header-section {
+        background: linear-gradient(135deg, var(--header-bg-start) 0%, var(--header-bg-end) 100%);
+        border-radius: 0 0 20px 20px;
+        padding: 4rem 2rem;
+        margin-bottom: 3rem;
+        text-align: center;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        animation: fadeInDown 0.8s ease-out;
+    }
+
+    .header-section h1 {
+        font-size: 3.5rem;
+        font-weight: 700;
+        color: var(--icon-color);
+        margin-bottom: 1rem;
+    }
+
+    .header-section p {
+        font-size: 1.25rem;
+        color: var(--text-secondary);
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    .header-section .bi-gear { /* Changed icon from bi-code-slash */
+        font-size: 3rem;
+        color: var(--icon-color);
+        margin-right: 15px;
+        animation: rotateIn 1s ease-out;
+    }
+
+    @keyframes rotateIn {
+        from { opacity: 0; transform: rotate(0deg); } /* Adjusted rotation for gear icon */
+        to { opacity: 1; transform: rotate(30deg); }
+    }
+    @keyframes fadeInDown {
+        from { opacity: 0; transform: translateY(-30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Settings Card Styling */
+    .settings-card {
+        background-color: var(--settings-card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 15px;
+        box-shadow: var(--settings-card-shadow);
+        padding: 2.5rem;
+        animation: fadeInUp 0.8s ease-out 0.2s both;
+    }
+
+    .settings-card h2 {
+        font-size: 2rem;
+        font-weight: 600;
+        color: var(--heading-color);
+        margin-bottom: 2rem;
+        text-align: center;
+    }
+
+    .settings-list .list-group-item {
+        background-color: transparent; /* Inherit from card or define explicitly */
+        border: none;
+        border-bottom: 1px solid var(--settings-item-border);
+        padding: 1rem 0;
+        transition: background-color 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        color: var(--text-primary);
+        font-size: 1.1rem;
+    }
+
+    .settings-list .list-group-item:last-child {
+        border-bottom: none;
+    }
+
+    .settings-list .list-group-item:hover {
+        background-color: var(--settings-item-hover-bg);
+        border-radius: 5px; /* Slight round on hover */
+        cursor: pointer;
+    }
+
+    .settings-list .list-group-item a {
+        text-decoration: none;
+        color: inherit; /* Inherit color from parent */
+        display: flex;
+        align-items: center;
+        flex-grow: 1; /* Allow link to take full width */
+    }
+
+    .settings-list .list-group-item .setting-icon {
+        font-size: 1.5rem;
+        color: var(--settings-icon-color);
+        margin-right: 1rem;
+        min-width: 30px; /* Ensure icons align */
+        text-align: center;
+    }
+
+    .settings-list .list-group-item .setting-text {
+        flex-grow: 1;
+    }
+
+    .settings-list .list-group-item .bi-chevron-right {
+        font-size: 1.2rem;
+        color: var(--settings-arrow-color);
+        margin-left: 1rem;
+        transition: transform 0.2s ease;
+    }
+
+    .settings-list .list-group-item:hover .bi-chevron-right {
+        transform: translateX(5px);
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .header-section h1 {
+            font-size: 2.5rem;
+        }
+        .header-section p {
+            font-size: 1rem;
+        }
+        .settings-card {
+            padding: 1.5rem;
+        }
+        .settings-card h2 {
+            font-size: 1.7rem;
+            margin-bottom: 1.5rem;
+        }
+        .settings-list .list-group-item {
+            font-size: 1rem;
+            padding: 0.8rem 0;
+        }
+        .settings-list .list-group-item .setting-icon {
+            font-size: 1.3rem;
+            margin-right: 0.8rem;
+        }
+        .settings-list .list-group-item .bi-chevron-right {
+            font-size: 1rem;
+        }
+    }
+</style>
+
+<div class="container my-5">
+    {# Header Section #}
+    <div class="header-section">
+        <h1 class="mb-3">
+            <i class="bi bi-gear me-3"></i>{% trans "Paramètres du Compte" %}
+        </h1>
+        <p class="lead">
+            {% blocktrans %}Gérez vos informations personnelles, votre sécurité et vos préférences.{% endblocktrans %}
+        </p>
+    </div>
+
+    {# Settings Card #}
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-7">
+            <div class="settings-card p-4">
+                <h2>{% trans "Mes Paramètres" %}</h2>
+
+                <ul class="list-group list-group-flush settings-list">
+                    {# Option: Modifier le profil #}
+                    <li class="list-group-item">
+                        {# Remplacez 'edit_profile' par le nom de votre URL Django pour l'édition de profil #}
+                        <a href="{% url 'profile' %}">
+                            <span class="setting-icon"><i class="bi bi-person-fill"></i></span>
+                            <span class="setting-text">{% trans "Modifier le profil" %}</span>
+                            <i class="bi bi-chevron-right"></i>
+                        </a>
+                    </li>
+
+                    {# Option: Changer le mot de passe #}
+                    <li class="list-group-item">
+                        {# Remplacez 'password_change' par le nom de votre URL Django pour le changement de mot de passe #}
+                        {# Django fournit des vues de changement de mot de passe prêtes à l'emploi que vous pouvez intégrer #}
+                        {% comment %} <a href="{% url 'password_change' %}"> {% endcomment %}
+                        <a href="#">
+                            <span class="setting-icon"><i class="bi bi-lock-fill"></i></span>
+                            <span class="setting-text">{% trans "Changer le mot de passe" %}</span>
+                            <i class="bi bi-chevron-right"></i>
+                        </a>
+                    </li>
+
+                    {# Option: Changer l'adresse email #}
+                    <li class="list-group-item">
+                        {# Si vous avez une vue spécifique pour changer l'email, mettez son URL ici #}
+                        {# Sinon, cela pourrait être une partie de 'edit_profile' ou nécessiter une nouvelle vue #}
+                        {% comment %} <a href="{% url 'change_email' %}"> {# Exemple: 'change_email' #} {% endcomment %}
+                        <a href="#"> {# Exemple: 'change_email' #}
+                            <span class="setting-icon"><i class="bi bi-envelope-fill"></i></span>
+                            <span class="setting-text">{% trans "Changer l'adresse email" %}</span>
+                            <i class="bi bi-chevron-right"></i>
+                        </a>
+                    </li>
+
+                    {# Option: Préférences de notification #}
+                    <li class="list-group-item">
+                        {# Créez une vue et une URL pour la gestion des notifications si nécessaire #}
+                        {% comment %} <a href="{% url 'notification_preferences' %}"> {# Exemple: 'notification_preferences' #} {% endcomment %}
+                        <a href="#"> {# Exemple: 'notification_preferences' #}
+                            <span class="setting-icon"><i class="bi bi-bell-fill"></i></span>
+                            <span class="setting-text">{% trans "Préférences de notification" %}</span>
+                            <i class="bi bi-chevron-right"></i>
+                        </a>
+                    </li>
+
+                    {# Option: Thème (Light/Dark Mode) - Si vous n'avez pas de bouton global #}
+                    <li class="list-group-item">
+                        <a href="#" id="theme-toggle-settings"> {# Ceci est un exemple si vous voulez un bouton ici #}
+                            <span class="setting-icon"><i class="bi bi-moon-fill"></i></span>
+                            <span class="setting-text">{% trans "Thème (Clair / Sombre)" %}</span>
+                            <i class="bi bi-chevron-right"></i>
+                        </a>
+                    </li>
+
+                    {# Ajoutez d'autres options si nécessaire #}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'Ekandra/css/create_offre.css' %}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+{% endblock %}
+
+{% block extra_js %}
+    {% bootstrap_javascript %}
+    <script src="{% static 'Ekandra/js/sombre.js' %}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const themeToggleSettings = document.getElementById('theme-toggle-settings');
+            if (themeToggleSettings) {
+                themeToggleSettings.addEventListener('click', function(e) {
+                    e.preventDefault(); // Empêche le lien de naviguer
+                    document.body.classList.toggle('dark-mode');
+                    // Stocke la préférence de l'utilisateur
+                    if (document.body.classList.contains('dark-mode')) {
+                        localStorage.setItem('theme', 'dark');
+                    } else {
+                        localStorage.setItem('theme', 'light');
+                    }
+                });
+            }
+        });
+    </script>
+{% endblock %} 

@@ -1,0 +1,126 @@
+/* General Body & Background */
+body {
+    background-color: #f0f2f5; /* Light, inviting background */
+    font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    line-height: 1.6;
+    color: #333;
+}
+
+/* Auth Page Wrapper for Vertical Centering */
+.auth-page-wrapper {
+    min-height: 100vh; /* Takes full viewport height */
+    padding: 2rem 0; /* Ensures padding on smaller screens */
+}
+
+/* Authentication Card Styling */
+.auth-card {
+    border: none;
+    border-radius: 1.5rem; /* More rounded corners */
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1); /* Deeper, softer shadow */
+    width: 100%; /* Ensure it's responsive */
+    max-width: 550px; /* Optimal max-width for forms */
+    overflow: hidden; /* Ensures corners clip content */
+}
+
+.auth-card .card-body {
+    padding: 3rem; /* More internal padding for a spacious feel */
+}
+
+/* Header within Card */
+.auth-card h1 {
+    color: #007bff; /* Primary brand color */
+    font-size: 2.5rem; /* Larger heading */
+    letter-spacing: -0.03em;
+}
+
+.auth-card .lead-sm {
+    font-size: 1rem;
+    color: #666;
+}
+
+/* Form Labels */
+.form-label {
+    font-weight: 600; /* Bolder labels */
+    color: #495057; /* Slightly darker than default text-secondary */
+    margin-bottom: 0.5rem;
+}
+
+/* Form Controls (Inputs, Selects, Textareas) */
+.form-control, .form-select {
+    border-radius: 0.75rem; /* More rounded inputs */
+    padding: 0.85rem 1.2rem; /* More padding inside */
+    font-size: 1rem;
+    border: 1px solid #ced4da;
+    transition: all 0.2s ease-in-out;
+}
+
+.form-control-lg, .form-select-lg { /* Apply to elements with .form-control-lg or .form-select-lg */
+    padding: 1rem 1.5rem; /* Even more padding for larger fields */
+    font-size: 1.1rem;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.25rem rgba(0, 123, 255, 0.25);
+    background-color: #f8fcff; /* Very subtle background on focus */
+}
+
+/* Help Text */
+.form-text {
+    font-size: 0.85rem;
+    color: #6c757d;
+    margin-top: 0.4rem;
+}
+
+/* Error Messages */
+.is-invalid + .invalid-feedback,
+.invalid-feedback {
+    color: #dc3545;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+    font-weight: 500;
+    display: block; /* Ensure visibility */
+}
+
+/* Submit Button */
+.register-btn {
+    background-color: #007bff;
+    border-color: #007bff;
+    padding: 0.9rem 1.5rem; /* Generous padding */
+    font-size: 1.25rem; /* Larger text */
+    font-weight: bold;
+    border-radius: 0.75rem;
+    transition: all 0.3s ease;
+    letter-spacing: 0.05em;
+    box-shadow: 0 5px 15px rgba(0, 123, 255, 0.2); /* Subtle initial shadow */
+}
+
+.register-btn:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+    transform: translateY(-2px); /* Lift effect */
+    box-shadow: 0 8px 20px rgba(0, 123, 255, 0.35); /* Enhanced shadow on hover */
+}
+
+.register-btn i {
+    vertical-align: middle;
+}
+
+/* Link Styling (for "Already have an account?") */
+.hover-underline:hover {
+    text-decoration: underline !important; /* Ensure underline on hover */
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .auth-card .card-body {
+        padding: 2.5rem; /* Slightly less padding on smaller screens */
+    }
+    .auth-card h1 {
+        font-size: 2rem;
+    }
+    .register-btn {
+        font-size: 1.1rem;
+        padding: 0.7rem 1.2rem;
+    }
+}

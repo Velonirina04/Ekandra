@@ -1,0 +1,326 @@
+{% extends 'Ekandra/base.html' %}
+{% load static %}
+{% load bootstrap5 %}
+{% load i18n %}
+
+{% block title %}{% trans "À Propos de Nous" %}{% endblock %}
+
+{% block content %}
+<style>
+    /* --- Light Mode Variables (Default) --- */
+    :root {
+        --light-page-bg: #f5f7fa;
+        --light-header-bg-start: #f0f2f5;
+        --light-header-bg-end: #e2e4e8;
+        --light-text-primary: #1e293b;
+        --light-text-secondary: #64748b;
+        --light-card-bg: #ffffff;
+        --light-card-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+        --light-icon-color: #3b82f6; /* Primary blue for icons */
+        --light-link-color: #3b82f6;
+        --light-link-hover-color: #2563eb;
+        --light-border-color: #e2e8f0;
+        --light-heading-color: #1e293b;
+
+        /* Apply light mode variables by default */
+        --page-bg: var(--light-page-bg);
+        --header-bg-start: var(--light-header-bg-start);
+        --header-bg-end: var(--light-header-bg-end);
+        --text-primary: var(--light-text-primary);
+        --text-secondary: var(--light-text-secondary);
+        --card-bg: var(--light-card-bg);
+        --card-shadow: var(--light-card-shadow);
+        --icon-color: var(--light-icon-color);
+        --link-color: var(--light-link-color);
+        --link-hover-color: var(--light-link-hover-color);
+        --border-color: var(--light-border-color);
+        --heading-color: var(--light-heading-color);
+    }
+
+    /* --- Dark Mode Variables (Override for body.dark-mode and system preference) --- */
+    body.dark-mode :root, /* For JS toggle */
+    @media (prefers-color-scheme: dark) { /* For system preference */
+        :root {
+            --dark-page-bg: #1a202c;
+            --dark-header-bg-start: #2d3748;
+            --dark-header-bg-end: #1a202c;
+            --dark-text-primary: #f1f5f9;
+            --dark-text-secondary: #a0aec0;
+            --dark-card-bg: #2d3748;
+            --dark-card-shadow: 0 5px 25px rgba(0, 0, 0, 0.5);
+            --dark-icon-color: #4361ee; /* Vibrant blue for dark mode icons */
+            --dark-link-color: #4361ee;
+            --dark-link-hover-color: #6a8cff;
+            --dark-border-color: #4a5568;
+            --dark-heading-color: #e2e8f0;
+
+            /* Override general variables with dark mode ones */
+            --page-bg: var(--dark-page-bg);
+            --header-bg-start: var(--dark-header-bg-start);
+            --header-bg-end: var(--dark-header-bg-end);
+            --text-primary: var(--dark-text-primary);
+            --text-secondary: var(--dark-text-secondary);
+            --card-bg: var(--dark-card-bg);
+            --card-shadow: var(--dark-card-shadow);
+            --icon-color: var(--dark-icon-color);
+            --link-color: var(--dark-link-color);
+            --link-hover-color: var(--dark-link-hover-color);
+            --border-color: var(--dark-border-color);
+            --heading-color: var(--dark-heading-color);
+        }
+    }
+
+    /* Global body transition for smooth mode change */
+    body {
+        transition: background-color 0.3s ease, color 0.3s ease;
+        background-color: var(--page-bg);
+        color: var(--text-primary);
+    }
+
+    /* Header Section */
+    .header-section {
+        background: linear-gradient(135deg, var(--header-bg-start) 0%, var(--header-bg-end) 100%);
+        border-radius: 0 0 20px 20px;
+        padding: 4rem 2rem;
+        margin-bottom: 3rem;
+        text-align: center;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        animation: fadeInDown 0.8s ease-out;
+        color: var(--heading-color); /* Ensure header text uses heading color */
+    }
+
+    .header-section h1 {
+        font-size: 3.5rem;
+        font-weight: 700;
+        color: var(--icon-color); /* Use icon color for main title */
+        margin-bottom: 1rem;
+    }
+
+    .header-section p {
+        font-size: 1.25rem;
+        color: var(--text-secondary);
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    .header-section .bi-info-circle-fill {
+        font-size: 3rem;
+        color: var(--icon-color);
+        margin-right: 15px;
+        animation: rotateIn 1s ease-out;
+    }
+
+    /* Content Cards */
+    .about-card {
+        background-color: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 15px;
+        box-shadow: var(--card-shadow);
+        padding: 2.5rem;
+        margin-bottom: 2rem;
+        transition: all 0.3s ease;
+        animation: fadeInUp 0.8s ease-out 0.2s both;
+    }
+
+    .about-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--card-shadow); /* Keep consistent shadow on hover */
+    }
+
+    .about-card h2 {
+        font-size: 2rem;
+        font-weight: 600;
+        color: var(--heading-color);
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+    }
+
+    .about-card h2 .bi {
+        font-size: 2.2rem;
+        color: var(--icon-color);
+        margin-right: 15px;
+    }
+
+    .about-card p {
+        font-size: 1.1rem;
+        line-height: 1.7;
+        color: var(--text-primary);
+    }
+
+    .about-card ul {
+        list-style: none;
+        padding-left: 0;
+        margin-top: 1.5rem;
+    }
+
+    .about-card ul li {
+        font-size: 1rem;
+        color: var(--text-primary);
+        margin-bottom: 0.8rem;
+        display: flex;
+        align-items: flex-start;
+    }
+
+    .about-card ul li .bi {
+        color: var(--icon-color);
+        margin-right: 10px;
+        font-size: 1.2rem;
+        line-height: 1.5rem;
+    }
+
+    /* Animations */
+    @keyframes fadeInDown {
+        from { opacity: 0; transform: translateY(-30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes rotateIn {
+        from { opacity: 0; transform: rotate(-90deg); }
+        to { opacity: 1; transform: rotate(0deg); }
+    }
+
+    /* Specific animation delays for cards */
+    .about-card:nth-child(1) { animation-delay: 0.3s; }
+    .about-card:nth-child(2) { animation-delay: 0.5s; }
+    .about-card:nth-child(3) { animation-delay: 0.7s; }
+
+    /* Footer / Call to Action */
+    .cta-section {
+        text-align: center;
+        padding: 3rem 0;
+        background-color: var(--card-bg);
+        border-radius: 15px;
+        margin-top: 2rem;
+        box-shadow: var(--card-shadow);
+        animation: fadeInUp 0.8s ease-out 0.9s both;
+    }
+    .cta-section h3 {
+        color: var(--heading-color);
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+    }
+    .cta-section .btn {
+        font-size: 1.1rem;
+        padding: 12px 30px;
+        border-radius: 50px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        background-color: var(--icon-color); /* Use icon color as primary button color */
+        border-color: var(--icon-color);
+        color: white;
+    }
+    .cta-section .btn:hover {
+        filter: brightness(1.1);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2); /* Adjust shadow for button */
+    }
+    body.dark-mode .cta-section .btn:hover {
+        box-shadow: 0 5px 15px rgba(var(--dark-bs-primary-rgb, 67, 97, 238), 0.4);
+    }
+
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .header-section h1 {
+            font-size: 2.5rem;
+        }
+        .header-section p {
+            font-size: 1rem;
+        }
+        .about-card {
+            padding: 1.5rem;
+        }
+        .about-card h2 {
+            font-size: 1.6rem;
+        }
+        .about-card h2 .bi {
+            font-size: 1.8rem;
+        }
+    }
+</style>
+
+<div class="container my-5">
+    {# Header Section #}
+    <div class="header-section">
+        <h1 class="mb-3">
+            <i class="bi bi-info-circle-fill me-3"></i>{% trans "À Propos de Nous" %}
+        </h1>
+        <p class="lead">
+            {% trans "Découvrez notre mission, notre vision et les valeurs qui nous animent dans la connexion des opportunités et des talents à Madagascar." %}
+        </p>
+    </div>
+
+    {# Mission Card #}
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="about-card">
+                <h2><i class="bi bi-rocket-fill"></i> {% trans "Notre Mission" %}</h2>
+                <p>
+                    {% blocktrans %}Notre mission est de transformer le marché de l'emploi à Madagascar en créant une plateforme intuitive et performante. Nous visons à connecter efficacement les entreprises à la recherche de talents avec les professionnels qualifiés et les jeunes diplômés en quête d'opportunités significatives. Nous nous engageons à faciliter le développement économique et professionnel de chacun.{% endblocktrans %}
+                </p>
+            </div>
+        </div>
+    </div>
+
+    {# Vision Card #}
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="about-card">
+                <h2><i class="bi bi-eye-fill"></i> {% trans "Notre Vision" %}</h2>
+                <p>
+                    {% blocktrans %}Nous aspirons à être la référence incontournable pour l'emploi à Madagascar, reconnue pour notre innovation, notre fiabilité et notre impact positif sur la société. Nous imaginons un avenir où chaque talent trouve sa place et où chaque entreprise prospère grâce aux bonnes compétences.{% endblocktrans %}
+                </p>
+            </div>
+        </div>
+    </div>
+
+    {# Values Card #}
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="about-card">
+                <h2><i class="bi bi-award-fill"></i> {% trans "Nos Valeurs" %}</h2>
+                <ul>
+                    <li><i class="bi bi-check-circle-fill"></i> <strong>{% trans "Innovation:" %}</strong> {% trans "Nous sommes constamment à la recherche de nouvelles solutions pour améliorer l'expérience utilisateur et l'efficacité de notre plateforme." %}</li>
+                    <li><i class="bi bi-check-circle-fill"></i> <strong>{% trans "Transparence:" %}</strong> {% trans "Nous croyons en une communication honnête et ouverte avec nos utilisateurs et partenaires." %}</li>
+                    <li><i class="bi bi-check-circle-fill"></i> <strong>{% trans "Engagement:" %}</strong> {% trans "Nous nous engageons pour la réussite de nos utilisateurs, qu'ils soient chercheurs d'emploi ou recruteurs." %}</li>
+                    <li><i class="bi bi-check-circle-fill"></i> <strong>{% trans "Intégrité:" %}</strong> {% trans "Nous agissons avec éthique et professionnalisme dans toutes nos interactions." %}</li>
+                    <li><i class="bi bi-check-circle-fill"></i> <strong>{% trans "Impact Social:" %}</strong> {% trans "Nous mesurons notre succès par l'impact positif que nous avons sur l'emploi et le développement à Madagascar." %}</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    {# Call to Action Section #}
+    <div class="cta-section">
+        <h3>{% trans "Prêt à en savoir plus ou à nous rejoindre ?" %}</h3>
+        <p>
+            {% comment %} <a href="{% url 'contact' %}" class="btn btn-primary"> {% endcomment %}
+            <a href="{% url 'contact' %}" class="btn btn-primary">
+                <i class="bi bi-envelope-fill me-2"></i> {% trans "Contactez-nous" %}
+            </a>
+            {# You might want another link here, e.g., to sign up or view jobs #}
+            {# <a href="{% url 'jobs_list' %}" class="btn btn-outline-primary ms-3">Voir les offres</a> #}
+        </p>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block extra_css %}
+    {# You can remove this if `create_offre.css` doesn't contain any truly global styles #}
+    {# If it does, keep it. This block is for any external CSS files. #}
+    <link rel="stylesheet" href="{% static 'Ekandra/css/create_offre.css' %}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+{% endblock %}
+
+{% block extra_js %}
+    {% bootstrap_javascript %}
+    <script src="{% static 'Ekandra/js/sombre.js' %}"></script>
+    {# Any page-specific JS can go here #}
+{% endblock %}

@@ -2,7 +2,7 @@
 
 import json
 from asgiref.sync import async_to_sync
-from channels.generic.websocket import WebsocketConsumer
+from channels.generic.websocket import WebsocketConsumer, AsyncWebsocketConsumer
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from .models import Message # Import your Message model
@@ -89,3 +89,40 @@ class ChatConsumer(WebsocketConsumer):
             'sender_username': sender_username,
             'timestamp': timestamp
         }))
+# ~/Desktop/project/ekandra/Ekandra/consumers.py
+
+
+
+class MessageListConsumer(AsyncWebsocketConsumer): # <--- This class must exist and be named correctly
+    async def connect(self):
+        # You might want to add users to a group here for general message list updates
+        # e.g., self.room_group_name = 'messages_list_updates'
+        # await self.channel_layer.group_add(
+        #     self.room_group_name,
+        #     self.channel_name
+        # )
+        await self.accept()
+        print(f"WebSocket connected: {self.scope['url_route']['kwargs']}")
+
+    async def disconnect(self, close_code):
+        # Leave room group
+        # await self.channel_layer.group_discard(
+        #     self.room_group_name,
+        #     self.channel_name
+        # )
+        print(f"WebSocket disconnected: {close_code}")
+
+    async def receive(self, text_data):
+        text_data_json = json.loads(text_data)
+        message = text_data_json["message"]
+
+        print(f"Received message: {message}")
+
+        await self.send(text_data=json.dumps({"message": message}))
+
+    # Add methods to receive messages from the channel layer if you're sending updates
+    # async def your_custom_event(self, event):
+    #     message = event['message']
+    #     await self.send(text_data=json.dumps({
+    #         'message': message
+    #     }))
