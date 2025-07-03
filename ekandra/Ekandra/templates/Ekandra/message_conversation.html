@@ -26,13 +26,13 @@
 
     <div id="chat-log" class="chat-log-area">
         {% for message in messages %}
-            <div class="message-item {% if message.expediteur == request.user %}message-sent{% else %}message-received{% endif %}">
-                <div class="message-bubble">
-                    {{ message.contenu }}
-                </div>
-                <div class="message-meta">
-                    <span class="message-sender">{{ message.expediteur.username }}</span>
-                    <span class="message-timestamp">{{ message.date_envoi|date:"H:i" }}</span>
+            <div class="d-flex {% if message.expediteur == request.user %}justify-content-end{% else %}justify-content-start{% endif %}">
+                <div class="message-item {% if message.expediteur == request.user %}message-sent{% else %}message-received{% endif %}">
+                    <div class="message-bubble">{{ message.contenu }}</div>
+                    <div class="message-meta">
+                        <span class="message-sender">{{ message.expediteur.username }}</span>
+                        <span class="message-timestamp">{{ message.date_envoi|date:"H:i" }}</span>
+                    </div>
                 </div>
             </div>
         {% empty %}
@@ -67,7 +67,7 @@
         const recipientId = {{ destinataire.id }};
         const wsProtocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
         const chatSocket = new WebSocket(
-            wsProtocol + window.location.host +
+            wsProtocol + 'localhost:8082' +
             '/ws/chat/' + recipientId + '/'
         );
 
@@ -91,6 +91,16 @@
             const timestamp = data['timestamp'];
             const chatLog = document.querySelector('#chat-log');
             const currentUser = "{{ request.user.username }}";
+
+            /*
+                <div 
+                    class="d-flex 
+                    {% if message.expediteur == request.user %}justify-content-end
+                    {% else %}justify-content-start{% endif %}">
+                </div>
+            */
+            const messageContainer = document.createElement('div');
+            messageContainer.classList.add('d-flex');
 
             const messageItem = document.createElement('div');
             messageItem.classList.add('message-item');
@@ -117,14 +127,18 @@
             // Set CSS class based on sender
             if (senderUsername === currentUser) {
                 messageItem.classList.add('message-sent');
+                messageContainer.classList.add('justify-content-end');
+
             } else {
                 messageItem.classList.add('message-received');
+                messageContainer.classList.add('justify-content-start');
             }
 
             messageItem.appendChild(messageBubble);
             messageItem.appendChild(messageMeta);
-
-            chatLog.appendChild(messageItem);
+            messageContainer.appendChild(messageItem)
+            
+            chatLog.appendChild(messageContainer);
             chatLog.scrollTop = chatLog.scrollHeight; // Scroll to bottom
         };
 
